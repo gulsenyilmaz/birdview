@@ -1,0 +1,122 @@
+.filter_list_panel_container {
+  position: relative;
+  width: 22vw;
+  /* max-height: 50vh; */
+  background-color: rgb(254, 255, 254);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.261);
+
+  align-items: center;
+  justify-content: top;  
+  padding: 0rem;
+  z-index: 1;
+ 
+  box-sizing: border-box;
+}
+
+.filter_list_panel {
+  /* position: absolute; */
+  box-sizing: border-box;
+  background-color: rgba(41, 178, 121, 0);
+  align-items: center;
+  justify-content: top;  
+  padding: 0rem;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  
+  gap: 0.5rem;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #0f0f0f9a;
+}
+
+.search-bar {
+  border: 0px solid #2c2b2b;
+  border-bottom: 1px solid #c1c1c1;
+  border-radius: 0px;
+  width: 100%;
+  font-size: 1rem;
+  background-color: #ffffff00;
+  box-sizing: border-box;
+  color: #0f0f0f9a;
+  padding: 1rem 0.5rem;
+}
+.search-bar:focus {
+  outline: none;
+}
+.search-bar:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+.search-results {
+  background-color: #c1171700;
+  /* border-bottom: 1px solid #ddd; */
+  border-radius: 6px;
+  padding: 0rem;
+  width: 100%;
+  overflow-y: auto;
+  max-height: 50vh;
+  
+  
+}
+
+.search-results h4 {
+  margin-bottom: 0rem;
+  margin-top: 0rem;
+  /* font-size: 0.95rem; */
+}
+
+.search-results ul {
+  list-style: none;
+  padding-left: 0.5rem;
+  margin: 0;
+}
+
+.search-results li {
+  padding: 0.25rem 0;
+  cursor: pointer;
+}
+
+.search-results li:hover {
+  background-color: #f0f0f0;
+}
+
+.category-list {
+ 
+  width: 100%;
+  
+  padding: 0rem;
+  background: #b81212d9;
+  box-sizing: border-box;
+  overflow: auto;
+  max-height: 50vh;
+
+}
+.category-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0 0;
+  width: 100%;
+  background: #ffffff;
+  border: 0px solid #ccc;
+  border-radius: 0px;
+}
+
+.category-list li {
+  padding: 0.5rem 0.6rem;
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.category-list li:last-child {
+  border-bottom: none;
+}
+
+.category-list li:hover {
+  background-color: #efefef;
+}
+
+.category-list li.selected {
+  background-color: #dcdcdc;
+  font-weight: bold;
+}

@@ -1,0 +1,112 @@
+.person-details-container {
+  width: 100%;
+  padding: 1rem;
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+  background-color: rgb(48, 49, 48);;
+  border-top: 1px solid #444;
+  box-sizing: border-box;
+}
+
+.person-details-container img.portrait {
+  box-sizing: border-box;
+  width: 100%;
+  height: auto; 
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: block;
+  background-color: #ffffff;
+}
+
+
+
+.person-details {
+  width: 100%;
+  padding: 1rem;
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+  background-color: rgb(48, 49, 48);;
+  border-top: 1px solid #444;
+  box-sizing: border-box;
+}
+
+.tab-buttons {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #6d6d6d;
+}
+
+.tab-buttons button {
+  margin-right: 0rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-radius: 1px;
+  background-color: transparent;
+  
+  cursor: pointer;
+}
+
+.tab-buttons button.active {
+  background-color: rgba(182, 72, 72, 0.869);;
+  color: white;
+  border-bottom: 1px solid #ccc;
+  /* border-color: #222; */
+}
+
+.person-details p {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.person-details h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #ccc;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.3rem;
+}
+
+.person-details ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.person-details li {
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.person-details li strong {
+  color: #89dceb;
+  margin-right: 0.4rem;
+}
+.person-details li bp {
+  color: #27AE60;
+  font-size: 0.8rem;
+  margin-right: 0.4rem;
+}
+.person-details li dp {
+  color: #C0392B;
+  font-size: 0.8rem;
+  margin-right: 0.4rem;
+}
+.person-details li ea {
+  color: #9B59B6;
+  font-size: 0.8rem;
+  margin-right: 0.4rem;
+}
+.person-details li re {
+  color: #3498DB;
+  font-size: 0.8rem;
+  margin-right: 0.4rem;
+}
+.person-details li wl {
+  color: #F39C12;
+  font-size:0.8rem;
+  margin-right: 0.4rem;
+}
+
