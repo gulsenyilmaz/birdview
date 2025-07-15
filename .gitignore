@@ -25,4 +25,8 @@ dist-ssr
 
 
 backend/venv/
-backend/birdview.db
+
+
+.env
+*.db
+__pycache__/

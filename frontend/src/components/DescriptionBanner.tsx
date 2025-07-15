@@ -1,10 +1,8 @@
-import React, { useState, useEffect} from 'react';
+
 
 import './DescriptionBanner.css';
 // import "react-widgets/styles.css";
 import type { Movement } from '../entities/Movement';
-import type { Human } from "../entities/Human";
-import type { Location } from "../entities/Location";
 import type { Nationality } from "../entities/Nationality";
 import type { Gender } from "../entities/Gender";
 import type { Occupation } from "../entities/Occupation";

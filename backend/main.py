@@ -5,11 +5,9 @@ import sqlite3
 from collections import Counter
 from fastapi.responses import JSONResponse
 
-from collections import defaultdict
 import os
 
 app = FastAPI()
-
 
 
 

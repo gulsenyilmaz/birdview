@@ -1,5 +1,5 @@
 // src/components/MapScene.tsx
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { FlyToInterpolator } from '@deck.gl/core';
 import { DeckGL } from "@deck.gl/react";
 import { Map } from "react-map-gl";

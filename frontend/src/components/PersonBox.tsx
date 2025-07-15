@@ -31,7 +31,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations}) => {
 
     const renderLocationList = (
         locations: Location[] | undefined,
-        label: string,
+        
         action: string
         ) => {
         if (!locations || locations.length === 0) return null;
@@ -142,17 +142,17 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations}) => {
 
                         {selectedTab === "cv" && (
                         <div className="cv_content">
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "birth_place"), "Birth Place", "was born here")}
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "educated_at"), "Education", "was educated here")}
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "residence"),"Residence", "lived here")}
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "work_location"),"Work", "worked here")}
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "death_place"),"Death", "passed away here")}
+                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "birth_place"),  "was born here")}
+                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "educated_at"), "was educated here")}
+                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "residence"), "lived here")}
+                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "work_location"), "worked here")}
+                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "death_place"), "passed away here")}
                         </div>
                     )}
 
                     {selectedTab === "museums" && (
                     <div className="museum_content">
-                        {renderLocationList(museums, "Museums", "has works here")}
+                        {renderLocationList(museums, "has works here")}
                     </div>
                     )}
                 </div>
