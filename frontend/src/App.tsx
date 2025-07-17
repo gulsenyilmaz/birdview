@@ -192,7 +192,10 @@ function App() {
             />
 
             <FilterList
-
+                selectedOccupation = {selectedOccupation}
+                selectedGender  = {selectedGender}
+                selectedNationality = {selectedNationality}
+                selectedMovement = {selectedMovement}
                 setSelectedOccupation= {setSelectedOccupation}
                 setSelectedGender = {setSelectedGender}
                 setSelectedNationality= {setSelectedNationality}

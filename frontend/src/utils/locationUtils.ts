@@ -57,4 +57,14 @@ export function offsetFibonacciPosition(lon:number, lat:number, index:number,  z
 }
 
 
+export function offsetCircularPosition(lon:number, lat:number, index:number, totalAtThisPoint = 100) {
+  const angle = (index / totalAtThisPoint) * 2 * Math.PI;  // Daire çevresine yay
+  const radius = Math.min(0.5, 0.1 + 0.3 / Math.sqrt(totalAtThisPoint));  // Daha az yoğun olan bölgelerde daha geniş dağılır
 
+  const spreadFactor = 0.1;  // İsteğe bağlı artırabilirsin
+
+  const newLon = lon + radius * spreadFactor * Math.cos(angle);
+  const newLat = lat + radius * spreadFactor * Math.sin(angle);
+
+  return [newLon, newLat];
+}

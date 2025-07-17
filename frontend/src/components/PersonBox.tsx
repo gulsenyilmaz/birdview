@@ -40,9 +40,8 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations}) => {
             <ul>
                 {locations.map((loc, idx) => (
                     <li key={idx}>
-                    {loc.start_date} - 
-                    {loc.end_date }
-                    {loc.name} — <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
+                    {loc.start_date} 
+                    {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} — <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
   {action}
 </em>
                     </li>
@@ -104,13 +103,13 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations}) => {
     <>
         {personDetails && (
             <div className="person-details-container ">
-                {(personDetails.img_url || fallbackImage) && (
+                {(personDetails.img_url || fallbackImage) ? (
                     <img
                         src={personDetails.img_url || fallbackImage!}
                         alt="portrait"
                         className="portrait"
                     />
-                )}
+                ) : (<p>IMAGE NOT AVAILABLE</p>)}
                 {personDetails.signature_url && (
                     <img
                         src={personDetails.signature_url}
