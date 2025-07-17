@@ -50,13 +50,15 @@ const WorkList: React.FC<WorkListProps> = ({person, selectedYear, backendUrl, se
         { filteredWorks.map((a) =>
               a.title ? (
                 <div key={a.id} className="timeline-item">
-                  <img
-                    src={a.image_url}
-                    alt={a.title}
-                    className="timeline-item-img"
-                    onClick={() => openImageModal(a.image_url)}
-                    style={{ cursor: "pointer" }}
-                  />
+                  {a.image_url ? ( 
+                    <img
+                      src={a.image_url}
+                      alt={a.title}
+                      className="timeline-item-img"
+                      onClick={() => openImageModal(a.image_url)}
+                      style={{ cursor: "pointer" }}
+                      />
+                      ) : <p>Image not available</p>}
                   <a href={a.url} target="_blank" rel="noreferrer" className="timeline-item-title">
                     <strong>{a.title}</strong>
                   </a>
@@ -82,3 +84,5 @@ const WorkList: React.FC<WorkListProps> = ({person, selectedYear, backendUrl, se
 };
 
 export default WorkList;
+
+

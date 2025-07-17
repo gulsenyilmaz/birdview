@@ -105,7 +105,7 @@ def get_humans(
         params.append(human_id)
 
     base_query += " ORDER BY h.birth_date ASC"
-    print(base_query)
+   
     results = cur.execute(base_query, params).fetchall()
     conn.close()
 
@@ -158,23 +158,8 @@ def get_person_details(human_id: int):
         WHERE hl.human_id = ?
     """, (human_id,))
 
-    # locs = defaultdict(list)
-
     locs =  [dict(row) for row in cur.fetchall()]
-    # locs = [row["name"] for row in cur.fetchall()] 
-    # for id, name, relationship_type_name, start, end, lat, lon, qid in cur.fetchall():
-    #     locs[relationship_type_name].append({
-    #         "id": id,
-    #         "name": name,
-    #         "start_date": start,
-    #         "end_date": end,
-    #         "relationship_type_name": relationship_type_name,
-    #         "entity_type": "location",
-    #         "lat": lat,
-    #         "lon": lon,
-    #         "qid" : qid
-    #     })        
-
+      
     cur.execute("""
         SELECT o.name AS name
         FROM human_occupation AS ho
@@ -231,48 +216,131 @@ def get_location_details(location_id: int):
     }) 
 
 @app.get("/movements")
-def get_movements():
+def get_movements(request: Request):
+    qp = request.query_params
+
+    occupation_id = qp.get("occupation_id")
+    gender_id = qp.get("gender_id")
+    nationality_id = qp.get("nationality_id")
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    query = """
+    base_query = """
         SELECT 
            m.id, m.name, COUNT(hm.human_id) AS count
         FROM human_movement hm
         INNER JOIN movements m ON hm.movement_id = m.id
+    """
+
+    params = []
+    conditions = []
+
+    if occupation_id:
+        conditions.append("""
+            hm.human_id IN (
+                SELECT human_id FROM human_occupation WHERE occupation_id = ?
+            )
+        """)
+        params.append(occupation_id)
+
+    if gender_id:
+        conditions.append("""
+            hm.human_id IN (
+                SELECT id FROM humans WHERE gender_id = ?
+            )
+        """)
+        params.append(gender_id)
+
+    if nationality_id:
+        conditions.append("""
+            hm.human_id IN (
+                SELECT id FROM humans WHERE nationality_id = ?
+            )
+        """)
+        params.append(nationality_id)
+
+   
+    if conditions:
+        base_query += f" WHERE {' AND '.join(conditions)}"
+
+    
+    base_query += """
         GROUP BY hm.movement_id
         ORDER BY count DESC
         LIMIT 200;
     """
 
-    results = cur.execute(query).fetchall()
+    print(base_query)
+
+    results = cur.execute(base_query, params).fetchall()
     conn.close()
 
     movements = [dict(row) for row in results]
-    
-       
-    return JSONResponse({
-        "movements": movements
-    }) 
+
+    return JSONResponse({"movements": movements})
+
 
 @app.get("/occupations")
-def get_occupations():
+def get_occupations(request: Request):
+    qp = request.query_params
+
+    movement_id = qp.get("movement_id")
+    gender_id = qp.get("gender_id")
+    nationality_id = qp.get("nationality_id")
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    query = """
+    base_query = """
         SELECT 
            o.id, o.name, COUNT(ho.human_id) AS count
         FROM human_occupation ho
         INNER JOIN occupations o ON ho.occupation_id = o.id
+        
+    """
+    params = []
+    conditions = []
+
+    if movement_id:
+        conditions.append("""
+            ho.human_id IN (
+                SELECT human_id FROM human_movement WHERE movement_id = ?
+            )
+        """)
+        params.append(movement_id)
+
+    if gender_id:
+        conditions.append("""
+            ho.human_id IN (
+                SELECT id FROM humans WHERE gender_id = ?
+            )
+        """)
+        params.append(gender_id)
+
+    if nationality_id:
+        conditions.append("""
+            ho.human_id IN (
+                SELECT id FROM humans WHERE nationality_id = ?
+            )
+        """)
+        params.append(nationality_id)
+
+   
+    if conditions:
+        base_query += f" WHERE {' AND '.join(conditions)}"
+
+    
+    base_query += """
         GROUP BY ho.occupation_id
         ORDER BY count DESC
         LIMIT 500;
     """
 
-    results = cur.execute(query).fetchall()
+    print(base_query)
+    results = cur.execute(base_query, params).fetchall()
     conn.close()
 
     occupations = [dict(row) for row in results]
@@ -283,21 +351,64 @@ def get_occupations():
     }) 
 
 @app.get("/genders")
-def get_genders():
+def get_genders(request: Request):
+    qp = request.query_params
+
+    movement_id = qp.get("movement_id")
+    occupation_id = qp.get("occupation_id")
+    nationality_id = qp.get("nationality_id")
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    query = """
-        SELECT 
+    base_query = """
+       SELECT 
            g.id, g.name, COUNT(h.gender_id) AS count
         FROM genders g
         INNER JOIN humans h ON h.gender_id = g.id
+       
+        
+    """
+    params = []
+    conditions = []
+
+    if movement_id:
+        conditions.append("""
+            h.id IN (
+                SELECT human_id FROM human_movement WHERE movement_id = ?
+            )
+        """)
+        params.append(movement_id)
+
+    if occupation_id:
+        conditions.append("""
+            h.id IN (
+                SELECT human_id FROM human_occupation WHERE occupation_id = ?
+            )
+        """)
+        params.append(occupation_id)
+
+    if nationality_id:
+        conditions.append("""
+            h.id IN (
+                SELECT id FROM humans WHERE nationality_id = ?
+            )
+        """)
+        params.append(nationality_id)
+
+   
+    if conditions:
+        base_query += f" WHERE {' AND '.join(conditions)}"
+
+    
+    base_query += """
         GROUP BY h.gender_id
         ORDER BY count DESC
     """
 
-    results = cur.execute(query).fetchall()
+    print(base_query)
+    results = cur.execute(base_query, params).fetchall()
     conn.close()
 
     genders = [dict(row) for row in results]
@@ -309,22 +420,63 @@ def get_genders():
 
 
 @app.get("/nationalities")
-def get_nationalities():
+def get_nationalities(request: Request):
+    qp = request.query_params
+
+    movement_id = qp.get("movement_id")
+    occupation_id = qp.get("occupation_id")
+    gender_id = qp.get("gender_id")
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    query = """
-        SELECT 
+    base_query = """
+       SELECT 
            n.id, n.name, COUNT(h.id) AS count
         FROM nationalities n
         INNER JOIN humans h ON h.nationality_id = n.id
-        WHERE h.nationality_id IS NOT NULL
+        
+    """
+    params = []
+    conditions = []
+
+    if movement_id:
+        conditions.append("""
+            h.id IN (
+                SELECT human_id FROM human_movement WHERE movement_id = ?
+            )
+        """)
+        params.append(movement_id)
+
+    if occupation_id:
+        conditions.append("""
+            h.id IN (
+                SELECT human_id FROM human_occupation WHERE occupation_id = ?
+            )
+        """)
+        params.append(occupation_id)
+
+    if gender_id:
+        conditions.append("""
+            h.id IN (
+                SELECT id FROM humans WHERE gender_id = ?
+            )
+        """)
+        params.append(gender_id)
+
+   
+    if conditions:
+        base_query += f" WHERE {' AND '.join(conditions)}"
+
+    
+    base_query += """
         GROUP BY n.id
         ORDER BY count DESC
     """
 
-    results = cur.execute(query).fetchall()
+    print(base_query)
+    results = cur.execute(base_query, params).fetchall()
     conn.close()
 
     nationalities = [dict(row) for row in results]

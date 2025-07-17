@@ -1,5 +1,4 @@
-import React, { useState, useEffect} from 'react';
-
+import React, { useState, useEffect, useRef} from 'react';
 import './FilterList.css';
 // import "react-widgets/styles.css";
 import NavBar from './NavBar';
@@ -16,15 +15,23 @@ interface Results{
     locations: Location[];
 }
 interface FilterListProps {
-  setSelectedOccupation: (obj: Occupation) => void;
-  setSelectedGender: (obj: Gender) => void;
-  setSelectedNationality: (obj: Nationality) => void;
-  setSelectedMovement: (obj: Movement) => void;
-  setSelectedObject: (obj: any) => void;
-  backendUrl:string;
+    selectedOccupation:Occupation| null;
+    selectedGender:Gender| null;
+    selectedNationality:Nationality| null;
+    selectedMovement:Movement| null;
+    setSelectedOccupation: (obj: Occupation) => void;
+    setSelectedGender: (obj: Gender) => void;
+    setSelectedNationality: (obj: Nationality) => void;
+    setSelectedMovement: (obj: Movement) => void;
+    setSelectedObject: (obj: any) => void;
+    backendUrl:string;
 }
 
 const FilterList: React.FC<FilterListProps> = ({
+    selectedOccupation,
+    selectedGender,
+    selectedNationality,
+    selectedMovement,
     setSelectedOccupation, 
     setSelectedGender,
     setSelectedNationality,
@@ -47,6 +54,7 @@ const FilterList: React.FC<FilterListProps> = ({
     const [listSearchInput, setListSearchInput] = useState<string>("");
     const [listData, setListData] = useState<any[]>([]);    
 
+    const panelRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
     
@@ -67,56 +75,89 @@ const FilterList: React.FC<FilterListProps> = ({
 
     useEffect(() => {
 
-        fetch(`${backendUrl}/movements/`)
+        const queryParams = new URLSearchParams();
+
+        if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
+        if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
+        if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+
+        fetch(`${backendUrl}/movements/?${queryParams.toString()}`)
         .then(res => res.json())
         .then(data => {
             setMovements(data.movements);  // 👈 dikkat!
         });
-    }, []);
+    }, [selectedGender,selectedOccupation,selectedNationality]);
 
     useEffect(() => {
 
-        fetch(`${backendUrl}/occupations/`)
+        const queryParams = new URLSearchParams();
+
+        if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
+        if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
+        if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+
+        fetch(`${backendUrl}/occupations/?${queryParams.toString()}`)
         .then(res => res.json())
         .then(data => {
             setOccupations(data.occupations);  // 👈 dikkat!
         });
-    }, []);
+    }, [selectedGender,selectedNationality,selectedMovement]);
 
     useEffect(() => {
 
-        fetch(`${backendUrl}/genders/`)
+        const queryParams = new URLSearchParams();
+
+        if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
+        if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
+        if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+
+        fetch(`${backendUrl}/genders/?${queryParams.toString()}`)
         .then(res => res.json())
         .then(data => {
             setGenders(data.genders);  // 👈 dikkat!
         });
-    }, []);
+    }, [selectedMovement,selectedOccupation,selectedNationality]);
 
     useEffect(() => {
 
-        fetch(`${backendUrl}/nationalities/`)
+        const queryParams = new URLSearchParams();
+
+        if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
+        if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
+        if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
+
+        fetch(`${backendUrl}/nationalities/?${queryParams.toString()}`)
         .then(res => res.json())
         .then(data => {
             setNationalities(data.nationalities);  // 👈 dikkat!
         });
-    }, []);
+    }, [selectedGender,selectedMovement,selectedOccupation]);
 
     
 
     useEffect(() => {
 
         switch (activeCategory) {
+            
             case "occupations":
                 setListData(occupations);
+                setSearchResults(null);  
+                setSearchTerm("");
                 break;
             case "genders":
                 setListData(genders);
+                setSearchResults(null);  
+                setSearchTerm("");
                 break;
             case "nationalities":
                 setListData(nationalities);
+                setSearchResults(null);  
+                setSearchTerm("");
                 break;
             case "movements":
                 setListData(movements);
+                setSearchResults(null);  
+                setSearchTerm("");
                 break;
             default:
                 setListData([]);
@@ -151,24 +192,45 @@ const FilterList: React.FC<FilterListProps> = ({
                     default:
                         break;
                 }
-                setListData([]);
-                setActiveCategory("");
-                setListSearchInput("");
-                setSearchTerm("");
+                clearAsInitial();
             }    
         }
     }, [selectedItem]);
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+                clearAsInitial();
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
     const getSearhResultPage = (result: any) => {
         setSelectedObject(result)
-        setSearchResults(null); 
-        setSearchTerm("");
+        clearAsInitial();
     };
+
+    const clearAsInitial = () => {
+
+        setSearchTerm("");
+        setSearchResults(null); 
+        
+
+        setListSearchInput("");
+        setListData([]);
+
+        setActiveCategory("");
+    }
 
 
   return (
     <>
-    <div className="filter_list_panel_container">
+    <div className="filter_list_panel_container" ref={panelRef}>
         <NavBar
             activeCategory={activeCategory}
             setActiveCategory = {setActiveCategory}

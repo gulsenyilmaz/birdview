@@ -13,7 +13,7 @@ import type { Location } from "../entities/Location";
 import type { Human } from "../entities/Human";
 import type { HumanEnriched } from "../entities/HumanEnriched";
 import { getColorForGender, getColorForAge, getColorForLabel, getColorForRelationType } from "../utils/colorUtils";
-import { computeBounds, offsetFibonacciPosition } from "../utils/locationUtils"
+import { computeBounds, offsetFibonacciPosition, offsetCircularPosition } from "../utils/locationUtils"
 
 
 type ViewStateType = {
@@ -52,12 +52,13 @@ const MapScene: React.FC<MapSceneProps> = ({
 
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE); 
   const [processedHumans, setProcessedHumans] = useState<HumanEnriched[]>([]);
+  const [layers, setLayers] = useState<any[]>([]); 
 
   useEffect(() => {
     const enrichedHumans: HumanEnriched[] = humans.map((h) => {
         let fillColor: [number, number, number, number];
         let fillTColor: [number, number, number, number];
-        let [lonOffsetSource, latOffsetSource] = offsetFibonacciPosition(h.lon, h.lat, h.city_index, viewState.zoom );
+        let [lonOffsetSource, latOffsetSource] = offsetCircularPosition(h.lon, h.lat, h.city_index, viewState.zoom );
         let lonOffsetTarget = lonOffsetSource + Math.random()*10;
         let latOffsetTarget = latOffsetSource + Math.random()*10;
         
@@ -116,60 +117,52 @@ const MapScene: React.FC<MapSceneProps> = ({
   }, [humans, locations, detailMode]);
 
 
+useEffect(() => {
   const locationLayer = new ScatterplotLayer({
-
-      id: "loacations-layer",
-      data: locations,
-      getPosition: (d) => [d.loc_lon, d.loc_lat],
-      getRadius: 200000/viewState.zoom^2,
-      getFillColor: d => getColorForRelationType(d.relationship_type_name),
-      pickable: true,
-      radiusUnits: "meters",
-
+    id: "locations-layer",
+    data: locations,
+    getPosition: (d) => [d.loc_lon, d.loc_lat],
+    getRadius: 200000 / Math.pow(viewState.zoom, 2),
+    getFillColor: d => getColorForRelationType(d.relationship_type_name),
+    pickable: true,
+    radiusUnits: "meters",
   });
 
   const humanArcLayer = new ArcLayer({
-
     id: 'humans-layer',
-    data: processedHumans.filter(d => viewState.zoom<3.1?d:null),
+    data: processedHumans.filter(d => viewState.zoom < 2 ? d : null),
     getSourcePosition: (d) => [d.lonOffsetSource, d.latOffsetSource],
     getTargetPosition: (d) => [d.lonOffsetTarget, d.latOffsetTarget],
-    getSourceColor:  d => d.fillColor,
+    getSourceColor: d => d.fillColor,
     getTargetColor: d => d.fillTColor,
     getWidth: 5,
     pickable: true
-
   });
 
-const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProps>({
-
-    id: 'humans--text-layer',
-    data: processedHumans.filter(d => viewState.zoom>2.9?d:null),
+  const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProps>({
+    id: 'humans-text-layer',
+    data: processedHumans.filter(d => d.num_of_identifiers * viewState.zoom > 80),
     characterSet: 'auto',
-    fontSettings: {
-      buffer: 8
-    },
+    fontSettings: { buffer: 1 },
     getPosition: d => [d.lonOffsetSource, d.latOffsetSource],
     getText: d => d.name,
-    getSize: d => 12 + (d.num_of_identifiers / 15),
-    getColor: [55, 55, 55],
-    sizeMinPixels: 10,
-    sizeMaxPixels: 30,
-    getTextAnchor: 'middle',
-    getAlignmentBaseline: 'top',
+    getSize: d => 7 + (d.num_of_identifiers / 150) * viewState.zoom,
+    sizeMinPixels: 14,
+    sizeMaxPixels: 50,
     background: true,
-    backgroundPadding: [2, 2],
-    getBackgroundColor: [22, 33, 44, 0],
+    backgroundPadding: [4, 4],
+    getBackgroundColor: [255, 255, 255, 0],
+    getColor: [0, 0, 0],
     pickable: true,
     getCollisionPriority: d => d.num_of_identifiers,
     extensions: [new CollisionFilterExtension()],
     collisionEnabled: true,
-    collisionTestProps: {
-      size: true,
-      text: true
-    }
-
+    collisionTestProps: { size: true, text: true }
   });
+
+  setLayers([locationLayer, humanArcLayer, humanTextLayer]);
+
+}, [locations, processedHumans, viewState.zoom]);
 
   
   return (
@@ -179,6 +172,7 @@ const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProp
         <DeckGL
           initialViewState={viewState}
           controller={true}
+         
           onViewStateChange={( obj :any) => {
             
              setViewState({
@@ -190,7 +184,7 @@ const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProp
               });
 
           }}
-          layers={[locationLayer, humanArcLayer, humanTextLayer]}
+          layers={layers}
           getTooltip={({ object }) =>
                     object ? {
                       text: `${object.tooltip_text? object.tooltip_text : object.name }`,
@@ -203,10 +197,23 @@ const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProp
                   // setProcessedHumans([object]);
                 }
             }}
+
           >
           <Map
             mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
             mapStyle="mapbox://styles/mapbox/light-v11"
+            onLoad={(e: any) => {
+              const map = e.target;
+
+              map.on("style.load", () => {
+                map.getStyle().layers.forEach((layer: any) => {
+                  if (layer.id.includes("label")) {
+                    map.setLayoutProperty(layer.id, "visibility", "none");
+                  }
+                });
+              });
+            }}
+            
           />
         </DeckGL>
       </div>
