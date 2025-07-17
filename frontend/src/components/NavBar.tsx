@@ -1,5 +1,5 @@
 
-// import { FaSearch } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import "./NavBar.css";
 
 interface NavBarProps {
@@ -34,7 +34,7 @@ const NavBar: React.FC<NavBarProps> = ({
                 className={`nav-button search-btn ${activeCategory === "searchbar" ? "active" : ""}`}
                 onClick={() => setActiveCategory("searchbar")}
             >
-            {/* // <FaSearch /> */}
+             <FaSearch />
             </button>
         </div>
     </div>

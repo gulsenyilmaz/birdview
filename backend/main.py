@@ -151,7 +151,7 @@ def get_person_details(human_id: int):
     description, img_url, signature_url = row
 
     cur.execute("""
-        SELECT l.id, l.name, hlt.name AS relationship_type_name, hl.start_date, hl.end_date, l.lat, l.lon, l.qid
+        SELECT l.id, l.name, hlt.name AS relationship_type_name, hl.start_date, hl.end_date, l.lat AS loc_lat, l.lon As loc_lon, l.qid
         FROM human_location AS hl
         JOIN locations AS l ON l.id = hl.location_id
         JOIN human_location_types AS hlt ON hlt.id = hl.relationship_type_id
@@ -357,7 +357,7 @@ def search(q: str):
 
        
         cur.execute("""
-            SELECT id, name, lat, lon, qid FROM locations
+            SELECT id, name, lat AS loc_lat, lon AS loc_lon, qid FROM locations
             WHERE name LIKE ?
             ORDER BY 
             CASE WHEN name LIKE ? THEN 0 ELSE 1 END,

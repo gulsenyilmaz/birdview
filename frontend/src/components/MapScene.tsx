@@ -94,11 +94,12 @@ const MapScene: React.FC<MapSceneProps> = ({
   }, [humans, selectedYear, colorFilterType, viewState.zoom]);
 
   useEffect(() => {
+
     if (!humans.length && !locations.length) return;
 
     const combinedLocations = [
       ...humans.map(h => ({ lon: h.lon, lat: h.lat })),
-      ...locations.map(l => ({ lon: l.lon, lat: l.lat }))
+      ...locations.map(l => ({ lon: l.loc_lon, lat: l.loc_lat }))
     ];
 
     const { centerLon, centerLat, zoom } = computeBounds(combinedLocations, detailMode);
@@ -116,16 +117,19 @@ const MapScene: React.FC<MapSceneProps> = ({
 
 
   const locationLayer = new ScatterplotLayer({
+
       id: "loacations-layer",
       data: locations,
-      getPosition: (d) => [d.lon, d.lat],
+      getPosition: (d) => [d.loc_lon, d.loc_lat],
       getRadius: 200000/viewState.zoom^2,
       getFillColor: d => getColorForRelationType(d.relationship_type_name),
       pickable: true,
       radiusUnits: "meters",
+
   });
 
   const humanArcLayer = new ArcLayer({
+
     id: 'humans-layer',
     data: processedHumans.filter(d => viewState.zoom<3.1?d:null),
     getSourcePosition: (d) => [d.lonOffsetSource, d.latOffsetSource],
@@ -134,9 +138,11 @@ const MapScene: React.FC<MapSceneProps> = ({
     getTargetColor: d => d.fillTColor,
     getWidth: 5,
     pickable: true
+
   });
 
 const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProps>({
+
     id: 'humans--text-layer',
     data: processedHumans.filter(d => viewState.zoom>2.9?d:null),
     characterSet: 'auto',
@@ -145,7 +151,7 @@ const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProp
     },
     getPosition: d => [d.lonOffsetSource, d.latOffsetSource],
     getText: d => d.name,
-    getSize: d => 15 + (d.num_of_identifiers / 15),
+    getSize: d => 12 + (d.num_of_identifiers / 15),
     getColor: [55, 55, 55],
     sizeMinPixels: 10,
     sizeMaxPixels: 30,
@@ -162,6 +168,7 @@ const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProp
       size: true,
       text: true
     }
+
   });
 
   
@@ -183,8 +190,6 @@ const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProp
               });
 
           }}
-
-          
           layers={[locationLayer, humanArcLayer, humanTextLayer]}
           getTooltip={({ object }) =>
                     object ? {
