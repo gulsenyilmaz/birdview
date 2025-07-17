@@ -13,7 +13,7 @@ import type { Location } from "../entities/Location";
 import type { Human } from "../entities/Human";
 import type { HumanEnriched } from "../entities/HumanEnriched";
 import { getColorForGender, getColorForAge, getColorForLabel, getColorForRelationType } from "../utils/colorUtils";
-import { computeBounds, offsetFibonacciPosition, offsetCircularPosition } from "../utils/locationUtils"
+import { computeBounds, offsetFibonacciPosition } from "../utils/locationUtils"
 
 
 type ViewStateType = {
@@ -58,7 +58,7 @@ const MapScene: React.FC<MapSceneProps> = ({
     const enrichedHumans: HumanEnriched[] = humans.map((h) => {
         let fillColor: [number, number, number, number];
         let fillTColor: [number, number, number, number];
-        let [lonOffsetSource, latOffsetSource] = offsetCircularPosition(h.lon, h.lat, h.city_index, viewState.zoom );
+        let [lonOffsetSource, latOffsetSource] = offsetFibonacciPosition(h.lon, h.lat, h.city_index, viewState.zoom );
         let lonOffsetTarget = lonOffsetSource + Math.random()*10;
         let latOffsetTarget = latOffsetSource + Math.random()*10;
         
