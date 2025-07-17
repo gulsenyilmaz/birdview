@@ -1,4 +1,4 @@
-// src/components/MapScene.tsx
+import './MapScene.css';
 import React, { useEffect, useState } from "react";
 import { FlyToInterpolator } from '@deck.gl/core';
 import { DeckGL } from "@deck.gl/react";
@@ -53,6 +53,7 @@ const MapScene: React.FC<MapSceneProps> = ({
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE); 
   const [processedHumans, setProcessedHumans] = useState<HumanEnriched[]>([]);
   const [layers, setLayers] = useState<any[]>([]); 
+  const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text'>('text');
 
   useEffect(() => {
     const enrichedHumans: HumanEnriched[] = humans.map((h) => {
@@ -118,6 +119,7 @@ const MapScene: React.FC<MapSceneProps> = ({
 
 
 useEffect(() => {
+
   const locationLayer = new ScatterplotLayer({
     id: "locations-layer",
     data: locations,
@@ -128,45 +130,57 @@ useEffect(() => {
     radiusUnits: "meters",
   });
 
-  const humanArcLayer = new ArcLayer({
-    id: 'humans-layer',
-    data: processedHumans.filter(d => viewState.zoom < 2 ? d : null),
-    getSourcePosition: (d) => [d.lonOffsetSource, d.latOffsetSource],
-    getTargetPosition: (d) => [d.lonOffsetTarget, d.latOffsetTarget],
-    getSourceColor: d => d.fillColor,
-    getTargetColor: d => d.fillTColor,
-    getWidth: 5,
-    pickable: true
-  });
+  const layersArray:any[] = [locationLayer];
 
-  const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProps>({
-    id: 'humans-text-layer',
-    data: processedHumans.filter(d => d.num_of_identifiers * viewState.zoom > 80),
-    characterSet: 'auto',
-    fontSettings: { buffer: 1 },
-    getPosition: d => [d.lonOffsetSource, d.latOffsetSource],
-    getText: d => d.name,
-    getSize: d => 7 + (d.num_of_identifiers / 150) * viewState.zoom,
-    sizeMinPixels: 14,
-    sizeMaxPixels: 50,
-    background: true,
-    backgroundPadding: [4, 4],
-    getBackgroundColor: [255, 255, 255, 0],
-    getColor: [0, 0, 0],
-    pickable: true,
-    getCollisionPriority: d => d.num_of_identifiers,
-    extensions: [new CollisionFilterExtension()],
-    collisionEnabled: true,
-    collisionTestProps: { size: true, text: true }
-  });
+  if (selectedLayerType === 'arc') {
 
-  setLayers([locationLayer, humanArcLayer, humanTextLayer]);
+    const humanArcLayer = new ArcLayer({
+      id: 'humans-layer',
+      data: processedHumans,
+      getSourcePosition: (d) => [d.lonOffsetSource, d.latOffsetSource],
+      getTargetPosition: (d) => [d.lonOffsetTarget, d.latOffsetTarget],
+      getSourceColor: d => d.fillColor,
+      getTargetColor: d => d.fillTColor,
+      getWidth: 5,
+      pickable: true
+    });
 
-}, [locations, processedHumans, viewState.zoom]);
+    layersArray.push(humanArcLayer);
+
+  } else if (selectedLayerType === 'text') {
+
+    const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProps>({
+      id: 'humans-text-layer',
+      data: processedHumans.filter(d => d.num_of_identifiers * viewState.zoom > 80),
+      characterSet: 'auto',
+      fontSettings: { buffer: 1 },
+      getPosition: d => [d.lonOffsetSource, d.latOffsetSource],
+      getText: d => d.name,
+      getSize: d => 7 + (d.num_of_identifiers / 100) * viewState.zoom,
+      sizeMinPixels: 14,
+      sizeMaxPixels: 50,
+      background: true,
+      backgroundPadding: [4, 4],
+      getBackgroundColor: [255, 255, 255, 0],
+      getColor: [20, 20, 20],
+      pickable: true,
+      getCollisionPriority: d => d.num_of_identifiers,
+      extensions: [new CollisionFilterExtension()],
+      collisionEnabled: true,
+      collisionTestProps: { size: true, text: true }
+    });
+
+    layersArray.push(humanTextLayer);
+  }
+
+  setLayers(layersArray);
+
+}, [locations, processedHumans, viewState.zoom, selectedLayerType]);
 
   
   return (
     <div>
+      
       
       <div>
         <DeckGL
@@ -200,23 +214,57 @@ useEffect(() => {
 
           >
           <Map
-            mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
-            mapStyle="mapbox://styles/mapbox/light-v11"
-            onLoad={(e: any) => {
-              const map = e.target;
+              mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
+              mapStyle="mapbox://styles/mapbox/light-v10"
+              onLoad={(e: any) => {
+                const map = e.target;
 
-              map.on("style.load", () => {
-                map.getStyle().layers.forEach((layer: any) => {
-                  if (layer.id.includes("label")) {
-                    map.setLayoutProperty(layer.id, "visibility", "none");
-                  }
+                const hideLabels = () => {
+                  map.getStyle().layers.forEach((layer: any) => {
+                    if (layer.id.includes('label')) {
+                      map.setLayoutProperty(layer.id, 'visibility', 'none');
+                    }
+                  });
+                };
+
+                // İlk yüklemede uygula
+                map.on('style.load', hideLabels);
+
+                // Stil yeniden yüklendiğinde de uygula
+                map.on('sourcedata', () => {
+                  hideLabels();
                 });
-              });
-            }}
-            
-          />
+
+                // Hatta periyodik garanti için (opsiyonel):
+                // setInterval(hideLabels, 5000);
+
+              }}
+            />
         </DeckGL>
+        
       </div>
+      <div className="layer-selector">
+          <label>
+            <input
+              type="radio"
+              value="arc"
+              checked={selectedLayerType === 'arc'}
+              onChange={() => setSelectedLayerType('arc')}
+            />
+            Arc Layer
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              value="text"
+              checked={selectedLayerType === 'text'}
+              onChange={() => setSelectedLayerType('text')}
+            />
+            Text Layer
+          </label>
+        </div>
+      
     </div>
   );
 };
