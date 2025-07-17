@@ -8,7 +8,7 @@ export function isHuman(obj: any): obj is Human {
     obj &&
     typeof obj === "object" &&
     "birth_date" in obj &&
-    "gender" in obj
+    "death_date" in obj
   );
 }
 
@@ -16,8 +16,8 @@ export function isLocation(obj: any): obj is Location {
   return (
     obj &&
     typeof obj === "object" &&
-    "relationship_type_name" in obj &&
-    "start_date" in obj
+    "loc_lat" in obj &&
+    "loc_lon" in obj
   );
 }
 

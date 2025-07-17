@@ -159,6 +159,12 @@ const FilterList: React.FC<FilterListProps> = ({
         }
     }, [selectedItem]);
 
+    const getSearhResultPage = (result: any) => {
+        setSelectedObject(result)
+        setSearchResults(null); 
+        setSearchTerm("");
+    };
+
 
   return (
     <>
@@ -216,7 +222,7 @@ const FilterList: React.FC<FilterListProps> = ({
                     <h4>People</h4>
                     <ul>
                         {searchResults.humans.map((result) => (
-                       <li key={`human-${result.id}`} onClick={() => setSelectedObject(result)}>
+                       <li key={`human-${result.id}`} onClick={() => getSearhResultPage(result)}>
                             👤 <strong>{result.name}</strong>
                         </li>
                         ))}
@@ -229,7 +235,7 @@ const FilterList: React.FC<FilterListProps> = ({
                     <h4>Places</h4>
                     <ul>
                         {searchResults.locations.map((result) => (
-                        <li key={`location-${result.id}`} onClick={() => setSelectedObject(result)}>
+                        <li key={`location-${result.id}`} onClick={() => getSearhResultPage(result)}>
                             📍 <strong>{result.name}</strong>
                         </li>
                         ))}
