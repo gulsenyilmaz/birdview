@@ -190,34 +190,34 @@ useEffect(() => {
   });
   layersArray.push(locationLayer);
 
-  if(selectedObjectThumbnail){
+  // if(selectedObjectThumbnail){
 
-    const filteredL = locations.filter(l =>
-      l.start_date <= selectedYear &&
-      (!l.end_date || l.end_date > selectedYear || (l.start_date == l.end_date && l.start_date == selectedYear )) &&
-      (selectedYear-l.start_date)<100
-    );
+  //   const filteredL = locations.filter(l =>
+  //     l.start_date <= selectedYear &&
+  //     (!l.end_date || l.end_date > selectedYear || (l.start_date == l.end_date && l.start_date == selectedYear )) &&
+  //     (selectedYear-l.start_date)<100
+  //   );
     
-    const thumbnailLayer = new IconLayer({
-      id: 'nodes',
-      data: filteredL,
-      getPosition: (d) => [d.loc_lon, d.loc_lat],
-      getIcon: () => ({
-        url: selectedObjectThumbnail || ICON_MISSING,
-        width: ICON_SIZE,
-        height: ICON_SIZE,
-        anchorX: ICON_SIZE / 2, // merkeze sabitle
-        anchorY: ICON_SIZE 
-      }),
-      loadOptions: { image: { crossOrigin: "anonymous" } },
-      getSize: 30,
-      sizeScale: viewState.zoom,
-      pickable: true
-    });
+  //   const thumbnailLayer = new IconLayer({
+  //     id: 'nodes',
+  //     data: filteredL,
+  //     getPosition: (d) => [d.loc_lon, d.loc_lat],
+  //     getIcon: () => ({
+  //       url: selectedObjectThumbnail || ICON_MISSING,
+  //       width: ICON_SIZE,
+  //       height: ICON_SIZE,
+  //       anchorX: ICON_SIZE / 2, // merkeze sabitle
+  //       anchorY: ICON_SIZE 
+  //     }),
+  //     loadOptions: { image: { crossOrigin: "anonymous" } },
+  //     getSize: 30,
+  //     sizeScale: viewState.zoom,
+  //     pickable: true
+  //   });
 
-    layersArray.push(thumbnailLayer);
-  }
-  else{
+  //   layersArray.push(thumbnailLayer);
+  // }
+  // else{
     
       if (selectedLayerType === 'arc') {
 
@@ -272,7 +272,7 @@ useEffect(() => {
           }
         );
         layersArray.push(humanTextLayer);
-  }
+  // }
 
   }
 
