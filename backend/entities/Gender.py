@@ -1,64 +1,67 @@
-import sqlite3
+from entities.BaseEntity import BaseEntity
 
-DB_PATH = "alive_then.db"
 
-class Gender:
-    def __init__(self, name=None, cursor=None):
-        
-        self.id = None
-        self.name = name
+class Gender(BaseEntity):
+    TABLE_NAME = "genders"
+    FIELDS = [
+        "id", 
+        "name"
+    ]
+# import sqlite3
 
-        self.cursor = cursor
+# DB_PATH = "birdview.db"
 
-        self._getFromTable()
 
-    def _getFromTable(self):
+# class Gender:
+#     def __init__(self, name=None, cursor=None):
+#         self.id = None
+#         self.name = name
 
-        conn = None
+#         self.cursor = cursor
 
-        if not self.name:
-            return
-        
-        if self.cursor is None:
-            conn = sqlite3.connect(DB_PATH)
-            conn.row_factory = sqlite3.Row
-            self.cursor = conn.cursor()
-        
-        query = "SELECT id, name FROM genders WHERE name = ?"
-        self.cursor.execute(query, (self.name,))
-        row = self.cursor.fetchone()
+#         self._getFromTable()
 
-        if row:
-            self.id = row["id"]
-            self.name = row["name"]
-        
-        if conn:
-            conn.close()
+#     def _getFromTable(self):
+#         conn = None
 
-    def setData(self, data):
+#         if not self.name:
+#             return
 
-        conn = None
-        
-        name = data.get("name")
-        if not name:
-            return
-        
-        if self.cursor is None:
-            conn = sqlite3.connect(DB_PATH)
-            conn.row_factory = sqlite3.Row
-            self.cursor = conn.cursor()
+#         if self.cursor is None:
+#             conn = sqlite3.connect(DB_PATH)
+#             conn.row_factory = sqlite3.Row
+#             self.cursor = conn.cursor()
 
-        self.cursor.execute(
-            "INSERT INTO genders (name) VALUES (?)",
-            (data["name"],)
-        )
-        
-        self.id = self.cursor.lastrowid
+#         query = "SELECT id, name FROM genders WHERE name = ?"
+#         self.cursor.execute(query, (self.name,))
+#         row = self.cursor.fetchone()
 
-        if conn:
-            conn.commit()
-            conn.close()
+#         if row:
+#             self.id = row["id"]
+#             self.name = row["name"]
 
-    def __repr__(self):
-        return f"<Gender {self.id or self.name}>"
+#         if conn:
+#             conn.close()
 
+#     def setData(self, data):
+#         conn = None
+
+#         name = data.get("name")
+#         if not name:
+#             return
+
+#         if self.cursor is None:
+#             conn = sqlite3.connect(DB_PATH)
+#             conn.row_factory = sqlite3.Row
+#             self.cursor = conn.cursor()
+
+#         self.cursor.execute("INSERT INTO genders (name) VALUES (?)", (data["name"],))
+
+#         self.id = self.cursor.lastrowid
+
+#         if conn:
+#             conn.commit()
+#             conn.close()
+
+#     def __repr__(self):
+#         return f"<Gender {self.id or self.name}>"

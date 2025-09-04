@@ -27,7 +27,7 @@
 /* Kulakçık (tab) */  
 .detail-tab {
   position: absolute;
-  top: 65%;
+  top: 55%;
   right: -30px;
   transform: translateY(-50%);
   width: 30px;
@@ -48,7 +48,7 @@
 
 .year-box{
   position: absolute;
-  bottom: 10%;
+  bottom: 25%;
   right: -10vw;
   height:5vh;
   width: 10vw; 
@@ -78,7 +78,7 @@
 .signature-image {
   position: absolute;
   bottom: 20%;
-  right: -75vw;
+  right: -10vw;
   height:auto;
   width: 10vw; 
   max-width: 200px;

@@ -31,13 +31,15 @@ export function computeBounds(locations: Location[], detailMode: Boolean = false
   else if (maxDiff > 30) zoom = 3;
   else if (maxDiff > 15) zoom = 4;
   else if (maxDiff > 8) zoom = 4.6;
-  else zoom = 5.3;
+  else if (maxDiff > 4) zoom = 5.2;
+  else if (maxDiff > 3) zoom = 5.7;
+  else zoom = 7;
 
   const centerLon = (minLon + maxLon) / 2 - (detailMode ? 40 / zoom : 0); 
   const centerLat = (minLat + maxLat) / 2;
 
 //   console.log("Computed bounds:", { maxDiff, centerLon, centerLat, zoom });
-  console.log("Computed bounds:", maxDiff, centerLon, centerLat, zoom );
+  // console.log("Computed bounds:", maxDiff, centerLon, centerLat, zoom );
 
   return { centerLon, centerLat, zoom };
 }
@@ -47,7 +49,7 @@ export function computeBounds(locations: Location[], detailMode: Boolean = false
 export function offsetFibonacciPosition(lon:number, lat:number, index:number,  zoom = 1.5) {
   const angle = index * 2.39996;
   const radius = 0.05 * Math.sqrt(index);
-  const spreadFactor = Math.min(0.3, 1.5 / 10);
+  const spreadFactor = Math.min(0.1, 1.5 / 10);
 
   const zoomFactor = Math.max(1, 2 * zoom); // daha yakınsa daha az yay
   const newLon = lon + radius * spreadFactor * zoomFactor * Math.cos(angle);

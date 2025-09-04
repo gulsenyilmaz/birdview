@@ -1,6 +1,7 @@
 import sqlite3
 
-DB_PATH = "alive_then.db"
+DB_PATH = "birdview.db"
+
 
 class LocationType:
     KEYWORDS = {
@@ -12,7 +13,6 @@ class LocationType:
         "urban": "city",
         "metropolis": "city",
         "human settlement": "city",
-
         "locality": "district",
         "borough": "district",
         "quarter": "district",
@@ -25,14 +25,13 @@ class LocationType:
         "area of london": "district",
         "stadtbezirk": "district",
         "Ortsteil": "district",
-        "canton":"district",
-        "settlement":"district",
-        "établissement":"district",
-        "ward of ":"district",
-        "chef-lieu":"district",
-        "cadastral area":"district",
-        "rural community":"district",
-
+        "canton": "district",
+        "settlement": "district",
+        "établissement": "district",
+        "ward of ": "district",
+        "chef-lieu": "district",
+        "cadastral area": "district",
+        "rural community": "district",
         # Regional group
         "commune": "region",
         "province": "region",
@@ -60,8 +59,7 @@ class LocationType:
         "civil parish": "region",
         "council": "region",
         "chef-lieu": "region",
-        "neighbourhood of ":"region",
-
+        "neighbourhood of ": "region",
         # Infrastructure
         "railway": "infrastructure",
         "station": "infrastructure",
@@ -72,7 +70,6 @@ class LocationType:
         "street": "infrastructure",
         "boulevard": "infrastructure",
         "square": "infrastructure",
-
         # Cultural / Institutional
         "art academy": "academy",
         "educational": "institution",
@@ -84,7 +81,7 @@ class LocationType:
         "high school": "school",
         "École": "school",
         "kindergarten": "school",
-        "institution":"institution",
+        "institution": "institution",
         "institute": "institution",
         "faculty": "university",
         "academy": "academy",
@@ -92,11 +89,10 @@ class LocationType:
         "gymnasium": "institution",
         "academy of fine arts": "academy",
         "technical university": "university",
-        "école":"school",
-        "lycée":"school",
-        "liceo":"school",
-        "Hochschule":"school",
-
+        "école": "school",
+        "lycée": "school",
+        "liceo": "school",
+        "Hochschule": "school",
         # Buildings
         "castle": "castle",
         "palace": "palace",
@@ -106,9 +102,8 @@ class LocationType:
         "building": "building",
         "tower": "building",
         "studio": "studio",
-        "mansion":"mansion",
-        "villa":"building",
-
+        "mansion": "mansion",
+        "villa": "building",
         # Landmarks
         "church": "landmark",
         "cemetery": "landmark",
@@ -116,7 +111,6 @@ class LocationType:
         "park": "landmark",
         "abbey": "landmark",
         "temple": "landmark",
-
         # Geography / Natural
         "island": "island",
         "archipelago": "island",
@@ -128,7 +122,6 @@ class LocationType:
         "mountain range": "geography",
         "lake": "waterbody",
         "river": "waterbody",
-
         # Country-level
         "country": "country",
         "sovereign state": "country",
@@ -140,8 +133,8 @@ class LocationType:
         "dominion": "country",
         "empire": "country",
     }
+
     def __init__(self, label=None, cursor=None):
-        
         self.id = None
         self.label = label
 
@@ -149,8 +142,7 @@ class LocationType:
 
         self._getFromTable()
 
-   
-    def _normalize_location_type(self,label):
+    def _normalize_location_type(self, label):
         if not label or not isinstance(label, str):
             return None
 
@@ -163,17 +155,16 @@ class LocationType:
         return None
 
     def _getFromTable(self):
-
         conn = None
 
         if not self.label:
             return
-        
+
         if self.cursor is None:
             conn = sqlite3.connect(DB_PATH)
             conn.row_factory = sqlite3.Row
             self.cursor = conn.cursor()
-        
+
         normalized_label = self._normalize_location_type(self.label)
         if normalized_label is not None:
             self.label = normalized_label
@@ -185,14 +176,13 @@ class LocationType:
         if row:
             self.id = row["id"]
             self.label = row["label"]
-        
+
         if conn:
             conn.close()
 
     def setData(self, data):
-
         conn = None
-        
+
         label = data.get("label")
         if not label:
             return
@@ -204,23 +194,14 @@ class LocationType:
             conn.row_factory = sqlite3.Row
             self.cursor = conn.cursor()
 
-        self.cursor.execute(
-            "INSERT INTO location_types (label) VALUES (?)",
-            (label,)
-        )
-        
+        self.cursor.execute("INSERT INTO location_types (label) VALUES (?)", (label,))
+
         self.id = self.cursor.lastrowid
 
         if conn:
             conn.commit()
             conn.close()
 
-    
-    
-
-
-
 
 def __repr__(self):
     return f"<LocationType {self.id or self.label}>"
-

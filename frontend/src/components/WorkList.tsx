@@ -50,6 +50,9 @@ const WorkList: React.FC<WorkListProps> = ({person, selectedYear, backendUrl, se
         { filteredWorks.map((a) =>
               a.title ? (
                 <div key={a.id} className="timeline-item">
+                  <div className="timeline-item-meta">
+                     · From <strong>{a.collection_name}</strong>
+                  </div>
                   {a.image_url ? ( 
                     <img
                       src={a.image_url}
@@ -63,7 +66,7 @@ const WorkList: React.FC<WorkListProps> = ({person, selectedYear, backendUrl, se
                     <strong>{a.title}</strong>
                   </a>
                   <div className="timeline-item-meta">
-                    {a.created_date} · {a.description}
+                     · {a.created_date} · {a.description} 
                   </div>
                 </div>
               ) : null

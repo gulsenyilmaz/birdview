@@ -117,7 +117,7 @@ export const getColorForAgeString = (
     case 'work_location':
       return [243, 156, 18, 180];       // ✔ Turuncu (#F39C12)
     case 'has_works_in':
-      return [64, 224, 208, 180];      // ✔ Turkuaz → [ (#40E0D0)
+      return [64, 150, 150, 180];      // ✔ Turkuaz → [ (#40E0D0)
     default:
       return [75, 75, 75, 180];     // Gri (bilinmeyen)
   }

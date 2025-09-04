@@ -1,9 +1,8 @@
 import requests
 from urllib.parse import quote
 
-HEADERS = {
-    "User-Agent": "AliveThen-HumanFetcher/1.0 (gulsenyilmaz9@gmail.com)"
-}
+HEADERS = {"User-Agent": "AliveThen-HumanFetcher/1.0 (gulsenyilmaz9@gmail.com)"}
+
 
 class LocationFromWikidata:
     def __init__(self, qid):
@@ -11,15 +10,14 @@ class LocationFromWikidata:
         self.name = ""
         self.description = ""
         self.image_url = ""
-        self.latitude = None  
-        self.longitude = None
+        self.lat = None
+        self.lon = None
         self.instance_label = ""
         self.instance_qid = None
         self.logo_url = ""
         self.inception = None
         self.country_qid = None
         self.country_label = ""
-        
 
         self._fetch_and_parse()
 
@@ -32,7 +30,7 @@ class LocationFromWikidata:
         except Exception as e:
             print(f"❌ Error fetching {self.qid}: {e}")
             return None
-        
+
     def _fetch_and_parse(self):
         entity = self._fetch_entity()
         if not entity:
@@ -45,8 +43,10 @@ class LocationFromWikidata:
 
         # Image
         if "P18" in claims:
-            img_name = claims["P18"][0]["mainsnak"]["datavalue"]["value"]
-            self.image_url = f"https://commons.wikimedia.org/wiki/Special:FilePath/{quote(img_name)}"
+            img_sn = claims["P18"][0].get("mainsnak", {}).get("datavalue", {})
+            img_name = img_sn.get("value")
+            if isinstance(img_name, str):
+                self.image_url = f"https://commons.wikimedia.org/wiki/Special:FilePath/{quote(img_name)}"
 
         # instance of (P31)
         if "P31" in claims:
@@ -54,8 +54,11 @@ class LocationFromWikidata:
 
         # Logo (P154)
         if "P154" in claims:
-            logo_name = claims["P154"][0]["mainsnak"]["datavalue"]["value"]
-            self.logo_url = f"https://commons.wikimedia.org/wiki/Special:FilePath/{quote(logo_name)}"
+            logo_sn = claims["P154"][0].get("mainsnak", {}).get("datavalue", {})
+            logo_name = logo_sn.get("value")
+
+            if isinstance(logo_name, str):
+                self.logo_url = f"https://commons.wikimedia.org/wiki/Special:FilePath/{quote(logo_name)}"
 
         # Inception (P571)
         # if "P571" in claims:
@@ -70,7 +73,9 @@ class LocationFromWikidata:
             country_url = f"https://www.wikidata.org/wiki/Special:EntityData/{self.country_qid}.json"
             try:
                 country_data = requests.get(country_url, headers=HEADERS).json()
-                self.country_label = country_data["entities"][self.country_qid]["labels"]["en"]["value"]
+                self.country_label = country_data["entities"][self.country_qid][
+                    "labels"
+                ]["en"]["value"]
             except:
                 pass
 
@@ -80,16 +85,18 @@ class LocationFromWikidata:
             snak = claims["P625"][0].get("mainsnak", {})
             if snak.get("datatype") == "globe-coordinate":
                 coords = snak.get("datavalue", {}).get("value")
-                
-                self.latitude = coords.get("latitude") if coords else None
-                self.longitude = coords.get("longitude") if coords else None
+
+                self.lat = coords.get("latitude") if coords else None
+                self.lon = coords.get("longitude") if coords else None
 
         if self.instance_qid:
             label_url = f"https://www.wikidata.org/wiki/Special:EntityData/{self.instance_qid}.json"
             label_r = requests.get(label_url, headers=HEADERS)
             label_r.raise_for_status()
             label_data = label_r.json()
-            self.instance_label = label_data["entities"][self.instance_qid]["labels"]["en"]["value"]
+            self.instance_label = label_data["entities"][self.instance_qid]["labels"][
+                "en"
+            ]["value"]
 
     def to_dict(self):
         return {
@@ -98,13 +105,13 @@ class LocationFromWikidata:
             "description": self.description,
             "image_url": self.image_url,
             "logo_url": self.logo_url,
-            "latitude": self.latitude,
-            "longitude": self.longitude,
+            "lat": self.lat,
+            "lon": self.lon,
             "inception": self.inception,
             "instance_label": self.instance_label,
             "instance_qid": self.instance_qid,
             "country_qid": self.country_qid,
-            "country_label": self.country_label
+            "country_label": self.country_label,
         }
 
     def __repr__(self):

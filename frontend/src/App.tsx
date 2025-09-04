@@ -2,14 +2,17 @@ import "./App.css"; // Import your CSS file
 import { useEffect, useState } from "react";
 import MapScene from './components/MapScene';
 import TimeSlider from "./components/TimeSlider";
+import TimeWindowSlider from "./components/TimeWindowSlider";
+
 import type { Human } from "./entities/Human";
 import type { Location } from "./entities/Location";
 import type { Movement } from "./entities/Movement";
 import type { Nationality } from "./entities/Nationality";
 import type { Gender } from "./entities/Gender";
 import type { Occupation } from "./entities/Occupation";
+import type { Event } from "./entities/Event";
 
-import { extractSortedDates, getDateRange } from "./utils/dateUtils";
+import { getFullRange } from "./utils/dateUtils";
 import { isHuman, isLocation } from "./utils/typeGuards";
 import Dashboard from "./components/Dashboard";
 import FilterList from "./components/FilterList";
@@ -20,18 +23,25 @@ import LocationBox from './components/LocationBox';
 import HumanList from './components/HumanList';
 import WorkList from './components/WorkList';
 import ContentStrip from "./components/ContentStrip";
+import { buildAliveCounts } from "./utils/buildAliveCounts";
 
 
 function App() {
   const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("nationality");
-  const [selectedYear, setSelectedYear] = useState<number>(2020);
+  const [selectedYear, setSelectedYear] = useState<number>(1944);
   const [detailMode, setDetailMode] = useState<boolean>(false);
   const [humans, setHumans] = useState<Human[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [filteredHumans, setFilteredHumans] = useState<Human[]>([]);
   const [distinctDates, setDistinctDates] = useState<number[]>([]);
-  const [dateRange, setDateRange] = useState<number[]>([]);
+  const [aliveCounts, setAliveCounts] = useState<{ year: number; count: number }[]>([]);
+  const [fullRange, setFullRange] = useState<[number, number]>([1200, 2025]); // başlangıç ve bitiş tarihleri
+  const [windowRange, setWindowRange] = useState<[number, number]>([1850, 1950]);
+
   const [selectedObject, setSelectedObject] = useState<any>(null);
+  const [selectedObjectThumbnail, setSelectedObjectThumbnail]= useState<string | null>(null);
 
   const [selectedHuman, setSelectedHuman] = useState<Human | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
@@ -41,11 +51,8 @@ function App() {
   const [selectedNationality, setSelectedNationality] = useState<Nationality| null>(null);
   const [selectedMovement, setSelectedMovement] = useState<Movement| null>(null);
 
-
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   
-  
-
   useEffect(() => {
     const queryParams = new URLSearchParams();
 
@@ -63,31 +70,64 @@ function App() {
       }
     } 
 
-    // Tüm human verilerini filtrelere göre getir
     fetch(`${backendUrl}/allhumans?${queryParams.toString()}`)
       .then(res => res.json())
       .then(data => {
-        setDateRange(getDateRange(data.humans));
-        setDistinctDates(extractSortedDates(data.humans, "birth_date"));   
+        setFullRange(getFullRange(data.humans));
+        // setDistinctDates(extractSortedDates(data.humans, "birth_date"));   
         setHumans(data.humans)
       })  
       .catch(err => console.error("API error:", err));
 
   }, [selectedHuman, selectedLocation, selectedOccupation, selectedGender, selectedNationality, selectedMovement]);
 
+
+  useEffect(() => {
+     
+    fetch(`${backendUrl}/allevents`)
+      .then(res => res.json())
+      .then(data => {
+       
+        setEvents(data.events)
+      })  
+      .catch(err => console.error("API error:", err));
+
+  }, [selectedHuman]);
+
+
   useEffect(() => {
 
-    const filtered = humans.filter(h =>
+    setWindowRange(fullRange);
+    if (humans.length > 1) {
+
+      setAliveCounts(buildAliveCounts(humans, fullRange, { maxAge: 100 }));
+      setDistinctDates([]);  
+    }
+    else {
+
+      setAliveCounts([]);
+    }
+
+  }, [fullRange]);
+
+
+  useEffect(() => {
+
+    const filteredH = humans.filter(h =>
       h.birth_date <= selectedYear &&
-      (!h.death_date || h.death_date >= selectedYear)
+      (!h.death_date || h.death_date >= selectedYear) &&
+      (selectedYear-h.birth_date)<100
     );
-    setFilteredHumans(filtered);
+    setFilteredHumans(filteredH);
+
+    const filteredE = events.filter(e =>
+      e.start_date <= selectedYear && (e.start_date+e.scale+2) > selectedYear
+    );
+    setFilteredEvents(filteredE);
 
   }, [selectedYear, humans]);
 
   useEffect(() => {
-
-    
 
     if(selectedObject){
 
@@ -122,9 +162,12 @@ function App() {
       setSelectedLocation(null);
       setSelectedObject(null);
       setLocations([]);
+      setSelectedObjectThumbnail(null);
     }
 
   }, [detailMode]);
+
+   
 
   return (
     <div className="app-container">
@@ -140,10 +183,12 @@ function App() {
                 <PersonBox
                   person={selectedHuman}
                   setLocations={setLocations}
+                  setSelectedObjectThumbnail ={setSelectedObjectThumbnail}
                 />
               )}
               {selectedLocation && (
-                <LocationBox location={selectedLocation} />
+                <LocationBox location={selectedLocation}
+                            setSelectedObjectThumbnail = {setSelectedObjectThumbnail} />
               )}
             </DetailBox>
           </div>
@@ -200,23 +245,23 @@ function App() {
                 setSelectedGender = {setSelectedGender}
                 setSelectedNationality= {setSelectedNationality}
                 setSelectedMovement= {setSelectedMovement}
-
                 setSelectedObject={setSelectedObject}
                 backendUrl={backendUrl}
               />
 
           </div>
           <div className="scene">
-            
 
-              <MapScene
-                locations={locations}
-                humans = {filteredHumans} 
-                selectedYear={selectedYear}
-                setSelectedObject={setSelectedObject}
-                colorFilterType={colorFilterType}
-                detailMode={detailMode}
-              />
+            <MapScene
+              locations={locations}
+              humans = {filteredHumans} 
+              events={filteredEvents}
+              selectedYear={selectedYear}
+              setSelectedObject={setSelectedObject}
+              colorFilterType={colorFilterType}
+              detailMode={detailMode}
+              selectedObjectThumbnail ={selectedObjectThumbnail}
+            />
 
           </div>
           <div className={`right-panel ${detailMode ? "hide" : ""}`}>
@@ -228,15 +273,34 @@ function App() {
               />
 
           </div>
-          <div className={`bottom-panel ${detailMode ? "squeezed" : ""}`}>
-        
-            <TimeSlider
+           <div className={`bottom-panel ${detailMode ? "squeezed" : ""}`}>
+
+            <TimeWindowSlider
+              fullRange={fullRange}
+              windowRange={windowRange}
+              setWindowRange={setWindowRange}
+              setSelectedYear={setSelectedYear}
+              selectedYear={selectedYear}
+              detailMode={detailMode}
+            />
+
+            {/* <TimeSlider
                 selectedYear={selectedYear}
                 setSelectedYear={setSelectedYear}
                 distinctDates= {distinctDates}
-                dateRange={dateRange}
+                windowRange={windowRange}
+                histogramYears={humans.map(d => d.birth_date)}
                 
-              />
+              /> */}
+
+              <TimeSlider
+                  selectedYear={selectedYear}
+                  setSelectedYear={setSelectedYear}
+                  windowRange={windowRange}
+                  aliveCounts={aliveCounts}          // ⬅️ histogram artık “o yıl hayatta olanlar”
+                  binAggregation="sum"               // istersen "sum"
+                  distinctDates= {distinctDates}            // opsiyonel
+                />
 
           </div>
       </div>

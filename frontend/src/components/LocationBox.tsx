@@ -4,6 +4,7 @@ import './LocationBox.css';
 
 interface LocationBoxProps {
   location:Location;
+  setSelectedObjectThumbnail: (str:string) => void;
 }
 
 interface LocationDetails {
@@ -15,7 +16,7 @@ interface LocationDetails {
  
 }
 
-const LocationBox: React.FC<LocationBoxProps> = ({location}) => {
+const LocationBox: React.FC<LocationBoxProps> = ({location, setSelectedObjectThumbnail}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [locationDetails, setLocationDetails] = useState<LocationDetails | null>(null);
@@ -24,7 +25,10 @@ const LocationBox: React.FC<LocationBoxProps> = ({location}) => {
         if (location) {
              fetch(`${backendUrl}/location/${location.id}`)
               .then(res => res.json())
-              .then(data => setLocationDetails(data.details))
+              .then(data => {
+                setLocationDetails(data.details)
+                setSelectedObjectThumbnail(data.img_url)
+              })
               .catch(err => console.error("Location details fetch error:", err));
          }
     }, [location]);
@@ -36,7 +40,7 @@ const LocationBox: React.FC<LocationBoxProps> = ({location}) => {
         {locationDetails && (
           
             <div className="location-details-container ">
-              <h2>{location.name}- {location.id}</h2>
+              <h2>{location.name}- {location.qid}</h2>
 
                 {locationDetails.logo_url && (
                   <img src={locationDetails.logo_url} alt="portrait" className="portrait" />

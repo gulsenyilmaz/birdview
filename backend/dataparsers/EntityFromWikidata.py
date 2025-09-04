@@ -1,8 +1,7 @@
 import requests
 
-HEADERS = {
-    "User-Agent": "AliveThen-HumanFetcher/1.0 (gulsenyilmaz9@gmail.com)"
-}
+HEADERS = {"User-Agent": "AliveThen-HumanFetcher/1.0 (gulsenyilmaz9@gmail.com)"}
+
 
 class EntityFromWikidata:
     def __init__(self, qid):
@@ -19,7 +18,7 @@ class EntityFromWikidata:
         except Exception as e:
             print(f"❌ Error fetching {self.qid}: {e}")
             return None
-        
+
     def _fetch_and_parse(self):
         entity = self._fetch_entity()
         if not entity:
