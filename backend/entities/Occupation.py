@@ -1,71 +1,81 @@
-import sqlite3
+from entities.BaseEntity import BaseEntity
 
-DB_PATH = "alive_then.db"
 
-class Occupation:
-    def __init__(self, id=None, name=None, cursor=None):
-       
-        self.id = id
-        self.name = name
+class Occupation(BaseEntity):
+    TABLE_NAME = "occupations"
+    FIELDS = [
+        "id", 
+        "name"
+    ]
 
-        self.cursor = cursor
+# import sqlite3
 
-        self._getFromTable()
+# DB_PATH = "birdview.db"
 
-    def _getFromTable(self):
 
-        conn = None
-        conditions = []
-        params = []
+# class Occupation:
+#     def __init__(self, id=None, name=None, cursor=None):
+#         self.id = id
+#         self.name = name
 
-        if self.id:
-            conditions.append("id = ?")
-            params.append(self.id)
-        if self.name:
-            conditions.append("name = ?")
-            params.append(self.name)
+#         self.cursor = cursor
 
-        if not conditions:
-            return
-        
-        if self.cursor is None:
-            conn = sqlite3.connect(DB_PATH)
-            conn.row_factory = sqlite3.Row
-            self.cursor = conn.cursor()
+#         self._getFromTable()
 
-        query = f"""
-            SELECT id, name FROM occupations WHERE  {' AND '.join(conditions)}
-        """    
-        
-        self.cursor.execute(query, params)
-        row = self.cursor.fetchone()
+#     def _getFromTable(self):
+#         conn = None
+#         conditions = []
+#         params = []
 
-        if row:
-            self.id = row["id"]
-            self.name = row["name"]
-        
-        if conn:
-            conn.close()
-    
-    def setData(self, data):
+#         if self.id:
+#             conditions.append("id = ?")
+#             params.append(self.id)
+#         if self.name:
+#             conditions.append("name = ?")
+#             params.append(self.name)
 
-        conn = None
-        if self.cursor is None:
-            conn = sqlite3.connect(DB_PATH)
-            conn.row_factory = sqlite3.Row
-            self.cursor = conn.cursor()
+#         if not conditions:
+#             return
 
-        print(data["name"])
+#         if self.cursor is None:
+#             conn = sqlite3.connect(DB_PATH)
+#             conn.row_factory = sqlite3.Row
+#             self.cursor = conn.cursor()
 
-        self.cursor.execute("INSERT INTO occupations (name) VALUES (?)", (data["name"],)) 
-        
-        self.id = self.cursor.lastrowid
+#         query = f"""
+#             SELECT id, name FROM occupations WHERE  {" AND ".join(conditions)}
+#         """
 
-        print("self.cursor.lastrowid", self.cursor.lastrowid)
+#         self.cursor.execute(query, params)
+#         row = self.cursor.fetchone()
 
-        if conn:
-            conn.commit()     
-            conn.close()
+#         if row:
+#             self.id = row["id"]
+#             self.name = row["name"]
 
-    def __repr__(self):
-        return f"<Occupation {self.id}: {self.name}>"
+#         if conn:
+#             conn.close()
+
+#     def setData(self, data):
+#         conn = None
+#         if self.cursor is None:
+#             conn = sqlite3.connect(DB_PATH)
+#             conn.row_factory = sqlite3.Row
+#             self.cursor = conn.cursor()
+
+#         print(data["name"])
+
+#         self.cursor.execute(
+#             "INSERT INTO occupations (name) VALUES (?)", (data["name"],)
+#         )
+
+#         self.id = self.cursor.lastrowid
+
+#         print("self.cursor.lastrowid", self.cursor.lastrowid)
+
+#         if conn:
+#             conn.commit()
+#             conn.close()
+
+#     def __repr__(self):
+#         return f"<Occupation {self.id}: {self.name}>"

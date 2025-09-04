@@ -1,6 +1,7 @@
 import sqlite3
 
-DB_PATH = "alive_then.db"
+DB_PATH = "birdview.db"
+
 
 class BaseEntity:
     TABLE_NAME = None
@@ -8,7 +9,8 @@ class BaseEntity:
 
     def __init__(self, **kwargs):
         self.cursor = kwargs.get("cursor")
-        
+        self.w = kwargs.get("w")
+
         # Dinamik alan oluşturma
         for field in self.FIELDS:
             setattr(self, field, kwargs.get(field))
@@ -23,13 +25,13 @@ class BaseEntity:
         conditions = []
         params = []
 
-        if getattr(self, "id", None):
-            conditions.append("id = ?")
-            params.append(self.id)
-        elif getattr(self, "name", None):
-            conditions.append("name = ?")
-            params.append(self.name)
-        else:
+        for field in self.FIELDS:
+            value = getattr(self, field, None)
+            if value is not None:
+                conditions.append(f"{field} = ?")
+                params.append(value)
+
+        if not conditions:
             return
 
         if self.cursor is None:
@@ -37,16 +39,32 @@ class BaseEntity:
             conn.row_factory = sqlite3.Row
             self.cursor = conn.cursor()
 
-        query = f"""
-            SELECT {', '.join(self.FIELDS)} FROM {self.TABLE_NAME}
-            WHERE {' AND '.join(conditions)}
-        """    
-        self.cursor.execute(query, params)
-        row = self.cursor.fetchone()
+        try:
+            query = f"""
+                SELECT {", ".join(self.FIELDS)} FROM {self.TABLE_NAME}
+                WHERE {" AND ".join(conditions)}
+            """
+            self.cursor.execute(query, params)
+            row = self.cursor.fetchone()
 
-        if row:
-            for field in self.FIELDS:
-                setattr(self, field, row[field])
+            if row:
+                for field in self.FIELDS:
+                    setattr(self, field, row[field])
+
+                field_updates = ", ".join([f"{col}={repr(getattr(self, col, None))}" for col in self.FIELDS])
+
+                self.log_results(
+                    self.id if hasattr(self, "id") else "-",
+                    field_updates,
+                    f"✅ FOUND in {self.TABLE_NAME} table ",
+                )
+
+        except Exception as e:
+            self.log_results(
+                getattr(self, "id", "-"),
+                str(e),
+                f"❌ error in {self.TABLE_NAME} table ",
+            )
 
         if conn:
             conn.close()
@@ -64,16 +82,94 @@ class BaseEntity:
         placeholders = ", ".join(["?"] * len(values))
         col_string = ", ".join(columns)
 
-        query = f"INSERT INTO {self.TABLE_NAME} ({col_string}) VALUES ({placeholders})"
-        self.cursor.execute(query, values)
+        try:
+            query = f"INSERT INTO {self.TABLE_NAME} ({col_string}) VALUES ({placeholders})"
+            self.cursor.execute(query, values)
 
-        self.id = self.cursor.lastrowid
-        for key in data:
-            setattr(self, key, data[key])
+            self.id = self.cursor.lastrowid
+            for key in columns:
+                setattr(self, key, data[key])
+            
+            field_updates = ", ".join([f"{col}={repr(data[col])}" for col in columns])
+
+            self.log_results(
+                    self.id,
+                    field_updates,
+                    f"✅ ADDED in {self.TABLE_NAME} table ",
+                )
+            
+            
+        
+        except Exception as e:
+            self.log_results(
+                e,
+                getattr(self, "id", ""),
+                f"❌ error in {self.TABLE_NAME} table",
+            )
+
+        
 
         if conn:
             conn.commit()
             conn.close()
+
+    def update(self, data: dict):
+        if not getattr(self, "id", None):
+            raise ValueError("Update requires 'id' to be set.")
+
+        conn = None
+        if self.cursor is None:
+            conn = sqlite3.connect(DB_PATH)
+            conn.row_factory = sqlite3.Row
+            self.cursor = conn.cursor()
+
+        columns = [key for key in data if key in self.FIELDS and key != "id"]
+        if not columns:
+            raise ValueError("No valid fields provided for update.")
+
+        set_clause = ", ".join([f"{col} = ?" for col in columns])
+        values = [data[col] for col in columns]
+        values.append(self.id)
+
+        try:
+            
+            query = f"""
+                UPDATE {self.TABLE_NAME}
+                SET {set_clause}
+                WHERE id = ?
+            """
+            self.cursor.execute(query, values)
+             # güncel değerleri nesne üzerine de yaz
+            for col in columns:
+                setattr(self, col, data[col])
+            
+            field_updates = ", ".join([f"{col}={repr(data[col])}" for col in columns])
+
+            self.log_results(
+                    self.id,
+                    field_updates,
+                    f"✅ UPDATED in {self.TABLE_NAME} table",
+                )
+        
+        except Exception as e:
+            
+            self.log_results(
+                e,
+                getattr(self, "id", ""),
+                f"❌ error in {self.TABLE_NAME} table",
+            )
+
+        if conn:
+            conn.commit()
+            conn.close()
+
+    def log_results(self, id, context, message):
+        print("-------------------------------------------------")
+        if hasattr(self, "w") and self.w:
+            self.w.writerow([message, id, context])
+        print(f" {message} {id}")
+        print(f" {context}")
+        print("-------------------------------------------------")
 
     def __repr__(self):
         if hasattr(self, "name"):

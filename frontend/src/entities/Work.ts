@@ -5,4 +5,5 @@ export interface Work {
   description: string;
   image_url: string;
   url: string;
+  collection_name: string;
 }

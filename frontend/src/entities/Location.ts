@@ -1,5 +1,6 @@
 export interface Location {
   id: number;
+  qid: string;
   name: string;
   loc_lat: number;
   loc_lon: number;

@@ -4,11 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 from collections import Counter
 from fastapi.responses import JSONResponse
+import json
 
 import os
 
 app = FastAPI()
-
 
 
 # CORS ayarı – Frontend'e veri göndermek için gerekli
@@ -24,11 +24,8 @@ app.add_middleware(
 DB_PATH = os.getenv("DB_PATH", "birdview.db")
 
 
-
 @app.get("/allhumans")
-def get_humans(
-    request: Request
-):
+def get_humans(request: Request):
     qp = request.query_params
 
     human_id = qp.get("human_id")
@@ -72,7 +69,7 @@ def get_humans(
         if relationship_type_id:
             base_query += " AND filtered_hl.relationship_type_id = ?"
             params.append(relationship_type_id)
-        
+
         base_query += """
             )
         """
@@ -105,7 +102,7 @@ def get_humans(
         params.append(human_id)
 
     base_query += " ORDER BY h.birth_date ASC"
-   
+
     results = cur.execute(base_query, params).fetchall()
     conn.close()
 
@@ -126,67 +123,112 @@ def get_works(creator_id: int):
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    cur.execute("""
-        SELECT id, title, created_date, description, image_url, url
-        FROM works
+    cur.execute(
+        """
+        SELECT w.id, w.title, w.created_date, w.description, w.image_url, w.url, c.name AS collection_name
+        FROM works AS w
+        JOIN collections AS c ON w.collection_id = c.id
         WHERE creator_id = ?
         ORDER BY created_date ASC
-    """, (creator_id,))
+    """,
+        (creator_id,),
+    )
 
     results = [dict(row) for row in cur.fetchall()]
     conn.close()
     return results
 
+
 @app.get("/person/{human_id}")
 def get_person_details(human_id: int):
+    print("get_person_details")
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    cur.execute("SELECT description, img_url, signature_url FROM humans WHERE id = ?", (human_id,))
+    cur.execute(
+        "SELECT description, img_url, signature_url FROM humans WHERE id = ?",
+        (human_id,),
+    )
     row = cur.fetchone()
     if not row:
         return {"error": "person not found"}
 
     description, img_url, signature_url = row
 
-    cur.execute("""
+    cur.execute(
+        """
         SELECT l.id, l.name, hlt.name AS relationship_type_name, hl.start_date, hl.end_date, l.lat AS loc_lat, l.lon As loc_lon, l.qid
         FROM human_location AS hl
         JOIN locations AS l ON l.id = hl.location_id
         JOIN human_location_types AS hlt ON hlt.id = hl.relationship_type_id
         WHERE hl.human_id = ?
-    """, (human_id,))
+    """,
+        (human_id,),
+    )
 
-    locs =  [dict(row) for row in cur.fetchall()]
-      
-    cur.execute("""
+    locs = [dict(row) for row in cur.fetchall()]
+
+    cur.execute(
+        """
         SELECT o.name AS name
         FROM human_occupation AS ho
         JOIN occupations AS o ON o.id = ho.occupation_id
         WHERE ho.human_id = ?
-    """, (human_id,))
+    """,
+        (human_id,),
+    )
 
-    occs = [row["name"] for row in cur.fetchall()] 
+    occs = [row["name"] for row in cur.fetchall()]
 
-    cur.execute("""
+    cur.execute(
+        """
         SELECT m.name AS name
         FROM human_movement AS hm
         JOIN movements AS m ON m.id = hm.movement_id
         WHERE hm.human_id = ?
-    """, (human_id,))
+    """,
+        (human_id,),
+    )
 
-    movs = [row["name"] for row in cur.fetchall()] 
+    movs = [row["name"] for row in cur.fetchall()]
+
+    cur.execute(
+        """
+        SELECT cl.name AS name
+        FROM human_collection AS hcl
+        JOIN collections AS cl ON cl.id = hcl.collection_id
+        WHERE hcl.human_id = ?
+    """,
+        (human_id,),
+    )
+
+    colls = [row["name"] for row in cur.fetchall()]
+
+
+    cur.execute(
+        """
+        SELECT s.name AS name
+        FROM citizenships AS c
+        JOIN states AS s ON s.id = c.state_id
+        WHERE c.human_id = ?
+    """,
+        (human_id,),
+    )
+
+    citizs = [row["name"] for row in cur.fetchall()]
 
     conn.close()
 
     return {
         "description": description,
         "img_url": img_url,
-        "signature_url":signature_url,
+        "signature_url": signature_url,
         "locations": locs,
-        "occupations":occs,
-        "movements": movs
+        "occupations": occs,
+        "movements": movs,
+        "collections": colls,
+        "citizenships": citizs,
     }
 
 
@@ -196,24 +238,30 @@ def get_location_details(location_id: int):
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-   
-    cur.execute("SELECT description, image_url, logo_url, inception, country_label FROM locations WHERE id = ?", (location_id,))
+    cur.execute(
+        "SELECT qid, description, image_url, logo_url, inception, country_label FROM locations WHERE id = ?",
+        (location_id,),
+    )
     row = cur.fetchone()
     if not row:
         return {"error": "location not found"}
-    description, img_url, logo_url, inception, country_label = row
+    qid, description, img_url, logo_url, inception, country_label = row
 
     conn.close()
-       
-    return JSONResponse({
-        "details":{
-            "description": description,
-            "img_url": img_url,
-            "logo_url": logo_url,
-            "inception":inception,
-            "country_label":country_label
+
+    return JSONResponse(
+        {
+            "details": {
+                "qid": qid,
+                "description": description,
+                "img_url": img_url,
+                "logo_url": logo_url,
+                "inception": inception,
+                "country_label": country_label,
+            }
         }
-    }) 
+    )
+
 
 @app.get("/movements")
 def get_movements(request: Request):
@@ -261,18 +309,14 @@ def get_movements(request: Request):
         """)
         params.append(nationality_id)
 
-   
     if conditions:
         base_query += f" WHERE {' AND '.join(conditions)}"
 
-    
     base_query += """
         GROUP BY hm.movement_id
         ORDER BY count DESC
         LIMIT 200;
     """
-
-    print(base_query)
 
     results = cur.execute(base_query, params).fetchall()
     conn.close()
@@ -328,27 +372,22 @@ def get_occupations(request: Request):
         """)
         params.append(nationality_id)
 
-   
     if conditions:
         base_query += f" WHERE {' AND '.join(conditions)}"
 
-    
     base_query += """
         GROUP BY ho.occupation_id
         ORDER BY count DESC
         LIMIT 500;
     """
 
-    print(base_query)
     results = cur.execute(base_query, params).fetchall()
     conn.close()
 
     occupations = [dict(row) for row in results]
-    
-       
-    return JSONResponse({
-        "occupations": occupations
-    }) 
+
+    return JSONResponse({"occupations": occupations})
+
 
 @app.get("/genders")
 def get_genders(request: Request):
@@ -397,26 +436,20 @@ def get_genders(request: Request):
         """)
         params.append(nationality_id)
 
-   
     if conditions:
         base_query += f" WHERE {' AND '.join(conditions)}"
 
-    
     base_query += """
         GROUP BY h.gender_id
         ORDER BY count DESC
     """
 
-    print(base_query)
     results = cur.execute(base_query, params).fetchall()
     conn.close()
 
     genders = [dict(row) for row in results]
-    
-       
-    return JSONResponse({
-        "genders": genders
-    }) 
+
+    return JSONResponse({"genders": genders})
 
 
 @app.get("/nationalities")
@@ -465,23 +498,21 @@ def get_nationalities(request: Request):
         """)
         params.append(gender_id)
 
-   
     if conditions:
         base_query += f" WHERE {' AND '.join(conditions)}"
 
-    
     base_query += """
         GROUP BY n.id
         ORDER BY count DESC
     """
 
-    print(base_query)
     results = cur.execute(base_query, params).fetchall()
     conn.close()
 
     nationalities = [dict(row) for row in results]
-    
+
     return JSONResponse({"nationalities": nationalities})
+
 
 @app.get("/search")
 def search(q: str):
@@ -489,14 +520,11 @@ def search(q: str):
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    results = {
-        "humans": [],
-        "locations": []
-    }
+    results = {"humans": [], "locations": []}
 
     if len(q) >= 2:
-       
-        cur.execute("""
+        cur.execute(
+            """
             SELECT id, name, birth_date, death_date, qid FROM humans
             WHERE name LIKE ?
             ORDER BY 
@@ -504,20 +532,70 @@ def search(q: str):
             num_of_identifiers DESC,
             name
             LIMIT 10
-        """, (f"%{q}%", f"{q}%"))
+        """,
+            (f"%{q}%", f"{q}%"),
+        )
         results["humans"] = [dict(r) for r in cur.fetchall()]
 
-       
-        cur.execute("""
+        cur.execute(
+            """
             SELECT id, name, lat AS loc_lat, lon AS loc_lon, qid FROM locations
             WHERE name LIKE ?
             ORDER BY 
             CASE WHEN name LIKE ? THEN 0 ELSE 1 END,
             name
             LIMIT 10
-        """, (f"%{q}%", f"{q}%"))
-        
-        
+        """,
+            (f"%{q}%", f"{q}%"),
+        )
+
         results["locations"] = [dict(r) for r in cur.fetchall()]
 
     return results
+
+
+
+@app.get("/allevents")
+def get_humans(request: Request):
+    qp = request.query_params
+
+   
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    base_query = """
+        SELECT 
+            el.id, e.name AS name, l.name AS battle, el.start_date, el.end_date,
+            l.lat AS lat, l.lon AS lon, el.description_json
+        FROM events e
+        INNER JOIN event_location el ON el.event_id = e.id
+        INNER JOIN locations l ON el.location_id = l.id
+    """
+
+    results = cur.execute(base_query).fetchall()
+    conn.close()
+
+    events = [dict(row) for row in results]
+
+    for e in events:
+        e["entity_type"] = "event"
+
+        try:
+            desc = json.loads(e["description_json"]) if e["description_json"] else {}
+        except json.JSONDecodeError:
+            desc = {}
+
+        
+
+        e["scale"] = desc.get("scale", 1)
+        e["tooltip_text"] = f"{e['name']} : {e['battle']}"
+        # e["participants"] = desc.get("participants", [])
+        # e["winner"] = desc.get("winner", "Unknown") if desc else "Unknown"
+        # e["loser"] = desc.get("loser")
+        # e["massacre"] = desc.get("massacre")
+   
+   
+
+    return JSONResponse({"events": events})

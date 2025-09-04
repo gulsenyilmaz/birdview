@@ -20,7 +20,7 @@ export function extractSortedDates<T extends Record<string, any>>(
 }
 
 
-export function getDateRange<T extends Record<string, any>>(items: T[]): [number, number] {
+export function getFullRange<T extends Record<string, any>>(items: T[]): [number, number] {
   const currentYear = new Date().getFullYear();
 
   const birthYears = items
@@ -49,3 +49,5 @@ export function getDateRange<T extends Record<string, any>>(items: T[]): [number
 
   return [min, max];
 }
+
+

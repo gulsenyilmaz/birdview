@@ -3,10 +3,12 @@ import type { Human } from "../entities/Human";
 import type { Location } from "../entities/Location";
 import { getColorForRelationTypeString } from "../utils/colorUtils";
 import './PersonBox.css';
+import { resolveCommonsThumb } from "../utils/commons"
 
 interface PersonBoxProps {
   person:Human;
   setLocations: (arr: Location[]) => void;
+  setSelectedObjectThumbnail: (str:string | null) => void;
   
 }
 
@@ -16,10 +18,12 @@ interface PersonDetails {
   signature_url?: string;
   occupations: string[];
   movements: string[];
+  collections: string[];
+  citizenships: string[];
   locations: Location[];
 }
 
-const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations}) => {
+const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedObjectThumbnail}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [personDetails, setPersonDetails] = useState<PersonDetails | null>(null);
@@ -42,8 +46,8 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations}) => {
                     <li key={idx}>
                     {loc.start_date} 
                     {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} — <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
-  {action}
-</em>
+                        {action}
+                        </em>
                     </li>
                 ))}
             </ul>
@@ -65,13 +69,25 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations}) => {
                     setMuseums(museum_locs);
                     setCvLocations(cv_locs);                                                       
                     setLocations(cv_locs);
-
+                    // setSelectedObjectThumbnail(data.img_url);
                     if (!data.img_url) {
                         getWikipediaImage(person.name).then(setFallbackImage);
                     }
                 })
          }
     }, [person]);
+
+
+    useEffect(() => {
+        (async () => {
+            if (!personDetails?.img_url) { setSelectedObjectThumbnail(null); return; }
+                console.log("selectedObjectThumbnail1: ", personDetails.img_url)
+                const url = await resolveCommonsThumb(personDetails.img_url, 256);
+
+                console.log("selectedObjectThumbnail2: ", url)
+                setSelectedObjectThumbnail(url);
+        })();
+    }, [personDetails]);
 
 
     useEffect(() => {
@@ -119,27 +135,35 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations}) => {
                 )}
                 <div className="person-details">
                     <h3><i>{personDetails.description} {person.qid}</i></h3>
-                    
                     <p><strong>Occupations:</strong> {personDetails.occupations.join(", ")}</p>
-                    {personDetails.movements && personDetails.movements.length > 0 && (
-                        <p><strong>Movements:</strong> {personDetails.movements.join(", ")}</p>)}
-                        
-                        <div className="tab-buttons">
-                            <button
-                                className={selectedTab === "cv" ? "active" : ""}
-                                onClick={() => setSelectedTab("cv")}
-                            >
-                                Curriculum Vitae
-                            </button>
-                            <button
-                                className={selectedTab === "museums" ? "active" : ""}
-                                onClick={() => setSelectedTab("museums")}
-                            >
-                                Has Works In
-                            </button>
-                        </div>
+                    <p><strong> {person.nationality} -  {person.gender}</strong></p>
 
-                        {selectedTab === "cv" && (
+                    {personDetails.citizenships && personDetails.citizenships.length > 0 && (
+                        <p><strong>Citizenships:</strong> {personDetails.citizenships.join(", ")}</p>
+                    )}
+                    {personDetails.collections && personDetails.collections.length > 0 && (
+                        <p><strong>Collections:</strong> {personDetails.collections.join(", ")}</p>
+                    )}
+                    {personDetails.movements && personDetails.movements.length > 0 && (
+                        <p><strong>Movements:</strong> {personDetails.movements.join(", ")}</p>
+                    )}
+                        
+                    <div className="tab-buttons">
+                        <button
+                            className={selectedTab === "cv" ? "active" : ""}
+                            onClick={() => setSelectedTab("cv")}
+                        >
+                            Curriculum Vitae
+                        </button>
+                        <button
+                            className={selectedTab === "museums" ? "active" : ""}
+                            onClick={() => setSelectedTab("museums")}
+                        >
+                            Has Works In
+                        </button>
+                    </div>
+
+                    {selectedTab === "cv" && (
                         <div className="cv_content">
                             {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "birth_place"),  "was born here")}
                             {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "educated_at"), "was educated here")}

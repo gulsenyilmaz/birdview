@@ -1,98 +1,105 @@
-import sqlite3
+from entities.BaseEntity import BaseEntity
 
-DB_PATH = "alive_then.db"
 
-class HumanOccupation:
-    def __init__(self, human_id=None, occupation_id=None, cursor=None):
-        
-        self.human_id = human_id
-        self.occupation_id = occupation_id
-        self.id = None
+class HumanOccupation(BaseEntity):
+    TABLE_NAME = "human_occupation"
+    FIELDS = [
+        "occupation_id", 
+        "human_id"
+    ]
 
-        self.cursor = cursor
+# import sqlite3
 
-        self._getFromTable()
+# DB_PATH = "birdview.db"
 
-    def _getFromTable(self):
 
-        conn = None
-        conditions = []
-        params = []
+# class HumanOccupation:
+#     def __init__(self, human_id=None, occupation_id=None, cursor=None):
+#         self.human_id = human_id
+#         self.occupation_id = occupation_id
+#         self.id = None
 
-        if self.human_id is not None:
-            conditions.append("human_id = ?")
-            params.append(self.human_id)
-        if self.occupation_id is not None:
-            conditions.append("occupation_id = ?")
-            params.append(self.occupation_id)
+#         self.cursor = cursor
 
-        if not conditions:
-            return
-        
-        if self.cursor is None:
-            conn = sqlite3.connect(DB_PATH)
-            conn.row_factory = sqlite3.Row
-            self.cursor = conn.cursor()
+#         self._getFromTable()
 
-        query = f"""
-            SELECT human_id, occupation_id
-            FROM human_occupation
-            WHERE {' AND '.join(conditions)}
-        """
-        
-        try:
-            self.cursor.execute(query, tuple(params))
-            row = self.cursor.fetchone()
-            print(row)
-            if row:
-                self.id = row["human_id"] +row["occupation_id"]
-                self.human_id = row["human_id"]
-                self.occupation_id = row["occupation_id"]
-            
-        except Exception as e:
+#     def _getFromTable(self):
+#         conn = None
+#         conditions = []
+#         params = []
 
-            print("e",e)
-            return 
+#         if self.human_id is not None:
+#             conditions.append("human_id = ?")
+#             params.append(self.human_id)
+#         if self.occupation_id is not None:
+#             conditions.append("occupation_id = ?")
+#             params.append(self.occupation_id)
 
-        if conn:
-            conn.close()
+#         if not conditions:
+#             return
 
-    def setData(self, data):
+#         if self.cursor is None:
+#             conn = sqlite3.connect(DB_PATH)
+#             conn.row_factory = sqlite3.Row
+#             self.cursor = conn.cursor()
 
-        conn = None
+#         query = f"""
+#             SELECT human_id, occupation_id
+#             FROM human_occupation
+#             WHERE {" AND ".join(conditions)}
+#         """
 
-        create_fields = []
-        placeholders = []
-        create_values = []
+#         try:
+#             self.cursor.execute(query, tuple(params))
+#             row = self.cursor.fetchone()
+#             print(row)
+#             if row:
+#                 self.id = row["human_id"] + row["occupation_id"]
+#                 self.human_id = row["human_id"]
+#                 self.occupation_id = row["occupation_id"]
 
-        create_fields.append("human_id")
-        placeholders.append("?")
-        create_values.append(data["human_id"])
+#         except Exception as e:
+#             print("e", e)
+#             return
 
-        create_fields.append("occupation_id")
-        placeholders.append("?")
-        create_values.append(data["occupation_id"])
+#         if conn:
+#             conn.close()
 
-        if create_fields:
-            create_sql = f"""
-                INSERT OR IGNORE INTO human_occupation ({', '.join(create_fields)})
-                VALUES ({', '.join(placeholders)})
-            """
-            if self.cursor is None:
-                conn = sqlite3.connect(DB_PATH)
-                conn.row_factory = sqlite3.Row
-                self.cursor = conn.cursor()
-            self.cursor.execute(create_sql, create_values)
-            row = self.cursor.fetchone()
-            print(row)
-            if row:
-                self.id = row["human_id"] +row["occupation_id"]
-                self.human_id = row["human_id"]
-                self.occupation_id = row["occupation_id"]
+#     def setData(self, data):
+#         conn = None
 
-            if conn:
-                conn.commit()
-                conn.close()
+#         create_fields = []
+#         placeholders = []
+#         create_values = []
 
-    def __repr__(self):
-        return f"<HumanOccupation {self.id}: human {self.human_id} @ occupation {self.occupation_id}>"
+#         create_fields.append("human_id")
+#         placeholders.append("?")
+#         create_values.append(data["human_id"])
+
+#         create_fields.append("occupation_id")
+#         placeholders.append("?")
+#         create_values.append(data["occupation_id"])
+
+#         if create_fields:
+#             create_sql = f"""
+#                 INSERT OR IGNORE INTO human_occupation ({", ".join(create_fields)})
+#                 VALUES ({", ".join(placeholders)})
+#             """
+#             if self.cursor is None:
+#                 conn = sqlite3.connect(DB_PATH)
+#                 conn.row_factory = sqlite3.Row
+#                 self.cursor = conn.cursor()
+#             self.cursor.execute(create_sql, create_values)
+#             row = self.cursor.fetchone()
+#             print(row)
+#             if row:
+#                 self.id = row["human_id"] + row["occupation_id"]
+#                 self.human_id = row["human_id"]
+#                 self.occupation_id = row["occupation_id"]
+
+#             if conn:
+#                 conn.commit()
+#                 conn.close()
+
+#     def __repr__(self):
+#         return f"<HumanOccupation {self.id}: human {self.human_id} @ occupation {self.occupation_id}>"
