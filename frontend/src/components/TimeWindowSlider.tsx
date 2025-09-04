@@ -1,5 +1,5 @@
 
-import { useMemo, useEffect } from "react";
+import { useEffect } from "react";
 import Slider from "rc-slider";
 import "./TimeWindowSlider.css";
 // import "./TimeSlider.css";
@@ -39,18 +39,18 @@ export default function TimeWindowSlider({
   }, [wStart, wEnd]); // eslint-disable-line
 
   // pencere genişliğine göre tick adımı
-  const step = useMemo(() => {
+  // const step = useMemo(() => {
 
    
-    const span = maxYear - minYear;
+  //   const span = maxYear - minYear;
     
-    if (span <= 50) return 1;
-    if (span <= 150) return 5;
-    if (span <= 400) return 10;
-    if (span <= 1000) return 25;
-    if (span <= 2000) return 50;
-    return 200;
-  }, [minYear, maxYear]);
+  //   if (span <= 50) return 1;
+  //   if (span <= 150) return 5;
+  //   if (span <= 400) return 10;
+  //   if (span <= 1000) return 25;
+  //   if (span <= 2000) return 50;
+  //   return 200;
+  // }, [minYear, maxYear]);
 
 
   return (
