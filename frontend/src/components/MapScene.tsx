@@ -91,7 +91,7 @@ const MapScene: React.FC<MapSceneProps> = ({
   const [layers, setLayers] = useState<any[]>([]); 
   const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text'>('text');
   const [showEvents, setShowEvents] = useState(true);
-  const [showHumans, setShowHumans] = useState(true);
+  // const [showHumans, setShowHumans] = useState(true);
 
  
 

@@ -320,41 +320,41 @@ class Human(BaseEntity):
                     }
                 )
 
-    def update_notable_works(self, notable_works):
+    # def update_notable_works(self, notable_works):
 
-        if not notable_works:
-            self.log_results(self.id, "", "❌ Failed to fetch notable_works")
-            return
+    #     if not notable_works:
+    #         self.log_results(self.id, "", "❌ Failed to fetch notable_works")
+    #         return
 
-        for work in notable_works:
-            if  not work:
-                continue
-            print("citizenships-------------------------------------------------")
+    #     for work in notable_works:
+    #         if  not work:
+    #             continue
+    #         print("citizenships-------------------------------------------------")
 
-            work_wiki_entity = WorkFromWikidata(work)
-            work_database_entity = Work(
-                name=state_wiki_entity.name,
-                qid=state_wiki_entity.qid,
-                cursor=self.cursor,
-                w=self.w 
-            )
+    #         work_wiki_entity = WorkFromWikidata(work)
+    #         work_database_entity = Work(
+    #             name=state_wiki_entity.name,
+    #             qid=state_wiki_entity.qid,
+    #             cursor=self.cursor,
+    #             w=self.w 
+    #         )
 
-            if state_database_entity.id is None:
+    #         if state_database_entity.id is None:
                 
-                state_database_entity.set_data(state_wiki_entity.to_dict())
+    #             state_database_entity.set_data(state_wiki_entity.to_dict())
                     
             
-            citizenship_database_entity = Citizenship(
-                human_id=self.id,
-                state_id=state_database_entity.id,
-                cursor=self.cursor,
-                w=self.w
-            )
-            if citizenship_database_entity.id is None:
+    #         citizenship_database_entity = Citizenship(
+    #             human_id=self.id,
+    #             state_id=state_database_entity.id,
+    #             cursor=self.cursor,
+    #             w=self.w
+    #         )
+    #         if citizenship_database_entity.id is None:
                 
-                citizenship_database_entity.set_data(
-                    {
-                        "human_id": self.id,
-                        "state_id": state_database_entity.id
-                    }
-                )
+    #             citizenship_database_entity.set_data(
+    #                 {
+    #                     "human_id": self.id,
+    #                     "state_id": state_database_entity.id
+    #                 }
+    #             )
