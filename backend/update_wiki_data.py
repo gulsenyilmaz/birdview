@@ -23,9 +23,15 @@ def process_all_artists():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
+    # cursor.execute(
+    #     "SELECT id, name, qid FROM humans WHERE num_of_identifiers<=50 AND qid IS NOT 'NOT_FOUND' AND qid IS NOT NULL ORDER BY num_of_identifiers DESC;"
+    # )
+
     cursor.execute(
-        "SELECT id, name, qid FROM humans WHERE num_of_identifiers<=100 AND num_of_identifiers>50 AND qid IS NOT 'NOT_FOUND' AND qid IS NOT NULL ORDER BY num_of_identifiers DESC;"
+        "SELECT id, name, qid FROM humans WHERE qid='Q125121';"
     )
+
+    
     rows = cursor.fetchall()
 
     print(f"🔎 Found {len(rows)} artists to update.\n")
@@ -47,7 +53,7 @@ def process_all_artists():
 
             human_entity = Human(id=human_id, cursor=cursor, w=writer)
             human_entity.update_birthplace(human_wiki_entity.birth_place, human_wiki_entity.birth_date)
-            human_entity.update_citizenships(human_wiki_entity.citizenships)
+            # human_entity.update_citizenships(human_wiki_entity.citizenships)
 
             conn.commit()
             time.sleep(0.4)
@@ -58,7 +64,7 @@ def process_all_locations():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, name, qid FROM locations WHERE lat is NULL AND qid IS NOT 'NOT_FOUND';")
+    cursor.execute("SELECT id, name, qid FROM locations WHERE qid='Q16563';")
     rows = cursor.fetchall()
 
     print(f"🔎 Found {len(rows)} locations to update.\n")
@@ -96,4 +102,4 @@ def process_all_locations():
 
 
 if __name__ == "__main__":
-    process_all_artists()
+    process_all_locations()
