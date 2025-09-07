@@ -1,69 +1,65 @@
-# React + TypeScript + Vite
+# AliveThen
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**AliveThen** is an interactive data visualization project that maps artists (and other cultural figures) who were alive in a given year, based on the MoMA collection and extended metadata.
 
-Currently, two official plugins are available:
+Inspired by the Museum of Modern Art (MoMA) collection and designed for extensibility, this project allows users to explore the lives of artists, thinkers, and other figures by time and geography.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🌍 What it does
 
-## Expanding the ESLint configuration
+- Visualizes artists on a 3D globe using **Deck.gl** and **Mapbox**
+- Slider to select a year and dynamically update who was alive
+- Animated arcs show geographic distribution by year.
+- Spiral layout prevents overlap when multiple artists share a nationality
+- Tooltips show artist name and age
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📸 Screenshot
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+![screenshot](BW_Screenshot000.png)
+![screenshot](BW_Screenshot001.png) 
+![screenshot](BW_Screenshot002.png) 
+![screenshot](BW_Screenshot003.png) 
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## 🚀 Technologies
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Frontend: React, Deck.gl, Plotly.js
+- Backend: FastAPI
+- Containerization: Docker, Docker Compose
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🧠 Future Plans
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Filter by movement, museum, gender, or era
+- Include other groups (philosophers, politicians, athletes, etc.)
+- Mini timeline markers for each artwork
+- Detail panel for selected artist
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🧠 DATA SOURCE
+This project uses publicly available open data:
+
+- [MoMA Collection](https://github.com/MuseumofModernArt/collection) – CC0 Public Domain
+- [Wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page) – CC0 Public Domain
+- [The Metropolitan Museum of Art Collection](https://github.com/metmuseum/openaccess) – CC0 Public Domain
+
+## Development Notes
+- The frontend queries data from the backend on port 8000.
+
+- Mapbox is used for base map layers. Add your Mapbox token to .env:
+    VITE_MAPBOX_TOKEN=your_token_here
+
+## 📦 Running the Project (with Docker)
+
+Make sure you have Docker and Docker Compose installed.
+
+```bash
+git clone https://github.com/yourusername/alivethen.git
+cd alivethen
+docker compose up --build
+
+
+AliveThen/
+│
+├── backend/           # FastAPI app and SQLite DB
+├── frontend/          # React + Deck.gl app
+├── docker-compose.yml
+├── .dockerignore
+└── README.md
+
