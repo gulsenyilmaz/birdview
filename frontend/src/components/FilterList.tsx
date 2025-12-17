@@ -13,6 +13,7 @@ interface Results{
 
     humans: Human[];
     locations: Location[];
+    events: any[];
 }
 interface FilterListProps {
     selectedOccupation:Occupation| null;
@@ -304,7 +305,20 @@ const FilterList: React.FC<FilterListProps> = ({
                     </ul>
                     </>
                 )}
-                </div>
+
+                {searchResults.events?.length > 0 && (
+                    <>
+                    <h4>Events</h4>
+                    <ul>
+                        {searchResults.events.map((result) => (
+                        <li key={`event-${result.id}`} onClick={() => getSearhResultPage(result)}>
+                            📍 <strong>{result.name}</strong>
+                        </li>
+                        ))}
+                    </ul>
+                    </>
+                )}
+            </div>
         )}
         {/* END OF SEARCH RESULTS */}
         </div> 

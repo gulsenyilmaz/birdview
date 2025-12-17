@@ -42,17 +42,21 @@ const LocationBox: React.FC<LocationBoxProps> = ({location, setSelectedObjectThu
             <div className="location-details-container ">
               <h2>{location.name}- {location.qid}</h2>
 
-                {locationDetails.logo_url && (
-                  <img src={locationDetails.logo_url} alt="portrait" className="portrait" />
-                )}
                 {locationDetails.img_url && (
                   <img src={locationDetails.img_url} alt="portrait" className="portrait" />
                 )}
-                
-                <p>{locationDetails.description}</p>
-                {locationDetails.country_label && (<p>IN COUNTRY: {locationDetails.country_label}</p>)}
-                {locationDetails.inception && (<p>INCEPTION: {locationDetails.inception}</p>)}
-
+                <div className="location-details">
+                  {locationDetails.logo_url && (
+                    <img src={locationDetails.logo_url} alt="logo" className="logo" />
+                  )}
+                  
+                  <div style={{height: '1rem'}}>
+                    <p>{locationDetails.description}</p>
+                  {locationDetails.country_label && (<p><strong>IN COUNTRY:</strong> {locationDetails.country_label}</p>)}
+                  {locationDetails.inception && (<p><strong>INCEPTION:</strong> {locationDetails.inception}</p>)}
+                  </div>
+                  
+                </div>
                 
                 
             </div>

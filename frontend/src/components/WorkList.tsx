@@ -18,7 +18,6 @@ const WorkList: React.FC<WorkListProps> = ({person, selectedYear, backendUrl, se
     const [works, setWorks] = useState<Work[]>([]);
     const [filteredWorks, setFilteredWorks] = useState<Work[]>([]);
 
-    
 
     useEffect(() => {
         fetch(`${backendUrl}/works/${person.id}`)

@@ -8,6 +8,8 @@ from entities.HumanLocationType import HumanLocationType
 from entities.Location import Location
 from entities.Occupation import Occupation
 from entities.HumanOccupation import HumanOccupation
+from entities.Collection import Collection
+from entities.HumanCollection import HumanCollection
 from entities.Gender import Gender
 from entities.Movement import Movement
 from entities.HumanMovement import HumanMovement
@@ -36,11 +38,11 @@ class Human(BaseEntity):
     ]
 
 
-    def update_gender(self, data):
+    def update_gender(self, gender):
         gender_str = "NOT_FOUND"
 
-        if data.gender:
-            gender_str = data.gender.lower()
+        if gender:
+            gender_str = gender.lower()
         else:
             self.log_results(self.id, self.name, f"❌ gender not provided.")
 
@@ -61,11 +63,11 @@ class Human(BaseEntity):
         
 
 
-    def update_nationality(self, data):
+    def update_nationality(self, nationality):
         nationality_str = "NOT_FOUND"
 
-        if data.nationality:
-            nationality_str = data.nationality
+        if nationality:
+            nationality_str = nationality
         else:
             self.log_results(self.id, self.name, f"❌ nationality not provided.")
 
@@ -189,12 +191,9 @@ class Human(BaseEntity):
             if not qid:
                 continue
 
-            location_wiki_entity = LocationFromWikidata(location["qid"])
+            location_wiki_entity = LocationFromWikidata(qid)
             location_database_entity = Location(
                 qid=qid,
-                name=location_wiki_entity.name,
-                lat=location_wiki_entity.latitude,
-                lon=location_wiki_entity.longitude,
                 cursor=self.cursor,
                 w=self.w
             )
@@ -320,6 +319,42 @@ class Human(BaseEntity):
                     }
                 )
 
+    def update_collections(self, collection_ids):
+
+        if not collection_ids:
+            self.log_results(self.id, "", "❌ Failed to fetch collection_ids")
+            return
+
+        for collection_id in collection_ids:
+            if  not collection_id:
+                continue
+            print("collections-------------------------------------------------")
+
+            
+            collection_database_entity = Collection(
+                id=collection_id,
+                cursor=self.cursor,
+                w=self.w
+            )
+            if collection_database_entity.id is None:
+                self.log_results(self.id, collection_database_entity.id, "❌ Failed to fetch this collection_id")
+                continue
+
+            human_collection_database_entity = HumanCollection(
+                human_id=self.id,
+                collection_id=collection_database_entity.id,
+                cursor=self.cursor,
+                w=self.w
+            )
+            if human_collection_database_entity.id is None:
+                
+                human_collection_database_entity.set_data(
+                    {
+                        "human_id": self.id,
+                        "collection_id": collection_database_entity.id
+                    }
+                )
+
     # def update_notable_works(self, notable_works):
 
     #     if not notable_works:
@@ -358,3 +393,4 @@ class Human(BaseEntity):
     #                     "state_id": state_database_entity.id
     #                 }
     #             )
+

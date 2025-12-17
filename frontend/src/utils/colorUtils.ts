@@ -133,5 +133,18 @@ export const getColorForAgeString = (
       return `rgba(${r},${g},${b})`;
 
       };
+  
+  export const getStatusColorForMilitaryEvents = (status?: string) => {
+          switch (status) {
+            case "ongoing":
+              return "#F26B6B"; // soft coral
+            case "upcoming":
+              return "#55B7D9"; // sky blue
+            case "ended":
+              return "#A0A6B1"; // cool gray
+            default:
+              return "#F4B860"; // warm apricot
+          }
+        };
 
   

@@ -21,6 +21,7 @@ def _safe_pick_entity(data: dict, requested_qid: str):
 class HumanFromWikidata:
     def __init__(self, qid):
         self.qid = qid
+        self.name = None
         self.description = ""
         self.image_url = ""
         self.citizenships = []
@@ -140,6 +141,8 @@ class HumanFromWikidata:
         self.description = (
             entity.get("descriptions", {}).get("en", {}).get("value", "") or ""
         )
+
+        self.name = entity.get("labels", {}).get("en", {}).get("value")
 
         # Image P18
         if "P18" in claims:
@@ -287,6 +290,7 @@ class HumanFromWikidata:
     def to_dict(self):
         return {
             "qid": self.qid,
+            "name": self.name,
             "description": self.description,
             "image_url": self.image_url,
             "gender": self.gender,
@@ -309,4 +313,4 @@ class HumanFromWikidata:
     
 
     def __repr__(self):
-        return f"<HumanFromWikidata {self.qid}: {self.description[:40]}...>"
+        return f"<HumanFromWikidata {self.qid}: {self.description[:70]}...>"

@@ -59,6 +59,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
             fetch(`${backendUrl}/person/${person.id}`)
                 .then(res => res.json())
                 .then(data => {
+                    console.log("setPersonDetails", data);
                     setPersonDetails(data);
                     const cv_locs:Location[] = (data.locations as Location[])
                             .filter(l => l.relationship_type_name !== "has_works_in");
@@ -134,7 +135,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
                         />
                 )}
                 <div className="person-details">
-                    <h3><i>{personDetails.description} {person.qid}</i></h3>
+                    <h3><i>{personDetails.description} {person.id}</i></h3>
                     <p><strong>Occupations:</strong> {personDetails.occupations.join(", ")}</p>
                     <p><strong> {person.nationality} -  {person.gender}</strong></p>
 

@@ -18,7 +18,10 @@ const Dashboard: React.FC<DashboardProps> = ({ humans, setColorFilterType, color
     : "0";
 
   const nationalityCounter: Record<string, number> = {};
-  const cityCounter: Record<string, number> = {};
+  const cityCounter: Record<
+    number,
+    { name: string; count: number }
+  > = {};
   const genderCounter: Record<string, number> = {};
 
   for (const h of humans) {
@@ -26,8 +29,11 @@ const Dashboard: React.FC<DashboardProps> = ({ humans, setColorFilterType, color
       nationalityCounter[h.nationality] =
         (nationalityCounter[h.nationality] || 0) + 1;
     }
-    if (h.city) {
-      cityCounter[h.city] = (cityCounter[h.city] || 0) + 1;
+    if (h.city_id && h.city) {
+      if (!cityCounter[h.city_id]) {
+        cityCounter[h.city_id] = { name: h.city, count: 0 };
+      }
+      cityCounter[h.city_id].count += 1;
     }
     if (h.gender) {
       genderCounter[h.gender] = (genderCounter[h.gender] || 0) + 1;
@@ -39,9 +45,6 @@ const Dashboard: React.FC<DashboardProps> = ({ humans, setColorFilterType, color
   );
   const topNationalities = nationalities.slice(0, 10);
 
-  const cities = Object.entries(cityCounter).sort((a, b) => b[1] - a[1]);
-  const topCities = cities.slice(0, 10);
-
   const genders = Object.entries(genderCounter).sort((a, b) => b[1] - a[1]);
 
   const genderLabels = genders.map(([label]) => label);
@@ -50,8 +53,19 @@ const Dashboard: React.FC<DashboardProps> = ({ humans, setColorFilterType, color
   const nationalityLabels = topNationalities.map(([label]) => label);
   const nationalityValues = topNationalities.map(([, value]) => value);
 
-  const citiesLabels = topCities.map(([label]) => label);
-  const citiesValues = topCities.map(([, value]) => value);
+  const cities = Object.entries(cityCounter)
+    .map(([id, { name, count }]) => ({
+      id: Number(id),
+      name,
+      count,
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const topCities = cities.slice(0, 10);
+
+  const citiesLabels = topCities.map((c) => c.name);
+  const citiesValues = topCities.map((c) => c.count);
+  const citiesIds = topCities.map((c) => c.id);
 
   return (
     <div className="dashboard-container">
@@ -179,7 +193,7 @@ const Dashboard: React.FC<DashboardProps> = ({ humans, setColorFilterType, color
 
       <div className="chart-box">
         <div className="chart-box-title">
-          <strong>CITIES : </strong>
+          <strong>LOCATIONS : </strong>
           {cities.length}
         </div>
         <Plot

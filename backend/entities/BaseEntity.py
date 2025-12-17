@@ -53,11 +53,11 @@ class BaseEntity:
 
                 field_updates = ", ".join([f"{col}={repr(getattr(self, col, None))}" for col in self.FIELDS])
 
-                self.log_results(
-                    self.id if hasattr(self, "id") else "-",
-                    field_updates,
-                    f"✅ FOUND in {self.TABLE_NAME} table ",
-                )
+                # self.log_results(
+                #     self.id if hasattr(self, "id") else "-",
+                #     field_updates,
+                #     f"✅ FOUND in {self.TABLE_NAME} table ",
+                # )
 
         except Exception as e:
             self.log_results(
@@ -116,6 +116,7 @@ class BaseEntity:
     def update(self, data: dict):
         if not getattr(self, "id", None):
             raise ValueError("Update requires 'id' to be set.")
+        
 
         conn = None
         if self.cursor is None:

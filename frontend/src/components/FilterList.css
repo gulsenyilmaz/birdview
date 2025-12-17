@@ -23,7 +23,7 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-   font-size: 0.8rem;
+  font-size: 0.8rem;
   gap: 0.5rem;
   font-family: 'Inter', sans-serif;
   color: #0f0f0f9a;

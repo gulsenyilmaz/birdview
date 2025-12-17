@@ -20,34 +20,93 @@ export function extractSortedDates<T extends Record<string, any>>(
 }
 
 
-export function getFullRange<T extends Record<string, any>>(items: T[]): [number, number] {
+type RangeMode = "humans" | "events";
+
+export function getFullRange<T extends Record<string, any>>(
+  items: T[],
+  start: keyof T,
+  end: keyof T,
+  mode: RangeMode = "humans"
+): [number, number] {
   const currentYear = new Date().getFullYear();
 
-  const birthYears = items
-    .map((item) => item["birth_date"])
+  const startYears = items
+    .map((item) => item[start] as unknown)
     .filter((d): d is number => typeof d === "number");
 
-  const deathYears = items
-    .map((item) => item["death_date"])
+  const endYears = items
+    .map((item) => item[end] as unknown)
     .filter((d): d is number => typeof d === "number");
 
-  const someoneAlive = items.some((item) => {
-    const birth = item["birth_date"];
-    const death = item["death_date"];
-    return (
-      typeof birth === "number" &&
-      (death === null || death === undefined || typeof death !== "number" || birth + 100 > currentYear)
-    );
-  });
+  // startYears tamamen boşsa güvenlik için
+  if (startYears.length === 0) {
+    return [currentYear - 10, currentYear];
+  }
 
-  const min = Math.min(...birthYears);
+  let someoneAlive = false;
+
+  if (mode === "humans") {
+    // SADECE humans için "hala hayatta" mantığı
+    someoneAlive = items.some((item) => {
+      const birth = item[start];
+      const death = item[end];
+      return (
+        typeof birth === "number" &&
+        (
+          death === null ||
+          death === undefined ||
+          typeof death !== "number" ||
+          (birth as number) + 100 > currentYear
+        )
+      );
+    });
+  } else {
+    // events için asla today'e clamp etme
+    someoneAlive = false;
+  }
+
+  const rawMin = Math.min(...startYears);
+  const min = rawMin < -500 ? -500 : rawMin;
+
   const max = someoneAlive
     ? currentYear
-    : deathYears.length > 0
-    ? Math.max(...deathYears)
-    : currentYear; // fallback
+    : endYears.length > 0
+    ? Math.max(...endYears)
+    : currentYear;
+
+  console.log(`getFullRange [${mode}] -> min: ${min}, max: ${max}, someoneAlive: ${someoneAlive}`);
 
   return [min, max];
 }
+
+// export function getFullRange<T extends Record<string, any>>(items: T[], start:keyof T, end:keyof T): [number, number] {
+//   const currentYear = new Date().getFullYear();
+
+//   const startYears = items
+//     .map((item) => item[start] as unknown)
+//     .filter((d): d is number => typeof d === "number");
+
+//   const endYears = items
+//     .map((item) => item[end] as unknown)
+//     .filter((d): d is number => typeof d === "number");
+
+//   const someoneAlive = items.some((item) => {
+//     const birth = item[start];
+//     const death = item[end];
+//     return (
+//       typeof birth === "number" &&
+//       (death === null || death === undefined || typeof death !== "number" || birth + 100 > currentYear)
+//     );
+//   });
+
+//   const min = Math.min(...startYears)<-1500 ? -1500 : Math.min(...startYears);
+//   const max = someoneAlive
+//     ? currentYear
+//     : endYears.length > 0
+//     ? Math.max(...endYears)
+//     : currentYear; // fallback
+
+//   return [min, max];
+// }
 
 

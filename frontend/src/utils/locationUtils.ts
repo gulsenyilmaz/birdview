@@ -46,18 +46,38 @@ export function computeBounds(locations: Location[], detailMode: Boolean = false
 
 
 
-export function offsetFibonacciPosition(lon:number, lat:number, index:number,  zoom = 1.5) {
-  const angle = index * 2.39996;
-  const radius = 0.05 * Math.sqrt(index);
-  const spreadFactor = Math.min(0.1, 1.5 / 10);
+// export function offsetFibonacciPosition(lon:number, lat:number, index:number,  zoom = 1.5) {
+//   const angle = index* 2 * (Math.PI / 100); 
+//   const radius = 0.02*index;
 
-  const zoomFactor = Math.max(1, 2 * zoom); // daha yakınsa daha az yay
-  const newLon = lon + radius * spreadFactor * zoomFactor * Math.cos(angle);
-  const newLat = lat + radius * spreadFactor * zoomFactor * Math.sin(angle);
+//   const newLon = lon + radius * Math.cos(angle);
+//   const newLat = lat + radius * Math.sin(angle);
+
+//   return [newLon, newLat];
+// }
+
+
+export function offsetFibonacciPosition(
+  lon: number,
+  lat: number,
+  age: number,
+  zoom = 1.5,
+  cityIndex = 0  // yeni parametre
+): [number, number] {
+
+  const baseAngle = age * 2*Math.PI/60; // altın oran ile ilişkili açı
+  const angleOffset = -cityIndex * ((2*Math.PI/60) /6); // aynı yaş+şehirdekiler azıcık sapma alır
+  const angle = baseAngle+ angleOffset;
+
+
+  
+  const radiusY = 0.014*age ;
+  const radiusX = 0.02*age;
+  const newLon = lon + radiusX * Math.cos(angle);
+  const newLat = lat + radiusY * Math.sin(angle);
 
   return [newLon, newLat];
 }
-
 
 export function offsetCircularPosition(lon:number, lat:number, index:number, totalAtThisPoint = 100) {
   const angle = (index / totalAtThisPoint) * 2 * Math.PI;  // Daire çevresine yay
@@ -69,4 +89,13 @@ export function offsetCircularPosition(lon:number, lat:number, index:number, tot
   const newLat = lat + radius * spreadFactor * Math.sin(angle);
 
   return [newLon, newLat];
+}
+
+
+export function groupBy<T, K extends keyof any>(array: T[], key: (item: T) => K): Record<K, T[]> {
+  return array.reduce((result, current) => {
+    const k = key(current);
+    (result[k] = result[k] || []).push(current);
+    return result;
+  }, {} as Record<K, T[]>);
 }

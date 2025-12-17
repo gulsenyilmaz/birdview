@@ -21,22 +21,16 @@ export default function TimeWindowSlider({
 
   const [minYear, maxYear] = fullRange;
   const [wStart, wEnd] = windowRange;
- 
 
+   useEffect(() => {
+    let newYear = selectedYear;
+    if (selectedYear < wStart) newYear = wStart;
+    else if (selectedYear > wEnd) newYear = wEnd;
 
-
-  // pencere içinde kal
-  useEffect(() => {
-    if (selectedYear < wStart) {
-      setSelectedYear(wStart);
-    } // pencereyi güncelle
-    else if (selectedYear > wEnd) {
-      setSelectedYear(wEnd);
-
+    if (newYear !== selectedYear) {
+      setSelectedYear(newYear);
     }
-      
-   
-  }, [wStart, wEnd]); // eslint-disable-line
+  }, [selectedYear, wStart, wEnd]); 
 
   // pencere genişliğine göre tick adımı
   // const step = useMemo(() => {
@@ -55,7 +49,7 @@ export default function TimeWindowSlider({
 
   return (
     <div className={`tw-container ${detailMode ? "hide" : ""}`}>
-    {/* OVERVIEW (pencere seçimi) */}
+  
         <div className="tw-overview">
           <div className="tw-window">
             <div className="tw-year-label" style={{

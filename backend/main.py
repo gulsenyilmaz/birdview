@@ -1,12 +1,15 @@
 from fastapi import FastAPI, Query
+from fastapi import HTTPException
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 from collections import Counter
 from fastapi.responses import JSONResponse
 import json
+from entities.MilitaryEvent import MilitaryEvent
 
 import os
+import re
 
 app = FastAPI()
 
@@ -44,7 +47,7 @@ def get_humans(request: Request):
         SELECT 
             h.id, h.name, h.birth_date, h.death_date,
             n.name AS nationality, g.name AS gender,
-            l.lat AS lat, l.lon AS lon, l.name AS city,
+            l.lat AS lat, l.lon AS lon, l.name AS city, l.id AS city_id,
             h.num_of_identifiers, h.qid, h.img_url
         FROM humans h
         INNER JOIN human_location hl ON hl.human_id = h.id
@@ -55,6 +58,8 @@ def get_humans(request: Request):
             h.birth_date IS NOT NULL
             AND h.birth_date != 0
             AND hl.relationship_type_id = 4
+            
+
     """
 
     params = []
@@ -101,7 +106,8 @@ def get_humans(request: Request):
         base_query += " AND h.id = ?"
         params.append(human_id)
 
-    base_query += " ORDER BY h.birth_date ASC"
+    base_query += """
+        ORDER BY city_id, h.birth_date  ASC"""
 
     results = cur.execute(base_query, params).fetchall()
     conn.close()
@@ -110,9 +116,10 @@ def get_humans(request: Request):
     city_counter = Counter()
     for h in humans:
         h["entity_type"] = "human"
-        if h["city"]:
-            city_counter[h["city"]] += 1
-            h["city_index"] = city_counter[h["city"]]
+        if h["city"] and h["birth_date"]:
+            key = f"{h['city']}_{h['birth_date']}"
+            city_counter[key] += 1
+            h["city_index"] = city_counter[key]
 
     return JSONResponse({"humans": humans})
 
@@ -520,7 +527,7 @@ def search(q: str):
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    results = {"humans": [], "locations": []}
+    results = {"humans": [], "locations": [], "events": []}
 
     if len(q) >= 2:
         cur.execute(
@@ -551,12 +558,25 @@ def search(q: str):
 
         results["locations"] = [dict(r) for r in cur.fetchall()]
 
+        cur.execute(
+            """
+            SELECT * FROM military_events
+            WHERE name LIKE ?
+            ORDER BY 
+            CASE WHEN name LIKE ? THEN 0 ELSE 1 END,
+            name
+            LIMIT 10
+        """,
+            (f"%{q}%", f"{q}%"),
+        )       
+        results["events"] = [dict(r) for r in cur.fetchall()]
+
     return results
 
 
 
 @app.get("/allevents")
-def get_humans(request: Request):
+def get_events(request: Request):
     qp = request.query_params
 
    
@@ -573,6 +593,8 @@ def get_humans(request: Request):
         INNER JOIN event_location el ON el.event_id = e.id
         INNER JOIN locations l ON el.location_id = l.id
     """
+
+    
 
     results = cur.execute(base_query).fetchall()
     conn.close()
@@ -599,3 +621,230 @@ def get_humans(request: Request):
    
 
     return JSONResponse({"events": events})
+
+def extract_year(val):
+    
+    if not val:
+        return None
+
+    s = str(val).strip()
+
+    # MÖ için işaret
+    sign = -1 if s.startswith('-') else 1
+
+    # 4 rakam arka arkaya olan kısmı bul
+    m = re.search(r"\d{4}", s)
+    if m:
+        year = int(m.group(0))   # "0053" -> 53
+        return sign * year       # MÖ ise -53, değilse 53
+
+    
+
+@app.get("/allmilitaryevents")
+def get_military_events(request: Request):
+    qp = request.query_params
+
+    military_event_depth_index = qp.get("military_event_depth_index")
+    
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    base_query = """
+        SELECT 
+           me.id, 
+           me.qid, 
+           me.name, 
+           me.image_url,
+           me.start_time, me.end_time, me.point_in_time, 
+           me.lat, me.lon, 
+           me.depth_index, me.descendant_count, me.depth_level, me.parent_id, 
+           GROUP_CONCAT(et.name, ' | ') AS event_type
+        FROM military_events AS me
+        LEFT JOIN event_type_relation AS etr ON me.id = etr.event_id
+        LEFT JOIN event_types AS et ON et.id = etr.type_id
+        
+    """
+
+    params = []
+
+    if military_event_depth_index:
+        # depth_index içindeki '_' karakterlerini LIKE için escape et
+        escaped_prefix = military_event_depth_index.replace("_", r"\_")
+        like_pattern = escaped_prefix + r"\_%"
+
+        base_query += """
+            WHERE depth_index = ?
+               OR depth_index LIKE ? ESCAPE '\\'
+        """
+        params.extend([military_event_depth_index, like_pattern])
+
+    base_query += """
+        GROUP BY me.id
+        ORDER BY me.depth_level ASC, me.start_time ASC
+    """
+
+    results = cur.execute(base_query, params).fetchall()
+    conn.close()
+
+    military_events = [dict(row) for row in results]
+
+    for e in military_events:
+        e["entity_type"] = "military_event"
+        
+        start_date = extract_year(e.get("start_time"))
+        point_in_time = extract_year(e.get("point_in_time"))
+        end_date = extract_year(e.get("end_time"))
+        e["start_date"] = start_date if start_date is not None else point_in_time
+        e["end_date"] =  end_date if end_date is not None else e["start_date"]
+       
+    return JSONResponse({"military_events": military_events})
+
+
+
+
+@app.get("/military_event/{military_event_id}")
+def get_military_event_details(military_event_id: int):
+    print("get_military_event_details")
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT 
+        me.id, 
+        me.qid, 
+        me.name, 
+        me.start_time, me.end_time, me.point_in_time, 
+        me.lat, me.lon, 
+        me.depth_index, me.descendant_count, me.depth_level, 
+        me.wiki_url, me.image_url, me.description,
+        me.parent_id, parent_me.name AS parent_name, et.name AS event_type
+          FROM military_events AS me 
+        INNER JOIN event_type_relation AS etr ON me.id = etr.event_id
+        INNER JOIN event_types AS et ON et.id = etr.type_id
+        LEFT JOIN military_events AS parent_me ON me.parent_id = parent_me.id
+        WHERE me.id = ?""",
+        (military_event_id,),
+    )
+    row = cur.fetchone()
+    if not row:
+        return {"error": "military_event not found"}
+
+
+    conn.close()
+
+    return JSONResponse(
+        {
+            "details": {
+                "id": row["id"],
+                "qid": row["qid"],
+                "name": row["name"],
+                "image_url": row["image_url"],
+                "description": row["description"],
+                "start_time": row["start_time"],
+                "end_time": row["end_time"],
+                "point_in_time": row["point_in_time"],
+                "wiki_url": row["wiki_url"],
+                "depth_index": row["depth_index"],
+                "descendant_count": row["descendant_count"],
+                "depth_level": row["depth_level"],
+                "parent_id": row["parent_id"],
+                "parent_name": row["parent_name"] if row["parent_id"] else None,
+                "event_type": row["event_type"]
+            }
+        }
+    )
+
+@app.put("/military_event/{event_id}/update_times")
+def militaryevent_update_time(event_id: int, payload: dict):
+    print("militaryevent_update_time")
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    start_time = payload.get("start_time")
+    end_time = payload.get("end_time")
+
+    event = MilitaryEvent(id=event_id, cursor=cur)
+    if event.id is None:
+        print("❌ Failed to add to humans - already exists")
+        return
+    
+    event.update_time({"start_time":start_time,"end_time":end_time})
+    conn.commit()
+    conn.close()
+    return {"status": "success", "event_id": event_id, "new_start_time": start_time}
+
+
+@app.put("/military_event/{event_id}/update_coors")
+def militaryevent_update_time(event_id: int, payload: dict):
+    print("militaryevent_update_time")
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    lat = payload.get("lat")
+    lon = payload.get("lon")
+
+    event = MilitaryEvent(id=event_id, cursor=cur)
+    if event.id is None:
+        print("❌ Failed to add to humans - already exists")
+        return
+    
+    event.update_coors({"lat":lat,"lon":lon})
+    conn.commit()
+    conn.close()
+    return {"status": "success", "event_id": event_id, "new_coors": f"{lat}, {lon}"}
+
+
+def to_int_or_none(value: str | None):
+    if value is None:
+        return None
+    value = value.strip()
+    if value == "":
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        return None   # veya hatayı loglayıp yine None dönebilirsin
+
+def to_float_or_none(value: str | None):
+    if value is None:
+        return None
+    value = value.strip()
+    if value == "":
+        return None
+    try:
+        return float(value)
+    except ValueError:
+        return None
+
+
+@app.put("/military_event/{event_id}/update")
+def militaryevent_update(event_id: int, payload: dict):
+    
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    start_time = to_int_or_none(payload.get("start_time"))
+    end_time   = to_int_or_none(payload.get("end_time"))
+    parent_id  = to_int_or_none(payload.get("parent_id"))
+    lat        = to_float_or_none(payload.get("lat"))
+    lon        = to_float_or_none(payload.get("lon"))
+
+    event = MilitaryEvent(id=event_id, cursor=cur)
+    if event.id is None:
+        raise HTTPException(status_code=404, detail=f"MilitaryEvent {event_id} not found")
+        print("❌ Failed to add to humans - already exists")
+        return
+    
+    event.update_time({"start_time":start_time,"end_time":end_time})
+    event.update_parent({"parent_id":parent_id})
+    event.update_coors({"lat":lat,"lon":lon})
+    
+    conn.commit()
+    conn.close()
+    return {"status": "success", "event_id": event_id}

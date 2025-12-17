@@ -9,6 +9,7 @@ export interface Human {
   lon: number;
   city: string;
   city_index: number;
+  city_id: number;
   num_of_identifiers: number;
   qid:string;
   img_url:string;

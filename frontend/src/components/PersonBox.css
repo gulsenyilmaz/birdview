@@ -19,6 +19,20 @@
   background-color: #ffffff;
 }
 
+.person-details-container img.signature-image {
+  position: absolute;
+  /* box-sizing: border-box; */
+  top: 5%;
+  right: 8%;
+  height:auto;
+  width: 50%; 
+  max-width: 200px;
+  height: auto;
+  margin-top: 1rem;
+  background-color:antiquewhite;
+  filter: grayscale(10%);
+}
+
 
 
 .person-details {

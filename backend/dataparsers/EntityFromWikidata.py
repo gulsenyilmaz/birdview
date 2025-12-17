@@ -7,6 +7,7 @@ class EntityFromWikidata:
     def __init__(self, qid):
         self.qid = qid
         self.name = ""
+        
         self._fetch_and_parse()
 
     def _fetch_entity(self):
@@ -25,12 +26,18 @@ class EntityFromWikidata:
             return
 
         self.name = entity.get("labels", {}).get("en", {}).get("value", "unknown")
+        self.description = (
+            entity.get("descriptions", {}).get("en", {}).get("value", "") or ""
+        )
 
     def to_dict(self):
         return {
             "qid": self.qid,
             "name": self.name,
+            "description":self.description,
         }
 
     def __repr__(self):
-        return f"<EntityFromWikidata {self.qid or self.name}>"
+        text = (self.description or self.name or "").replace("\n", " ").strip()
+        short = (text[:40] + "…") if len(text) > 40 else text
+        return f"<EntityFromWikidata {self.qid}: {short!r}>"

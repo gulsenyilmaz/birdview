@@ -11,33 +11,43 @@ import type { Nationality } from "./entities/Nationality";
 import type { Gender } from "./entities/Gender";
 import type { Occupation } from "./entities/Occupation";
 import type { Event } from "./entities/Event";
+import type { MilitaryEvent } from "./entities/MilitaryEvent";
 
 import { getFullRange } from "./utils/dateUtils";
-import { isHuman, isLocation } from "./utils/typeGuards";
+import { isHuman, isLocation, isEvent, isMilitaryEvent } from "./utils/typeGuards";
 import Dashboard from "./components/Dashboard";
 import FilterList from "./components/FilterList";
 import DescriptionBanner from "./components/DescriptionBanner"
 import DetailBox from "./components/DetailBox";
 import PersonBox from './components/PersonBox';
 import LocationBox from './components/LocationBox';
+import EventBox from './components/EventBox';
+import MilitaryEventBox from './components/MilitaryEventBox';
 import HumanList from './components/HumanList';
+import MilitaryEventDetail from './components/MilitaryEventDetail';
+import MilitaryEventTree from './components/MilitaryEventTree';
 import WorkList from './components/WorkList';
 import ContentStrip from "./components/ContentStrip";
-import { buildAliveCounts } from "./utils/buildAliveCounts";
+import { buildAliveCounts, buildEventCounts } from "./utils/buildCounts";
 
 
 function App() {
   const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("nationality");
-  const [selectedYear, setSelectedYear] = useState<number>(1944);
+  const [selectedYear, setSelectedYear] = useState<number>(1921);
   const [detailMode, setDetailMode] = useState<boolean>(false);
+  const [eventDetailMode, setEventDetailMode] = useState<boolean>(false);
+  
   const [humans, setHumans] = useState<Human[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [militaryEvents, setMilitaryEvents] = useState<MilitaryEvent[]>([]);
+  const [filteredMilitaryEvents, setFilteredMilitaryEvents] = useState<MilitaryEvent[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [filteredHumans, setFilteredHumans] = useState<Human[]>([]);
   const [distinctDates, setDistinctDates] = useState<number[]>([]);
   const [aliveCounts, setAliveCounts] = useState<{ year: number; count: number }[]>([]);
-  const [fullRange, setFullRange] = useState<[number, number]>([1200, 2025]); // başlangıç ve bitiş tarihleri
+  const [eventCounts, setEventCounts] = useState<{ year: number; count: number }[]>([]);
+  const [fullRange, setFullRange] = useState<[number, number]>([-1600, 2025]); // başlangıç ve bitiş tarihleri
   const [windowRange, setWindowRange] = useState<[number, number]>([1850, 1950]);
 
   const [selectedObject, setSelectedObject] = useState<any>(null);
@@ -45,6 +55,8 @@ function App() {
 
   const [selectedHuman, setSelectedHuman] = useState<Human | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedMilitaryEvent, setSelectedMilitaryEvent] = useState<MilitaryEvent | null>(null);
 
   const [selectedOccupation, setSelectedOccupation] = useState<Occupation| null>(null);
   const [selectedGender, setSelectedGender] = useState<Gender| null>(null);
@@ -73,9 +85,11 @@ function App() {
     fetch(`${backendUrl}/allhumans?${queryParams.toString()}`)
       .then(res => res.json())
       .then(data => {
-        setFullRange(getFullRange(data.humans));
+         
+        setFullRange(getFullRange(data.humans, "birth_date", "death_date", "humans"));
         // setDistinctDates(extractSortedDates(data.humans, "birth_date"));   
         setHumans(data.humans)
+        
       })  
       .catch(err => console.error("API error:", err));
 
@@ -83,16 +97,35 @@ function App() {
 
 
   useEffect(() => {
+    const queryParams = new URLSearchParams();
+    if (selectedEvent) queryParams.append("event_id", String(selectedEvent.id));
      
-    fetch(`${backendUrl}/allevents`)
+    fetch(`${backendUrl}/allevents?${queryParams.toString()}`)
       .then(res => res.json())
       .then(data => {
-       
         setEvents(data.events)
       })  
       .catch(err => console.error("API error:", err));
 
-  }, [selectedHuman]);
+  }, [selectedEvent]);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams();
+    if (selectedMilitaryEvent) {
+      queryParams.append("military_event_depth_index", String(selectedMilitaryEvent.depth_index));
+    }
+     
+    fetch(`${backendUrl}/allmilitaryevents?${queryParams.toString()}`)
+      .then(res => res.json())
+      .then(data => {
+        setMilitaryEvents(data.military_events)
+        
+        setFullRange(getFullRange(data.military_events , "start_date", "end_date","events"));
+        console.log("Fetched military events:", data.military_events);
+      })  
+      .catch(err => console.error("API error:", err));
+
+  }, [selectedMilitaryEvent]);
 
 
   useEffect(() => {
@@ -107,6 +140,14 @@ function App() {
 
       setAliveCounts([]);
     }
+
+    if (militaryEvents.length > 1) {
+      setEventCounts(buildEventCounts(militaryEvents, fullRange));
+    }
+    else {
+      setEventCounts([]);
+    }
+
 
   }, [fullRange]);
 
@@ -125,31 +166,70 @@ function App() {
     );
     setFilteredEvents(filteredE);
 
-  }, [selectedYear, humans]);
+
+    const filteredME = militaryEvents.filter(me =>
+     me.start_date && me.start_date <= selectedYear 
+    //  && (!me.end_date || me.end_date >= selectedYear)
+    );
+    
+    setFilteredMilitaryEvents(filteredME);
+
+  }, [selectedYear, humans, militaryEvents]);
 
   useEffect(() => {
 
     if(selectedObject){
+      
 
       setDetailMode(true);
+      setEventDetailMode(false);
 
       if(isHuman(selectedObject)){
 
         setSelectedHuman(selectedObject);
         setSelectedLocation(null);
+        setSelectedEvent(null);
+        setSelectedMilitaryEvent(null);
       }
       else if(isLocation(selectedObject)){
 
         setSelectedLocation(selectedObject);
         setSelectedHuman(null);
         setLocations([selectedObject]);
+        setSelectedEvent(null);
+        setSelectedMilitaryEvent(null);
 
       }
+      else if(isEvent(selectedObject)){
+
+        setSelectedLocation(null);
+        setSelectedHuman(null);
+        setLocations([]);
+        setSelectedEvent(selectedObject);
+        setSelectedMilitaryEvent(null);
+
+      }
+      else if(isMilitaryEvent(selectedObject)){
+        setEventDetailMode(true);
+        // setDetailMode(false);
+
+        
+        setSelectedLocation(null);
+        setSelectedHuman(null);
+        setLocations([]);
+        setSelectedMilitaryEvent(selectedObject);
+        setSelectedEvent(null);
+
+      }
+      
       else{
         setSelectedHuman(null);
         setSelectedLocation(null);
+        setSelectedEvent(null);
+        setSelectedMilitaryEvent(null);
         setSelectedObject(null);
         setDetailMode(false);
+        setEventDetailMode(false);
       }
     }
 
@@ -163,6 +243,7 @@ function App() {
       setSelectedObject(null);
       setLocations([]);
       setSelectedObjectThumbnail(null);
+      setSelectedMilitaryEvent(null);
     }
 
   }, [detailMode]);
@@ -173,7 +254,7 @@ function App() {
     <div className="app-container">
       <div className="main-content">
         
-          <div className={`left-panel ${detailMode ? "open" : ""}`}>
+          <div className={`left-panel ${detailMode&&!eventDetailMode? "open" : ""}`}>
             <DetailBox
               selectedYear={selectedYear}
               detailMode={detailMode}
@@ -181,19 +262,30 @@ function App() {
             >
               {selectedHuman && (
                 <PersonBox
-                  person={selectedHuman}
-                  setLocations={setLocations}
-                  setSelectedObjectThumbnail ={setSelectedObjectThumbnail}
+                    person={selectedHuman}
+                    setLocations={setLocations}
+                    setSelectedObjectThumbnail ={setSelectedObjectThumbnail}
                 />
               )}
               {selectedLocation && (
-                <LocationBox location={selectedLocation}
-                            setSelectedObjectThumbnail = {setSelectedObjectThumbnail} />
+                <LocationBox 
+                    location={selectedLocation}
+                    setSelectedObjectThumbnail = {setSelectedObjectThumbnail} />
               )}
+              {selectedEvent && (
+                <EventBox 
+                    event={selectedEvent}
+                    setSelectedObjectThumbnail = {setSelectedObjectThumbnail} />
+              )}
+              {/* {selectedMilitaryEvent && (
+                <MilitaryEventBox 
+                    militaryEvent={selectedMilitaryEvent}
+                    setSelectedObjectThumbnail = {setSelectedObjectThumbnail} />
+              )} */}
             </DetailBox>
           </div>
 
-          <div className={`top-panel ${detailMode ? "open" : ""}`}>
+          <div className={`top-panel ${detailMode ? (eventDetailMode?"openAndStretched":"open") : ""}`}>
               {selectedObject &&(
                 <ContentStrip 
                     selectedYear = {selectedYear}
@@ -212,12 +304,23 @@ function App() {
                           setSelectedObject = {setSelectedObject}
                         />
                       )}
+                     
+                      {selectedMilitaryEvent && (
+                        <MilitaryEventDetail
+                            selectedYear={selectedYear}
+                            militaryEvents={militaryEvents}
+                            setSelectedObject = {setSelectedObject}
+                            selectedMilitaryEvent={selectedMilitaryEvent}
+                        />
+                        
+                      )}
+                      
                 </ContentStrip>
               )}
-
+              
           </div>
 
-          <div className={`top-filter_description-bar ${detailMode ? "close" : ""}`} >
+          <div className={`top-filter_description-bar ${detailMode? "close" : ""}`} >
               
             <DescriptionBanner
                 selectedMovement ={selectedMovement}
@@ -250,12 +353,23 @@ function App() {
               />
 
           </div>
+
+          {/* <div className={`top-event-bar ${eventDetailMode ? "open" : ""}`} >
+               {selectedMilitaryEvent && (
+                        <MilitaryEventTree
+                            selectedYear={selectedYear}
+                            militaryEvents={militaryEvents}
+                            setSelectedObject = {setSelectedObject} />
+                      )}
+          </div> */}
+
           <div className="scene">
 
             <MapScene
               locations={locations}
               humans = {filteredHumans} 
               events={filteredEvents}
+              militaryEvents={filteredMilitaryEvents}
               selectedYear={selectedYear}
               setSelectedObject={setSelectedObject}
               colorFilterType={colorFilterType}
@@ -264,7 +378,7 @@ function App() {
             />
 
           </div>
-          <div className={`right-panel ${detailMode ? "hide" : ""}`}>
+          <div className={`right-panel ${detailMode? "hide" : ""}`}>
             
             <Dashboard
                 humans = {filteredHumans} 
@@ -273,7 +387,7 @@ function App() {
               />
 
           </div>
-           <div className={`bottom-panel ${detailMode ? "squeezed" : ""}`}>
+           <div className={`bottom-panel ${detailMode&&!eventDetailMode ? "squeezed" : ""}`}>
 
             <TimeWindowSlider
               fullRange={fullRange}
@@ -297,7 +411,8 @@ function App() {
                   selectedYear={selectedYear}
                   setSelectedYear={setSelectedYear}
                   windowRange={windowRange}
-                  aliveCounts={aliveCounts}          // ⬅️ histogram artık “o yıl hayatta olanlar”
+                  aliveCounts={eventCounts.length>0?eventCounts:aliveCounts}          // ⬅️ histogram artık “o yıl hayatta olanlar”
+                         // ⬅️ histogram artık “o yıl aktif olan eventler”
                   binAggregation="sum"               // istersen "sum"
                   distinctDates= {distinctDates}            // opsiyonel
                 />

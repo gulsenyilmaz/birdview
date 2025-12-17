@@ -69,7 +69,7 @@ def add_events(file_path):
                     # log_results(writer, event.id, war, "is updated")
 
                 # --- Location işlemleri ---
-                location = Location(id=None, name=battle, latitude=lat, longitude=lon, country=country, cursor=cursor)
+                location = Location(id=None, name=battle, lat=lat, lon=lon, country=country, cursor=cursor)
                 if location.id is None:
                     location.set_data({
                         "name": battle,

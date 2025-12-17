@@ -21,28 +21,31 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   setSelectedYear,
   distinctDates = [],
   windowRange = [1200, 2025],
-  aliveCounts = [],                 // ⬅️ yeni
+  aliveCounts = [],               // ⬅️ yeni
   binAggregation = "avg",           // ⬅️ yeni
 }) => {
 
   const [minYear, maxYear] = windowRange;
   const totalRange = maxYear - minYear;
 
+  // console.log("TimeSlider windowRange:", windowRange);
+
   const step = useMemo(() => {
     const span = maxYear - minYear;
 
-    return Math.round(span/40);
+    // return Math.round(span/40);
     if (span <= 50) return 1;
     if (span <= 150) return 5;
     if (span <= 500) return 10;
     if (span <= 1500) return 20;
+    if (span <= 1500) return 50;
     return 50;
   }, [minYear, maxYear]);
 
   // Histogram bin genişliği
   const binSize = useMemo(() => {
     const span = maxYear - minYear;
-    return Math.round(span/200);
+    // return Math.round(span/250);
     if (span <= 50) return 1;
     if (span <= 150) return 2;
     if (span <= 500) return 5;
@@ -50,11 +53,9 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
     return 20;
   }, [minYear, maxYear]);
 
-  // ⬇️ aliveCounts → bin'lere topla (avg/sum)
   const { bins, maxVal } = useMemo(() => {
     if (!aliveCounts.length) return { bins: [] as Array<{start:number; end:number; value:number}>, maxVal: 0 };
 
-    // pencereye hizalanmış, yıl->count hızlı erişim
     const arrLen = maxYear - minYear + 1;
     const dense: number[] = new Array(arrLen).fill(0);
     for (const { year, count } of aliveCounts) {
@@ -117,7 +118,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
             })}
           </div>
         )}
-       {/* Etiketler (senin kodun) */}
+      
         <div className="year-labels">
           {Array.from(
             { length: Math.floor((maxYear - minYear) / step) + 1 },
@@ -133,7 +134,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
           )}
         </div>
 
-        {/* Main slider + milestones (senin kodun) */}
+        
         <div className="slider-wrapper">
           <div className="milestone-markers bottom">
             {distinctDates.map((year, idx) => {
@@ -162,10 +163,6 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
             onChange={(e) => setSelectedYear(Number(e.target.value))}
           />
         </div>
-
-        
-
-        
 
         <hr className="divider" />
         <div className="time-slider-info">[step: {step}, bin: {binSize}, aggregation: {binAggregation}]

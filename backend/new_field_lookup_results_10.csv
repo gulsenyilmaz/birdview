@@ -1,0 +1,4 @@
+Result,id,Context
+🔎 FOUND to fetch entity,143700,Eugène-Emmanuel Viollet-le-Duc
+✅ FOUND in humans table ,143700,"id=143700, name='Eugène-Emmanuel Viollet-le-Duc', birth_date=1814, death_date=1879, nationality_id=5, gender_id=1, qid='Q272912', num_of_identifiers=164, description='French architect (1814-1879)', img_url='https://commons.wikimedia.org/wiki/Special:FilePath/Eugene%20viollet%20le%20duc.jpg', signature_url='https://commons.wikimedia.org/wiki/Special:FilePath/Signature%20d%27Eug%C3%A8ne%20Viollet%20Le%20Duc%20-%20Archives%20nationales.png'"
+✅ UPDATED in humans table,143700,name='Eugène Viollet-le-Duc'

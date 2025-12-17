@@ -1,0 +1,30 @@
+.military_event_detail_container {
+  
+
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  background-color: #fffefe;
+  box-shadow: 0 3px 5px rgba(93, 93, 93, 0.538);
+  
+  padding: 0;
+  box-sizing: border-box;
+  border: 1px solid #74747400;
+  z-index: 150;
+
+
+  
+}
+.military_event_details_box {
+    margin-left: 1rem;
+    margin-top: 0.5rem;
+    width: 15%;
+
+}
+
+.military_event_tree_box {
+    margin-left: 1rem;
+    margin-top: 0.5rem;
+    width: 85%;
+
+}
