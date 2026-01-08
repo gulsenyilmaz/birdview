@@ -28,9 +28,14 @@ backend/venv/
 backend/data/
 design/
 
+# databases
+*.db
 backend/*.db
 backend/*backup*.db
-*.db
+
+# documents
+*.pdf
+design/*.pdf
 
 .env
 
