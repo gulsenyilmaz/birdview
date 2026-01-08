@@ -9,18 +9,18 @@ import {MapView} from '@deck.gl/core';
 import {scaleLog,scaleLinear,scaleSqrt} from 'd3-scale';
 
 import { ScatterplotLayer } from "@deck.gl/layers";
-import { PathLayer,IconLayer } from "@deck.gl/layers";
+import { IconLayer } from "@deck.gl/layers";
 import { ArcLayer } from "@deck.gl/layers";
 import { TextLayer } from '@deck.gl/layers';
 import { CollisionFilterExtension } from '@deck.gl/extensions';
 import type {CollisionFilterExtensionProps} from '@deck.gl/extensions';
 import type { Location } from "../entities/Location";
 import type { Human } from "../entities/Human";
-import type { Event } from "../entities/Event";
+// import type { Event } from "../entities/Event";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import type { HumanEnriched } from "../entities/HumanEnriched";
 import { getColorForGender, getColorForAge, getColorForLabel, getColorForRelationType } from "../utils/colorUtils";
-import { computeBounds, offsetFibonacciPosition, groupBy } from "../utils/locationUtils"
+import { computeBounds, offsetFibonacciPosition } from "../utils/locationUtils"
 
 
 
@@ -48,20 +48,20 @@ const ICON_MISSING = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9
 const ICON_SIZE = 50;
 
 
-const grayColorScale = scaleLog<Color>()
-  .domain([1, 426])
-  .range([
-    [80, 80, 80, 150],  // Açık gri (az tanınan)
-    [40, 40, 40, 255]      // Koyu gri (tanınmış)
-  ]).clamp(true);  
+// const grayColorScale = scaleLog<Color>()
+//   .domain([1, 426])
+//   .range([
+//     [80, 80, 80, 150],  // Açık gri (az tanınan)
+//     [40, 40, 40, 255]      // Koyu gri (tanınmış)
+//   ]).clamp(true);  
 
 
-const ageColorScale = scaleLog<Color>()
-  .domain([1, 80])
-  .range([
-    [5, 5, 5, 150],
-    [70, 70, 70,10]
-  ]).clamp(true); 
+// const ageColorScale = scaleLog<Color>()
+//   .domain([1, 80])
+//   .range([
+//     [5, 5, 5, 150],
+//     [70, 70, 70,10]
+//   ]).clamp(true); 
 
 const fillColorScale = scaleLog<Color>()    
   .domain([1, 80, 100])
@@ -130,7 +130,7 @@ interface MapSceneProps {
 
   locations:Location[];
   humans:Human[];
-  events:Event[];
+  // events:Event[];
   militaryEvents:MilitaryEvent[];
   selectedYear:number;
   setSelectedObject: (obj: any) => void;
@@ -143,7 +143,7 @@ interface MapSceneProps {
 const MapScene: React.FC<MapSceneProps> = ({
                                               locations,
                                               humans,
-                                              events,
+                                              // events,
                                               militaryEvents,
                                               selectedYear,
                                               setSelectedObject,
@@ -370,7 +370,7 @@ const layers = useMemo(() => {
             id: 'humans-layer',
             data: processedHumans,
             getSourcePosition: (d) => [d.lon, d.lat],
-            getTargetPosition: (d) => [d.lonOffsetSource, d.latOffsetSource],
+            getTargetPosition: (d) => [d.lonOffsetTarget, d.latOffsetTarget],
             getSourceColor: d => d.fillColor,
             getTargetColor: d => d.fillTColor,
             getWidth: 5,

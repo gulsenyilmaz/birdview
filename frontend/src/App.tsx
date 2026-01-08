@@ -10,7 +10,7 @@ import type { Movement } from "./entities/Movement";
 import type { Nationality } from "./entities/Nationality";
 import type { Gender } from "./entities/Gender";
 import type { Occupation } from "./entities/Occupation";
-import type { Event } from "./entities/Event";
+// import type { Event } from "./entities/Event";
 import type { MilitaryEvent } from "./entities/MilitaryEvent";
 
 import { getFullRange } from "./utils/dateUtils";
@@ -21,7 +21,7 @@ import DescriptionBanner from "./components/DescriptionBanner"
 import DetailBox from "./components/DetailBox";
 import PersonBox from './components/PersonBox';
 import LocationBox from './components/LocationBox';
-import EventBox from './components/EventBox';
+// import EventBox from './components/EventBox';
 import MilitaryEventBox from './components/MilitaryEventBox';
 import HumanList from './components/HumanList';
 import MilitaryEventDetail from './components/MilitaryEventDetail';
@@ -38,10 +38,10 @@ function App() {
   
   const [humans, setHumans] = useState<Human[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
+  // const [events, setEvents] = useState<Event[]>([]);
   const [militaryEvents, setMilitaryEvents] = useState<MilitaryEvent[]>([]);
   const [filteredMilitaryEvents, setFilteredMilitaryEvents] = useState<MilitaryEvent[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  // const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [filteredHumans, setFilteredHumans] = useState<Human[]>([]);
   const [distinctDates, setDistinctDates] = useState<number[]>([]);
   const [aliveCounts, setAliveCounts] = useState<{ year: number; count: number }[]>([]);
@@ -54,7 +54,7 @@ function App() {
 
   const [selectedHuman, setSelectedHuman] = useState<Human | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  // const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedMilitaryEvent, setSelectedMilitaryEvent] = useState<MilitaryEvent | null>(null);
 
   const [selectedOccupation, setSelectedOccupation] = useState<Occupation| null>(null);
@@ -95,18 +95,18 @@ function App() {
   }, [selectedHuman, selectedLocation, selectedOccupation, selectedGender, selectedNationality, selectedMovement]);
 
 
-  useEffect(() => {
-    const queryParams = new URLSearchParams();
-    if (selectedEvent) queryParams.append("event_id", String(selectedEvent.id));
+  // useEffect(() => {
+  //   const queryParams = new URLSearchParams();
+  //   if (selectedEvent) queryParams.append("event_id", String(selectedEvent.id));
      
-    fetch(`${backendUrl}/allevents?${queryParams.toString()}`)
-      .then(res => res.json())
-      .then(data => {
-        setEvents(data.events)
-      })  
-      .catch(err => console.error("API error:", err));
+  //   fetch(`${backendUrl}/allevents?${queryParams.toString()}`)
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       setEvents(data.events)
+  //     })  
+  //     .catch(err => console.error("API error:", err));
 
-  }, [selectedEvent]);
+  // }, [selectedEvent]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams();
@@ -160,10 +160,10 @@ function App() {
     );
     setFilteredHumans(filteredH);
 
-    const filteredE = events.filter(e =>
-      e.start_date <= selectedYear && (e.start_date+e.scale+2) > selectedYear
-    );
-    setFilteredEvents(filteredE);
+    // const filteredE = events.filter(e =>
+    //   e.start_date <= selectedYear && (e.start_date+e.scale+2) > selectedYear
+    // );
+    // setFilteredEvents(filteredE);
 
 
     const filteredME = militaryEvents.filter(me =>
@@ -187,7 +187,7 @@ function App() {
 
         setSelectedHuman(selectedObject);
         setSelectedLocation(null);
-        setSelectedEvent(null);
+        // setSelectedEvent(null);
         setSelectedMilitaryEvent(null);
       }
       else if(isLocation(selectedObject)){
@@ -195,7 +195,7 @@ function App() {
         setSelectedLocation(selectedObject);
         setSelectedHuman(null);
         setLocations([selectedObject]);
-        setSelectedEvent(null);
+        // setSelectedEvent(null);
         setSelectedMilitaryEvent(null);
 
       }
@@ -204,7 +204,7 @@ function App() {
         setSelectedLocation(null);
         setSelectedHuman(null);
         setLocations([]);
-        setSelectedEvent(selectedObject);
+        // setSelectedEvent(selectedObject);
         setSelectedMilitaryEvent(null);
 
       }
@@ -217,14 +217,14 @@ function App() {
         setSelectedHuman(null);
         setLocations([]);
         setSelectedMilitaryEvent(selectedObject);
-        setSelectedEvent(null);
+        // setSelectedEvent(null);
 
       }
       
       else{
         setSelectedHuman(null);
         setSelectedLocation(null);
-        setSelectedEvent(null);
+        // setSelectedEvent(null);
         setSelectedMilitaryEvent(null);
         setSelectedObject(null);
         setDetailMode(false);
@@ -271,11 +271,11 @@ function App() {
                     location={selectedLocation}
                     setSelectedObjectThumbnail = {setSelectedObjectThumbnail} />
               )}
-              {selectedEvent && (
+              {/* {selectedEvent && (
                 <EventBox 
                     event={selectedEvent}
                     setSelectedObjectThumbnail = {setSelectedObjectThumbnail} />
-              )}
+              )} */}
               {selectedMilitaryEvent && (
                
                 <MilitaryEventBox 
@@ -368,7 +368,7 @@ function App() {
             <MapScene
               locations={locations}
               humans = {filteredHumans} 
-              events={filteredEvents}
+              // events={filteredEvents}
               militaryEvents={filteredMilitaryEvents}
               selectedYear={selectedYear}
               setSelectedObject={setSelectedObject}
