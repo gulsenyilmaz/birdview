@@ -6,4 +6,5 @@ export interface Work {
   image_url: string;
   url: string;
   collection_name: string;
+  qid: string;
 }

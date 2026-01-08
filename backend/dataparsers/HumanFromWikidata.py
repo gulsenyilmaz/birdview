@@ -131,9 +131,26 @@ class HumanFromWikidata:
             ):
                 count += 1
         return count
+    
+    def _pick_label(entity: dict, preferred=("en", "tr", "fr", "de", "es", "it")) -> str | None:
+        labels = (entity or {}).get("labels", {})
+        # 1) Öncelikli diller
+        for lang in preferred:
+            v = labels.get(lang, {}).get("value")
+            if v:
+                return v
+
+        # 2) "en" yoksa elde ne varsa ilkini al (default gibi)
+        for obj in labels.values():
+            v = (obj or {}).get("value")
+            if v:
+                return v
+
+        return None
 
     def _fetch_and_parse(self):
         entity = self._fetch_entity()
+        print("entity")
         if not entity:
             return
 
@@ -142,7 +159,12 @@ class HumanFromWikidata:
             entity.get("descriptions", {}).get("en", {}).get("value", "") or ""
         )
 
+        # self.name = self._pick_label(entity)
+        labels = entity.get("labels", {})
+
         self.name = entity.get("labels", {}).get("en", {}).get("value")
+        if not self.name:
+            self.name = next((v.get("value") for v in labels.values() if v.get("value")), None)
 
         # Image P18
         if "P18" in claims:
@@ -230,15 +252,15 @@ class HumanFromWikidata:
             )
             self.birth_place = bp_val.get("id")
 
-        if self.birth_place:
-            self.locations.append(
-                {
-                    "qid": self.birth_place,
-                    "relation_type": "birth_place",
-                    "start_date": self.birth_date,
-                    "end_date": self.birth_date,
-                }
-            )
+        # if self.birth_place:
+        #     self.locations.append(
+        #         {
+        #             "qid": self.birth_place,
+        #             "relation_type": "birth_place",
+        #             "start_date": self.birth_date,
+        #             "end_date": self.birth_date,
+        #         }
+        #     )
 
         if "P570" in claims:
             dod_t = (
@@ -259,15 +281,15 @@ class HumanFromWikidata:
             )
             self.death_place = dp_val.get("id")
 
-        if self.death_place:
-            self.locations.append(
-                {
-                    "qid": self.death_place,
-                    "relation_type": "death_place",
-                    "start_date": self.death_date,
-                    "end_date": self.death_date,
-                }
-            )
+        # if self.death_place:
+        #     self.locations.append(
+        #         {
+        #             "qid": self.death_place,
+        #             "relation_type": "death_place",
+        #             "start_date": self.death_date,
+        #             "end_date": self.death_date,
+        #         }
+        #     )
 
         if self.has_works_in:
             for hwi_qid in self.has_works_in:

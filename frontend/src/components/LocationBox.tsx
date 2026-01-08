@@ -20,6 +20,8 @@ const LocationBox: React.FC<LocationBoxProps> = ({location, setSelectedObjectThu
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [locationDetails, setLocationDetails] = useState<LocationDetails | null>(null);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [updateError, setUpdateError] = useState<string | null>(null);
 
     useEffect(() => {
         if (location) {
@@ -33,14 +35,41 @@ const LocationBox: React.FC<LocationBoxProps> = ({location, setSelectedObjectThu
          }
     }, [location]);
 
+    const handleUpdateLocationDetails = async () => {
+      if (!location) return;
+      setIsUpdating(true);
+      setUpdateError(null);
 
+      try {
+        // 🔧 endpoint’i backend’ine göre değiştir
+        const res = await fetch(
+          `${backendUrl}/locations/${location.id}/update`,
+          {
+                method: "PUT",          
+                headers: {
+                "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+      } catch (err: any) {
+        console.error(" update error:", err);
+        setUpdateError("kaydedilirken bir hata oldu.");
+      } finally {
+        setIsUpdating(false);
+      }
+    };
 
     return (
       <>
         {locationDetails && (
           
             <div className="location-details-container ">
-              <h2>{location.name}- {location.qid}</h2>
+              <h2>{location.name}-({location.id})</h2>
 
                 {locationDetails.img_url && (
                   <img src={locationDetails.img_url} alt="portrait" className="portrait" />
@@ -50,10 +79,24 @@ const LocationBox: React.FC<LocationBoxProps> = ({location, setSelectedObjectThu
                     <img src={locationDetails.logo_url} alt="logo" className="logo" />
                   )}
                   
-                  <div style={{height: '1rem'}}>
+                  <div style={{height: 'auto'}}>
+                    <a href={`https://www.wikidata.org/wiki/${location.qid}`} target="_blank" rel="noreferrer" className="timeline-item-title">{location.qid}</a>
+                    <button
+                        onClick={handleUpdateLocationDetails}
+                        disabled={isUpdating}
+                        style={{ marginLeft:"0.4rem", marginTop: "0.4rem" }}
+                      >
+                        {isUpdating ? "UPDATING..." : "UPDATE"}
+                    </button>
+
+                    {updateError && (
+                    <p style={{ color: "red", marginTop: "0.3rem" }}>
+                        {updateError}
+                    </p>
+                    )}
                     <p>{locationDetails.description}</p>
-                  {locationDetails.country_label && (<p><strong>IN COUNTRY:</strong> {locationDetails.country_label}</p>)}
-                  {locationDetails.inception && (<p><strong>INCEPTION:</strong> {locationDetails.inception}</p>)}
+                    {locationDetails.country_label && (<p><strong>IN COUNTRY:</strong> {locationDetails.country_label}</p>)}
+                    {locationDetails.inception && (<p><strong>INCEPTION:</strong> {locationDetails.inception}</p>)}
                   </div>
                   
                 </div>

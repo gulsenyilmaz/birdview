@@ -31,6 +31,8 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
     const [museums, setMuseums] = useState<Location[]>([]);
     const [selectedTab, setSelectedTab] = useState<"cv" | "museums">("cv");
     const [fallbackImage, setFallbackImage] = useState<string | null>(null);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [updateError, setUpdateError] = useState<string | null>(null);
 
 
     const renderLocationList = (
@@ -45,7 +47,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
                 {locations.map((loc, idx) => (
                     <li key={idx}>
                     {loc.start_date} 
-                    {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} — <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
+                    {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} {loc.qid}— <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
                         {action}
                         </em>
                     </li>
@@ -115,6 +117,35 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
         return page?.thumbnail?.source || null;
     }
 
+    const handleUpdatePersonDetails = async () => {
+      if (!person) return;
+      setIsUpdating(true);
+      setUpdateError(null);
+
+      try {
+        // 🔧 endpoint’i backend’ine göre değiştir
+        const res = await fetch(
+          `${backendUrl}/humans/${person.id}/update`,
+          {
+                method: "PUT",          
+                headers: {
+                "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+      } catch (err: any) {
+        console.error(" update error:", err);
+        setUpdateError("kaydedilirken bir hata oldu.");
+      } finally {
+        setIsUpdating(false);
+      }
+    };
+
     
     return (
     <>
@@ -135,7 +166,23 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
                         />
                 )}
                 <div className="person-details">
-                    <h3><i>{personDetails.description} {person.id}</i></h3>
+
+                    
+                    <h3><i>{personDetails.description} ({person.id} )</i></h3>
+                    <a href={`https://www.wikidata.org/wiki/${person.qid}`} target="_blank" rel="noreferrer" className="timeline-item-title">{person.qid}</a>
+                    <button
+                        onClick={handleUpdatePersonDetails}
+                        disabled={isUpdating}
+                        style={{ marginLeft:"0.4rem", marginTop: "0.4rem" }}
+                      >
+                        {isUpdating ? "UPDATING..." : "UPDATE"}
+                    </button>
+
+                    {updateError && (
+                    <p style={{ color: "red", marginTop: "0.3rem" }}>
+                        {updateError}
+                    </p>
+                    )}
                     <p><strong>Occupations:</strong> {personDetails.occupations.join(", ")}</p>
                     <p><strong> {person.nationality} -  {person.gender}</strong></p>
 

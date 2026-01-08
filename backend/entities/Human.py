@@ -20,7 +20,6 @@ from entities.Citizenship import Citizenship
 from entities.BaseEntity import BaseEntity
 
 
-
 class Human(BaseEntity):
     TABLE_NAME = "humans"
     FIELDS = [
@@ -36,6 +35,21 @@ class Human(BaseEntity):
         "img_url",
         "signature_url",
     ]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        SPARQL_QUERY = f"""
+            SELECT ?qid 
+            WHERE {{
+                ?person wdt:P31 wd:Q5;
+                rdfs:label "{self.name}"@en;
+                BIND(STRAFTER(STR(?person), "entity/") AS ?qid)
+            }}
+            LIMIT 1
+            
+            """
+        self.SPARQL_QUERY = SPARQL_QUERY
+    
 
 
     def update_gender(self, gender):
@@ -236,18 +250,19 @@ class Human(BaseEntity):
                 )
                     
 
-            
-    def update_birthplace(self, birth_place, birth_date):
-        if not birth_place:
-            self.log_results(self.id, "", "❌ Failed to fetch birthplace")
+
+
+    def update_uniqueplace(self, unique_place_type_id, place_qid, date):
+        if not place_qid:
+            self.log_results(self.id, "", "❌ Failed to fetch place")
             return
 
-        location_wiki_entity = LocationFromWikidata(birth_place)
+        location_wiki_entity = LocationFromWikidata(place_qid)
 
-        print(birth_place, location_wiki_entity.name, "------------------------------------------------")
+        print(place_qid, location_wiki_entity.name, "------------------------------------------------")
         location_database_entity = Location(
-            qid=birth_place,
-            cursor=self.cursor ,
+            qid=place_qid,
+            cursor=self.cursor,
             w=self.w
         )
 
@@ -256,7 +271,7 @@ class Human(BaseEntity):
     
         humanlocation_database_entity = HumanLocation(
                     human_id=self.id,
-                    relationship_type_id=4,
+                    relationship_type_id=unique_place_type_id,
                     cursor=self.cursor,
                     w=self.w
                 )
@@ -274,9 +289,9 @@ class Human(BaseEntity):
                 {
                     "human_id": self.id,
                     "location_id": location_database_entity.id,
-                    "relationship_type_id": 4,
-                    "start_date": birth_date,
-                    "end_date": birth_date,
+                    "relationship_type_id": unique_place_type_id,
+                    "start_date": date,
+                    "end_date": date,
                 }
             )
         
@@ -354,6 +369,63 @@ class Human(BaseEntity):
                         "collection_id": collection_database_entity.id
                     }
                 )
+
+    def add_collection(self, collection_id):
+
+        if not collection_id:
+            self.log_results(self.id, "", "❌ Failed to fetch collection_id")
+            return
+
+            
+        collection_database_entity = Collection(
+            id=collection_id,
+            cursor=self.cursor,
+            w=self.w
+        )
+        
+        if collection_database_entity.id is None:
+            self.log_results(self.id, collection_database_entity.id, "❌ Failed to fetch this collection_id")
+            return
+
+        human_collection_database_entity = HumanCollection(
+            human_id=self.id,
+            collection_id=collection_database_entity.id,
+            cursor=self.cursor,
+            w=self.w
+        )
+
+        if human_collection_database_entity.id:
+            self.log_results(self.id, human_collection_database_entity.id, "connection is already established")
+            return
+       
+        human_collection_database_entity.set_data(
+            {
+                "human_id": self.id,
+                "collection_id": collection_database_entity.id
+            }
+        )
+
+    def update_from_wikidata(self, human_wiki_entity):
+        self.update({
+            "name": human_wiki_entity.name,
+            "birth_date": human_wiki_entity.birth_date,
+            "death_date": human_wiki_entity.death_date,
+            "description": human_wiki_entity.description,
+            "img_url": human_wiki_entity.image_url,
+            "signature_url": human_wiki_entity.signature_url,
+            "num_of_identifiers": human_wiki_entity.num_of_identifiers
+        })
+        self.update_nationality(human_wiki_entity.nationality)
+        self.update_gender(human_wiki_entity.gender)        
+        self.update_citizenships(human_wiki_entity.citizenships)
+        self.update_locations(human_wiki_entity.locations)
+        self.update_movements(human_wiki_entity.movements)
+        self.update_occupations(human_wiki_entity.occupations)
+        self.update_uniqueplace(4, human_wiki_entity.birth_place, human_wiki_entity.birth_date)
+        self.update_uniqueplace(5, human_wiki_entity.death_place, human_wiki_entity.death_date)    
+
+
+    
 
     # def update_notable_works(self, notable_works):
 

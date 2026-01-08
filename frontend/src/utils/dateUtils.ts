@@ -6,6 +6,15 @@
  * @param field - Örneğin "birth_date", "start_date" gibi bir alan adı
  * @returns number[] - sıralı ve tekrarsız değerler
  */
+
+export function extractYear(iso:string) {
+  if (!iso) return null;
+  const m = String(iso).trim().match(/^(-?\d{1,6})/); // -0467, 1590, 2025...
+  if (!m) return null;
+  return Number(m[1]); // -467
+}
+
+
 export function extractSortedDates<T extends Record<string, any>>(
   items: T[],
   field: keyof T
@@ -66,7 +75,7 @@ export function getFullRange<T extends Record<string, any>>(
   }
 
   const rawMin = Math.min(...startYears);
-  const min = rawMin < -500 ? -500 : rawMin;
+  const min = rawMin < -1500 ? -1500 : rawMin;
 
   const max = someoneAlive
     ? currentYear

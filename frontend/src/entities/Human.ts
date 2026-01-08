@@ -13,4 +13,5 @@ export interface Human {
   num_of_identifiers: number;
   qid:string;
   img_url:string;
+  awarded:boolean;
 }

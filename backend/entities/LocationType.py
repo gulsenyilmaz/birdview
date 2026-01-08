@@ -1,9 +1,12 @@
-import sqlite3
-
-DB_PATH = "birdview.db"
+from entities.BaseEntity import BaseEntity
 
 
-class LocationType:
+class LocationType(BaseEntity):
+    TABLE_NAME = "location_types"
+    FIELDS = [
+        "id",
+        "label"
+    ]
     KEYWORDS = {
         # City group
         "city": "city",
@@ -134,13 +137,7 @@ class LocationType:
         "empire": "country",
     }
 
-    def __init__(self, label=None, cursor=None):
-        self.id = None
-        self.label = label
-
-        self.cursor = cursor
-
-        self._getFromTable()
+ 
 
     def _normalize_location_type(self, label):
         if not label or not isinstance(label, str):
@@ -154,53 +151,7 @@ class LocationType:
 
         return None
 
-    def _getFromTable(self):
-        conn = None
-
-        if not self.label:
-            return
-
-        if self.cursor is None:
-            conn = sqlite3.connect(DB_PATH)
-            conn.row_factory = sqlite3.Row
-            self.cursor = conn.cursor()
-
-        normalized_label = self._normalize_location_type(self.label)
-        if normalized_label is not None:
-            self.label = normalized_label
-
-        query = "SELECT id, label FROM location_types WHERE label = ?"
-        self.cursor.execute(query, (self.label,))
-        row = self.cursor.fetchone()
-
-        if row:
-            self.id = row["id"]
-            self.label = row["label"]
-
-        if conn:
-            conn.close()
-
-    def setData(self, data):
-        conn = None
-
-        label = data.get("label")
-        if not label:
-            return
-        normalized_label = self._normalize_location_type(label)
-        if normalized_label is not None:
-            label = normalized_label
-        if self.cursor is None:
-            conn = sqlite3.connect(DB_PATH)
-            conn.row_factory = sqlite3.Row
-            self.cursor = conn.cursor()
-
-        self.cursor.execute("INSERT INTO location_types (label) VALUES (?)", (label,))
-
-        self.id = self.cursor.lastrowid
-
-        if conn:
-            conn.commit()
-            conn.close()
+    
 
 
 def __repr__(self):

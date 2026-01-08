@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
-import './PersonBox.css';
+import './MilitaryEventBox.css';
 
 interface MilitaryEventBoxProps {
   militaryEvent:MilitaryEvent;
@@ -99,27 +99,26 @@ const MilitaryEventBox: React.FC<MilitaryEventBoxProps> = ({militaryEvent}) => {
       
         {militaryEventDetails && (
           
-            <div className="person-details-container">
-              <h2>{militaryEvent.name} ({militaryEvent.id})</h2>
-              <a href={`https://www.wikidata.org/wiki/${militaryEvent.qid}`} target="_blank" rel="noreferrer" className="timeline-item-title">{militaryEvent.qid} - 
-                <strong> Depth Info: {militaryEvent.depth_index} / {militaryEvent.depth_level} / {militaryEvent.descendant_count}</strong>
-              </a>
-
+            <div className="militaryevent-details-container">
               {militaryEventDetails.image_url && (
                 <img src={militaryEventDetails.image_url} alt="portrait" className="portrait" />
               )}
-              <div className="person-details">
-                  <div style={{height: 'auto'}}>
-                    <p>
-                      {militaryEventDetails.parent_name && (
-                          <strong>{militaryEventDetails.parent_name} / </strong> 
-                      )}
-                      <a href={militaryEventDetails.wiki_url} target="_blank" rel="noreferrer">
-                      <strong>{militaryEvent.name} ({militaryEvent.event_type})</strong>
-                      </a>
-                    </p>
-                    <p>{militaryEventDetails.description}</p>
-
+              <div className="militaryevent-details">
+                  <div>
+                        <h4>
+                          {militaryEventDetails.parent_name && (
+                              <strong>{militaryEventDetails.parent_name} / </strong> 
+                          )}
+                          <a href={militaryEventDetails.wiki_url} target="_blank" rel="noreferrer">
+                            <strong>{militaryEvent.name} ({militaryEvent.event_type})</strong>
+                          </a>
+                        </h4>
+                        <a href={`https://www.wikidata.org/wiki/${militaryEvent.qid}`} target="_blank" rel="noreferrer" className="timeline-item-title">{militaryEvent.qid} - 
+                          <strong> Depth Info: {militaryEvent.depth_index} / {militaryEvent.depth_level} / {militaryEvent.descendant_count}</strong>
+                        </a>
+                        <p>{militaryEventDetails.description}</p>
+                      </div>
+                    <div>
                     <div style={{ marginBottom: "0.5rem" }}>
                       {/* Start Time */}
                       <div style={{ display: "flex", alignItems: "center", marginBottom: "0.3rem" }}>
@@ -194,6 +193,7 @@ const MilitaryEventBox: React.FC<MilitaryEventBoxProps> = ({militaryEvent}) => {
                           {saveError}
                         </p>
                       )}
+                     
                     </div>
                   </div>
                 </div>

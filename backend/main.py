@@ -1,23 +1,32 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
 import sqlite3
 from collections import Counter
-from fastapi.responses import JSONResponse
+
 import json
+
+from dataparsers.LocationFromWikidata import LocationFromWikidata
+from dataparsers.HumanFromWikidata import HumanFromWikidata
+from dataparsers.WorkFromWikidata import WorkFromWikidata
+
+from entities.Human import Human
 from entities.MilitaryEvent import MilitaryEvent
+from entities.Location import Location
+from entities.Work import Work
+
 
 import os
 import re
 
 app = FastAPI()
 
-
-# CORS ayarı – Frontend'e veri göndermek için gerekli
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # sadece frontend adresinle sınırlandırabilirsin
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,7 +57,13 @@ def get_humans(request: Request):
             h.id, h.name, h.birth_date, h.death_date,
             n.name AS nationality, g.name AS gender,
             l.lat AS lat, l.lon AS lon, l.name AS city, l.id AS city_id,
-            h.num_of_identifiers, h.qid, h.img_url
+            h.num_of_identifiers, h.qid, h.img_url,
+            EXISTS (
+                SELECT 1
+                FROM works w
+                WHERE w.creator_id = h.id
+                AND w.type_id = 19
+            ) AS awarded
         FROM humans h
         INNER JOIN human_location hl ON hl.human_id = h.id
         INNER JOIN locations l ON hl.location_id = l.id
@@ -58,8 +73,6 @@ def get_humans(request: Request):
             h.birth_date IS NOT NULL
             AND h.birth_date != 0
             AND hl.relationship_type_id = 4
-            
-
     """
 
     params = []
@@ -116,6 +129,7 @@ def get_humans(request: Request):
     city_counter = Counter()
     for h in humans:
         h["entity_type"] = "human"
+        h["awarded"] = bool(h["awarded"])
         if h["city"] and h["birth_date"]:
             key = f"{h['city']}_{h['birth_date']}"
             city_counter[key] += 1
@@ -132,7 +146,7 @@ def get_works(creator_id: int):
 
     cur.execute(
         """
-        SELECT w.id, w.title, w.created_date, w.description, w.image_url, w.url, c.name AS collection_name
+        SELECT w.id, w.qid, w.title, w.created_date, w.description, w.image_url, w.url, c.name AS collection_name
         FROM works AS w
         JOIN collections AS c ON w.collection_id = c.id
         WHERE creator_id = ?
@@ -757,47 +771,6 @@ def get_military_event_details(military_event_id: int):
         }
     )
 
-@app.put("/military_event/{event_id}/update_times")
-def militaryevent_update_time(event_id: int, payload: dict):
-    print("militaryevent_update_time")
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-
-    start_time = payload.get("start_time")
-    end_time = payload.get("end_time")
-
-    event = MilitaryEvent(id=event_id, cursor=cur)
-    if event.id is None:
-        print("❌ Failed to add to humans - already exists")
-        return
-    
-    event.update_time({"start_time":start_time,"end_time":end_time})
-    conn.commit()
-    conn.close()
-    return {"status": "success", "event_id": event_id, "new_start_time": start_time}
-
-
-@app.put("/military_event/{event_id}/update_coors")
-def militaryevent_update_time(event_id: int, payload: dict):
-    print("militaryevent_update_time")
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-
-    lat = payload.get("lat")
-    lon = payload.get("lon")
-
-    event = MilitaryEvent(id=event_id, cursor=cur)
-    if event.id is None:
-        print("❌ Failed to add to humans - already exists")
-        return
-    
-    event.update_coors({"lat":lat,"lon":lon})
-    conn.commit()
-    conn.close()
-    return {"status": "success", "event_id": event_id, "new_coors": f"{lat}, {lon}"}
-
 
 def to_int_or_none(value: str | None):
     if value is None:
@@ -837,9 +810,10 @@ def militaryevent_update(event_id: int, payload: dict):
 
     event = MilitaryEvent(id=event_id, cursor=cur)
     if event.id is None:
-        raise HTTPException(status_code=404, detail=f"MilitaryEvent {event_id} not found")
         print("❌ Failed to add to humans - already exists")
-        return
+        raise HTTPException(status_code=404, detail=f"MilitaryEvent {event_id} not found")
+        
+        
     
     event.update_time({"start_time":start_time,"end_time":end_time})
     event.update_parent({"parent_id":parent_id})
@@ -848,3 +822,105 @@ def militaryevent_update(event_id: int, payload: dict):
     conn.commit()
     conn.close()
     return {"status": "success", "event_id": event_id}
+
+
+@app.put("/humans/{human_id}/update")
+def human_update(human_id: int):
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    human = Human(id=human_id, cursor=cur)
+    if human.qid is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Human {human_id} not found"
+        )
+    
+    try:
+        human_wiki_entity = HumanFromWikidata(human.qid)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Wikidata fetch failed: {str(e)}"
+        )
+
+    human.update_from_wikidata(human_wiki_entity)
+
+    # print(f"human.get_wikidata_qid(): {human.get_wikidata_qid()}")
+
+    conn.commit()
+    conn.close()
+    return {
+        "status": "success",
+        "human_id": human_id
+    }
+
+
+
+@app.put("/locations/{location_id}/update")
+def location_update(location_id: int):
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    location = Location(id=location_id, cursor=cur)
+    if location.qid is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Location {location_id} not found"
+        )
+
+    try:
+        location_wiki_entity = LocationFromWikidata(location.qid)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Wikidata fetch failed: {str(e)}"
+        )
+
+    location.update_from_wikidata(location_wiki_entity)
+
+    conn.commit()
+    conn.close()
+    return {
+        "status": "success",
+        "location_id": location_id
+    }
+
+
+@app.put("/works/{work_id}/update")
+def work_update(work_id: int):
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    work = Work(id=work_id, cursor=cur)
+  
+    try:
+        work_qid =work.get_wikidata_qid()
+    except Exception as e:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Work {work_id} not found"
+        )
+
+    try:
+        work_wiki_entity = WorkFromWikidata(work_qid)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Wikidata fetch failed: {str(e)}"
+        )
+
+    work.update_from_wikidata(work_wiki_entity)
+
+    conn.commit()
+    conn.close()
+    return {
+        "status": "success",
+        "work_id": work_id
+    }

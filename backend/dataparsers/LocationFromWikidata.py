@@ -88,6 +88,33 @@ class LocationFromWikidata:
 
                 self.lat = coords.get("latitude") if coords else None
                 self.lon = coords.get("longitude") if coords else None
+                
+        elif "P131" in claims:
+            # Eğer koordinatlar yoksa, idari bölgeye bak
+            admin_qid = claims["P131"][0]["mainsnak"]["datavalue"]["value"]["id"]
+            admin_entity = LocationFromWikidata(admin_qid)
+            self.lat = admin_entity.lat
+            self.lon = admin_entity.lon
+
+        elif "P361" in claims:
+            # Eğer koordinatlar yoksa, bağlı olduğu yere bak
+            partof_qid = claims["P361"][0]["mainsnak"]["datavalue"]["value"]["id"]
+            partof_entity = LocationFromWikidata(partof_qid)
+            self.lat = partof_entity.lat
+            self.lon = partof_entity.lon
+
+        elif "P36" in claims:
+            # Eğer koordinatlar yoksa, başkent bilgisine bak
+            capital_qid = claims["P36"][0]["mainsnak"]["datavalue"]["value"]["id"]
+            capital_entity = LocationFromWikidata(capital_qid)
+            self.lat = capital_entity.lat
+            self.lon = capital_entity.lon
+        elif "P17" in claims:
+            # Eğer koordinatlar yoksa, ülkeye bak
+            country_qid = claims["P17"][0]["mainsnak"]["datavalue"]["value"]["id"]
+            country_entity = LocationFromWikidata(country_qid)
+            self.lat = country_entity.lat
+            self.lon = country_entity.lon
 
         if self.instance_qid:
             label_url = f"https://www.wikidata.org/wiki/Special:EntityData/{self.instance_qid}.json"

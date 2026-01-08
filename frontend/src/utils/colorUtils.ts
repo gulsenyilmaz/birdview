@@ -137,13 +137,13 @@ export const getColorForAgeString = (
   export const getStatusColorForMilitaryEvents = (status?: string) => {
           switch (status) {
             case "ongoing":
-              return "#F26B6B"; // soft coral
+              return "#d02d2dff"; // soft coral
             case "upcoming":
-              return "#55B7D9"; // sky blue
+              return "#3d839aff"; // sky blue
             case "ended":
-              return "#A0A6B1"; // cool gray
+              return "#84878eff"; // cool gray
             default:
-              return "#F4B860"; // warm apricot
+              return "#b37c29ff"; // warm apricot
           }
         };
 

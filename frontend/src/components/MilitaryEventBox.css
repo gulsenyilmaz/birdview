@@ -1,47 +1,40 @@
-.person-details-container {
+.militaryevent-details-container {
+
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  height: auto;
   padding: 1rem;
-  overflow-y: auto;
   font-family: 'Inter', sans-serif;
-  color: #ffffff;
-  background-color: rgb(48, 49, 48);;
-  border-top: 1px solid #444;
+  color: #ffffff00;
+  background-color: rgba(48, 49, 48, 0);;
+  /* border-top: 1px solid #444; */
   box-sizing: border-box;
 }
 
-.person-details-container img.portrait {
+.militaryevent-details-container img.portrait {
   box-sizing: border-box;
   width: 100%;
   height: auto; 
   border-radius: 8px;
   margin-bottom: 1rem;
   display: block;
-  background-color: #ffffff;
+  background-color: #ffffffa4;
+
 }
 
-.person-details-container img.signature-image {
-  position: absolute;
-  /* box-sizing: border-box; */
-  top: 5%;
-  right: 8%;
-  height:auto;
-  width: 50%; 
-  max-width: 200px;
-  height: auto;
-  margin-top: 1rem;
-  background-color:antiquewhite;
-  filter: grayscale(10%);
-}
-
-
-.person-details {
+.militaryevent-details {
   width: 100%;
+  height: 100%;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   font-family: 'Inter', sans-serif;
-  color: #ffffff;
-  background-color: rgb(48, 49, 48);;
-  border-top: 1px solid #444;
+  color: #494747;
+  background-color: rgba(48, 49, 48, 0);
+  gap: 1rem;
+  /* border-top: 1px solid #444; */
   box-sizing: border-box;
 }
 
@@ -68,14 +61,12 @@
   /* border-color: #222; */
 }
 
-.person-details p {
+.militaryevent-details p {
   font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: 1rem;
 }
 
-.person-details h4 {
-  margin-top: 1.5rem;
+.militaryevent-details h4 {
+ 
   margin-bottom: 0.5rem;
   font-size: 1.1rem;
   color: #ccc;
@@ -83,41 +74,45 @@
   padding-bottom: 0.3rem;
 }
 
-.person-details ul {
+.militaryevent-details h4 strong {
+  color: #5e6060;
+}
+
+.militaryevent-details ul {
   list-style: none;
   padding-left: 0;
 }
 
-.person-details li {
+.militaryevent-details li {
   margin-bottom: 0.4rem;
   font-size: 0.9rem;
 }
 
-.person-details li strong {
+.militaryevent-details li strong {
   color: #89dceb;
   margin-right: 0.4rem;
 }
-.person-details li bp {
+.militaryevent-details li bp {
   color: #27AE60;
   font-size: 0.8rem;
   margin-right: 0.4rem;
 }
-.person-details li dp {
+.militaryevent-details li dp {
   color: #C0392B;
   font-size: 0.8rem;
   margin-right: 0.4rem;
 }
-.person-details li ea {
+.militaryevent-details li ea {
   color: #9B59B6;
   font-size: 0.8rem;
   margin-right: 0.4rem;
 }
-.person-details li re {
+.militaryevent-details li re {
   color: #3498DB;
   font-size: 0.8rem;
   margin-right: 0.4rem;
 }
-.person-details li wl {
+.militaryevent-details li wl {
   color: #F39C12;
   font-size:0.8rem;
   margin-right: 0.4rem;

@@ -1,9 +1,20 @@
 import sqlite3
+import requests
 
 DB_PATH = "birdview.db"
 
+WIKIDATA_ENDPOINT = "https://query.wikidata.org/sparql"
+
+HEADERS = {
+    "User-Agent": "AliveThen-WikidataLookup/1.0 (gulsenyilmaz9@gmail.com)",
+    "Accept": "application/sparql-results+json",
+}
+
+
+
 
 class BaseEntity:
+    SPARQL_QUERY = None
     TABLE_NAME = None
     FIELDS = ["id", "name"]  # subclasses should override
 
@@ -163,6 +174,31 @@ class BaseEntity:
         if conn:
             conn.commit()
             conn.close()
+
+    def get_wikidata_qid(self):
+
+        print(f"Executing SPARQL query for {self.TABLE_NAME}:\n{self.SPARQL_QUERY}\n")
+        
+        response = requests.get(WIKIDATA_ENDPOINT, headers=HEADERS, params={"query": self.SPARQL_QUERY})
+       
+        if response.status_code != 200:
+            print(f"❌ HTTP error {response.status_code} for query:\n{self.SPARQL_QUERY}\n")
+            return None
+        
+        try:
+            data = response.json()
+            print(f"Response JSON: {data}")  # Debugging line
+        except Exception as e:
+            print("❌ JSON decode failed:", e)
+            print("Response content:", response.text)
+            return None
+
+        results = data.get("results", {}).get("bindings", [])
+        if results:
+            qid = results[0]["qid"]["value"]
+            return qid
+        
+        return None
 
     def log_results(self, id, context, message):
         print("-------------------------------------------------")

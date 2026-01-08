@@ -25,7 +25,7 @@ interface MilitaryEventTreeProps {
   setSelectedObject: (obj: any) => void;
 }
 
-const MilitaryEventTree: React.FC<MilitaryEventTreeProps> = ({
+const MilitaryEventTreeHorizontal: React.FC<MilitaryEventTreeProps> = ({
   selectedYear,
   militaryEvents, 
   setSelectedObject
@@ -33,7 +33,6 @@ const MilitaryEventTree: React.FC<MilitaryEventTreeProps> = ({
   
   const [militaryEventsTree, setMilitaryEventsTree] = useState<EventNode>({ id: 0, name: "Root", children: [] });
   const [maxNumberOfNodesAtDepth, setMaxNumberOfNodesAtDepth] = useState<number>(0);
-  const [maxNumberDepth, setMaxNumbeDepth] = useState<number>(0);
 
     
   useEffect(() => {
@@ -71,7 +70,8 @@ const MilitaryEventTree: React.FC<MilitaryEventTreeProps> = ({
       parentNode.isLeaf = false;
     });
     setMaxNumberOfNodesAtDepth(Math.max(...Array.from(mapDepthLevel.values())));
-    setMaxNumbeDepth(Math.max(...Array.from(mapDepthLevel.keys())))
+    
+
     setMilitaryEventsTree(root.children![0] || root);
 
   }, [militaryEvents, selectedYear]);
@@ -84,10 +84,8 @@ const MilitaryEventTree: React.FC<MilitaryEventTreeProps> = ({
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-
-
-    const dx = (1200/maxNumberOfNodesAtDepth)<8?8:(1200/maxNumberOfNodesAtDepth);
-    const dy = 1200/maxNumberDepth;
+    const dx = 1400/(maxNumberOfNodesAtDepth<150?maxNumberOfNodesAtDepth:150);
+    const dy = 170;
 
     const root = d3.hierarchy<EventNode>(militaryEventsTree as EventNode);
     const treeLayout = d3.tree<EventNode>().nodeSize([dx, dy]);
@@ -107,29 +105,29 @@ const MilitaryEventTree: React.FC<MilitaryEventTreeProps> = ({
     const paddingX = 50;
     const paddingY = 50;
 
-    const autoWidth = (xMax - xMin) + paddingX;
-    const autoHeight = (yMax - yMin) + dy;
+    const autoWidth = (xMax - xMin) + paddingX * 2;
+    const autoHeight = (yMax - yMin) + dy * 2;
 
 
-    svg.attr("width", autoHeight).attr("height", autoWidth);
+    svg.attr("width", autoWidth).attr("height", autoHeight);
 
 
     const g = svg
       .append("g")
       .attr("stroke-linejoin", "round")
       .attr("stroke-width", 3)
-      .attr("transform", `translate(${paddingY+100},${paddingX-xMin})`)
+      .attr("transform", `translate(${paddingX-xMin },${paddingY-yMin})`)
       .attr("style", "max-width:100%; height: auto; height: intrinsic;")
       .attr("font-family", "sans-serif")
       .attr("font-size", 10);
   
     const linkGenerator = d3
-      .linkHorizontal<
+      .linkVertical<
         d3.HierarchyPointLink<EventNode>,
         d3.HierarchyPointNode<EventNode>
       >()
-      .x((d) => d.y ?? 0)
-      .y((d) => d.x ?? 0);
+      .x((d) => d.x ?? 0)
+      .y((d) => d.y ?? 0);
 
     g.selectAll(".link")
       .data(root.links())
@@ -148,7 +146,7 @@ const MilitaryEventTree: React.FC<MilitaryEventTreeProps> = ({
       .enter()
       .append("g")
       .attr("class", "node")
-      .attr("transform", (d) => `translate(${d.y ?? 0},${d.x ?? 0})`)
+      .attr("transform", (d) => `translate(${d.x ?? 0},${d.y ?? 0})`)
       .attr("cursor", "pointer")
       .on("click", (_, d) => setSelectedObject(d.data.me));
 
@@ -159,17 +157,17 @@ const MilitaryEventTree: React.FC<MilitaryEventTreeProps> = ({
       
     node.append("text")
         .attr("dy", "1.6em")
-        .attr("text-anchor", (d) => d.data.isLeaf ? "start" : "end")
-        .attr("y", d => d.data.isLeaf ? 0: -12)
-        .attr("x", d => d.data.isLeaf ? 0: -12)
+        .attr("text-anchor", (d) => d.data.isLeaf ? "end" : "end")
+        .attr("y", d => d.data.isLeaf ? -12: -12)
+        .attr("x", d => d.data.isLeaf ? -12: -12)
         .attr("transform", (d) => {
-          return d.data.isLeaf ? "translate(10,-10)" : `translate(10,-10)`; 
+          return d.data.isLeaf ? "rotate(-90, 0, 0)" : `translate(10,-10)`; 
         })
         .attr("fill", (d) => getStatusColorForMilitaryEvents(d.data.status))
         .attr("font-size", (d) => (d.data.status=="ongoing" ? "10px" : "9px"))
         .attr("font-family", "Arial, sans-serif")
         .attr("font-weight", (d) => (d.data.status=="ongoing" ? "bold" : "normal"))
-        .attr("stroke","#d8d8d8cf")
+        .attr("stroke","#cbccceff")
         .attr("paint-order", "stroke")
         .text(d => d.data.name.toLocaleUpperCase())
         .call((text) => {
@@ -200,4 +198,4 @@ const MilitaryEventTree: React.FC<MilitaryEventTreeProps> = ({
 );
 };
 
-export default MilitaryEventTree;
+export default MilitaryEventTreeHorizontal;

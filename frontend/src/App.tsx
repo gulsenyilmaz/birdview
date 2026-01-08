@@ -25,7 +25,6 @@ import EventBox from './components/EventBox';
 import MilitaryEventBox from './components/MilitaryEventBox';
 import HumanList from './components/HumanList';
 import MilitaryEventDetail from './components/MilitaryEventDetail';
-import MilitaryEventTree from './components/MilitaryEventTree';
 import WorkList from './components/WorkList';
 import ContentStrip from "./components/ContentStrip";
 import { buildAliveCounts, buildEventCounts } from "./utils/buildCounts";
@@ -254,7 +253,7 @@ function App() {
     <div className="app-container">
       <div className="main-content">
         
-          <div className={`left-panel ${detailMode&&!eventDetailMode? "open" : ""}`}>
+          <div className={`left-panel ${detailMode? "open" : ""}`}>
             <DetailBox
               selectedYear={selectedYear}
               detailMode={detailMode}
@@ -277,15 +276,16 @@ function App() {
                     event={selectedEvent}
                     setSelectedObjectThumbnail = {setSelectedObjectThumbnail} />
               )}
-              {/* {selectedMilitaryEvent && (
+              {selectedMilitaryEvent && (
+               
                 <MilitaryEventBox 
-                    militaryEvent={selectedMilitaryEvent}
-                    setSelectedObjectThumbnail = {setSelectedObjectThumbnail} />
-              )} */}
+                    militaryEvent={selectedMilitaryEvent} 
+                />
+              )}
             </DetailBox>
           </div>
 
-          <div className={`top-panel ${detailMode ? (eventDetailMode?"openAndStretched":"open") : ""}`}>
+          <div className={`top-panel ${detailMode ? (eventDetailMode?"open":"open") : ""}`}>
               {selectedObject &&(
                 <ContentStrip 
                     selectedYear = {selectedYear}
@@ -310,7 +310,7 @@ function App() {
                             selectedYear={selectedYear}
                             militaryEvents={militaryEvents}
                             setSelectedObject = {setSelectedObject}
-                            selectedMilitaryEvent={selectedMilitaryEvent}
+                            // selectedMilitaryEvent={selectedMilitaryEvent}
                         />
                         
                       )}

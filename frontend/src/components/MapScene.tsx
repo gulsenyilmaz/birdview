@@ -45,7 +45,7 @@ const INITIAL_VIEW_STATE: ViewStateType = {
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
 
 const ICON_MISSING = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iLTQtNCA4IDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSByPSI0IiBmaWxsPSIjY2NjIi8+PHRleHQgeT0iLjUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiIGZpbGw9IiNmZmYiPj88L3RleHQ+PC9zdmc+';
-const ICON_SIZE = 200;
+const ICON_SIZE = 50;
 
 
 const grayColorScale = scaleLog<Color>()
@@ -69,21 +69,21 @@ const fillColorScale = scaleLog<Color>()
 
     [255, 200, 200, 100],
     [255, 100, 100, 50],
-    [120, 120, 120, 20] 
+    [160, 180, 180, 15] 
   ]).clamp(true);
 
 const colorScale = scaleLog<Color>()
   .domain([1, 80, 100])
   .range([
     [255,  30,  30, 250], 
-    [255,  60, 100, 200],
-    [150, 150, 150, 15]
+    [255,  60, 100, 150],
+    [150, 150, 150, 0]
   ]).clamp(true); 
 
 // 1 yıl → küçük, 200 yıl → büyük
 const radiusByDuration = scaleSqrt<number, number>()
   .domain([1, 25])          // min–max duration (yıl)
-  .range([100000, 400000])    // metre cinsinden base radius
+  .range([10000, 400000])    // metre cinsinden base radius
   .clamp(true);
 
 // zaman içindeki ilerlemeye göre çarpan
@@ -99,7 +99,7 @@ const timeFactorScale = scaleLinear<number, number>()
 const getDuration = (d: MilitaryEvent) => { 
   let duration = d.end_date - d.start_date;
   if (!isFinite(duration) || duration <= 0) {
-    duration = 5; // güvenlik için
+    duration = 8; // güvenlik için
   }
   return duration;
 };
@@ -158,72 +158,84 @@ const MapScene: React.FC<MapSceneProps> = ({
   const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text'>('text');
   const [showEvents, setShowEvents] = useState(true);
   const [showHumans, setShowHumans] = useState(false);
+  const [manuelMode, setManuelMode] = useState(true)
 
  
 
   useEffect(() => {
-    const enrichedHumans: HumanEnriched[] = humans.map((h) => {
-        const age = selectedYear - h.birth_date;
-        
-        let fillColor: [number, number, number, number];
-        let fillTColor: [number, number, number, number];
-        let [lonOffsetSource, latOffsetSource] = offsetFibonacciPosition(h.lon, h.lat, age, viewState.zoom, h.city_index || 0);
-        let lonOffsetTarget = lonOffsetSource + Math.random()*10;
-        let latOffsetTarget = latOffsetSource + Math.random()*10;
-        
-        switch (colorFilterType) {
-          case "gender":
-            fillColor = getColorForGender(h.gender, 250);
-            fillTColor = getColorForGender(h.gender, 0);
-            break;
-          case "nationality":
-            fillColor = getColorForLabel(h.nationality || "", 200);
-            fillTColor = getColorForLabel(h.nationality || "", 0);
-            break;
-          case "age":
-          default:
-            
-            fillColor = getColorForAge(age, 200);
-            fillTColor = getColorForAge(age, 0);
-            break;
-        }
+    if(showHumans){
+      const enrichedHumans: HumanEnriched[] = humans.map((h) => {
+          const age = selectedYear - h.birth_date;
+          
+          let fillColor: [number, number, number, number];
+          let fillTColor: [number, number, number, number];
+          let [lonOffsetSource, latOffsetSource] = offsetFibonacciPosition(h.lon, h.lat, age, viewState.zoom, h.city_index || 0);
+          let lonOffsetTarget = lonOffsetSource + Math.random()*20;
+          let latOffsetTarget = latOffsetSource + Math.random()*20;
+          
+          switch (colorFilterType) {
+            case "gender":
+              fillColor = getColorForGender(h.gender, 250);
+              fillTColor = getColorForGender(h.gender, 0);
+              break;
+            case "nationality":
+              fillColor = getColorForLabel(h.nationality || "", 200);
+              fillTColor = getColorForLabel(h.nationality || "", 0);
+              break;
+            case "age":
+            default:
+              
+              fillColor = getColorForAge(age, 200);
+              fillTColor = getColorForAge(age, 0);
+              break;
+          }
 
-        return {
-          ...h,
-          age,
-          fillColor,
-          fillTColor,
-          lonOffsetSource,
-          latOffsetSource,
-          lonOffsetTarget,
-          latOffsetTarget
-        };
-      });
+          return {
+            ...h,
+            age,
+            fillColor,
+            fillTColor,
+            lonOffsetSource,
+            latOffsetSource,
+            lonOffsetTarget,
+            latOffsetTarget
+          };
+        });
 
-      setProcessedHumans(enrichedHumans);
+        setProcessedHumans(enrichedHumans);
+      }
 
-  }, [humans, selectedYear, colorFilterType, viewState.zoom]);
+  }, [showHumans, humans, selectedYear, colorFilterType, viewState.zoom]);
 
   useEffect(() => {
-    if (viewState.zoom>1) return;
-    if (!humans.length && !locations.length) return;
-    const combinedLocations = [
-      ...humans.map(h => ({ lon: h.lon, lat: h.lat })),
-      ...locations.map(l => ({ lon: l.loc_lon, lat: l.loc_lat }))
-    ];
+    if (manuelMode) return;
+    
+    const combinedLocations:any[] = [];
+    
+
+    if(showHumans){
+      combinedLocations.push(...humans.map(h => ({ lon: h.lon, lat: h.lat })));
+      combinedLocations.push(...locations.map(l => ({ lon: l.loc_lon, lat: l.loc_lat })));
+    }
+
+    if (showEvents){
+      combinedLocations.push(...militaryEvents.map(me =>({ lon: me.lon, lat: me.lat })));
+    }
 
     const { centerLon, centerLat, zoom } = computeBounds(combinedLocations, detailMode);
+
+    const zoomME = showEvents && militaryEvents.length > 0? Math.min(...militaryEvents.map(me => me.depth_level)): zoom;
 
     setViewState((prev) => ({
       ...prev,
       longitude: centerLon,
       latitude: centerLat,
-      zoom: zoom,
+      zoom: zoomME+0.2,
       transitionInterpolator: new FlyToInterpolator({ speed: 1 }),
       transitionDuration: 'auto',
     }));
 
-  }, [humans, locations, detailMode]);
+  }, [humans, locations, militaryEvents, detailMode, showHumans, showEvents, manuelMode]);
 
 
 const layers = useMemo(() => {
@@ -237,7 +249,7 @@ const layers = useMemo(() => {
   // console.log("sizeMaxPixels:", sizeMaxPixels, "sizeMinPixels:", sizeMinPixels);
 
   const SCATTER_FACTOR = 0.04 * 111320;
-  
+  console.log(viewState.zoom)
 
     // const eventLayer = new ScatterplotLayer({
     //   id: "events-layer",
@@ -277,8 +289,7 @@ const layers = useMemo(() => {
     const militaryEventTextLayer = new TextLayer<MilitaryEvent, CollisionFilterExtensionProps<MilitaryEvent>>(
       {
         id: "military_events-layer1",
-        // data: militaryEvents.filter(me => me.depth_level === Math.floor(viewState.zoom) && me.descendant_count>0 && (!me.end_date || me.end_date >= selectedYear)),
-        data: militaryEvents.filter(me => me.depth_level === Math.floor(viewState.zoom) && me.descendant_count>0 && (!me.end_date || me.end_date >= selectedYear)),
+        data: militaryEvents.filter(me => me.depth_level <= Math.floor(viewState.zoom)  && (!me.end_date || me.end_date >= selectedYear)),
         characterSet: 'auto',
         fontSettings: { buffer: 8, sdf: true },
 
@@ -344,7 +355,7 @@ const layers = useMemo(() => {
           anchorY: ICON_SIZE 
         }),
         loadOptions: { image: { crossOrigin: "anonymous" } },
-        getSize: 30,
+        getSize: 10,
         sizeScale: viewState.zoom,
         pickable: true
       });
@@ -401,9 +412,9 @@ const layers = useMemo(() => {
               characterSet: 'auto',
               fontSettings: { buffer: 8, sdf: true },
 
-              getText: d => d.name,
+              getText: d => (d.awarded?"✨":"")+d.name +" ("+d.age +")",
               getPosition: d => [d.lonOffsetSource, d.latOffsetSource],
-              getColor: d =>  grayColorScale((d.num_of_identifiers ?? 0) + 1), 
+              // getColor: d =>  grayColorScale((d.num_of_identifiers ?? 0) + 1), 
               getSize: d => Math.pow((d.num_of_identifiers+10)*30*d.age, 0.25) / 40,
               sizeScale: fontSize,
               sizeMinPixels,
@@ -461,13 +472,14 @@ const layers = useMemo(() => {
           
           getTooltip={({ object }) =>
                     object ? {
-                      text: `${object.tooltip_text? object.tooltip_text :object.depth_level+object.name }`,
+                      text: `${object.tooltip_text? object.tooltip_text :object.name }`,
                       style: { fontSize: "14px", color: "white" }
                     } : null
                   }
           onClick={({ object }) => {
                 if (object) {
                   console.log("Clicked object:", object);
+                  setManuelMode(true);
                   setSelectedObject(object);
                 }
             }}

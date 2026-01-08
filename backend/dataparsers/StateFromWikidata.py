@@ -35,11 +35,6 @@ class StateFromWikidata:
 
         self.name = entity.get("labels", {}).get("en", {}).get("value", "unknown")
 
-
-        
-
-       
-
         # Inception (P571)
         if "P571" in claims:
             inception_val = claims["P571"][0]["mainsnak"]["datavalue"]["value"]

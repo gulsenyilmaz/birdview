@@ -162,7 +162,7 @@ html, body, #root {
   flex-direction: row;
   width: 76vw;
   /* height: 16vh; */
-  background-color: #b8b8b8c9;
+  background-color: #d8d8d8cf;
   box-shadow: 0 3px 5px rgba(93, 93, 93, 0.538);
   
   padding: 0;
@@ -179,8 +179,8 @@ html, body, #root {
   transform: translateY(0%);
 }
 .top-panel.openAndStretched {
-  width: 100vw;
-  left: 0;
+  width: 40vw;
+  left: 60vw;
   transform: translateY(0%);
 }
 

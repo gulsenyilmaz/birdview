@@ -19,19 +19,19 @@ interface EventDetails {
 const EventBox: React.FC<EventBoxProps> = ({event, setSelectedObjectThumbnail}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    // const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
+    const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
 
-    // useEffect(() => {
-    //     if (event) {
-    //          fetch(`${backendUrl}/event/${event.id}`)
-    //           .then(res => res.json())
-    //           .then(data => {
-    //             setEventDetails(data.details)
-    //             setSelectedObjectThumbnail(data.img_url)
-    //           })
-    //           .catch(err => console.error("Event details fetch error:", err));
-    //      }
-    // }, [event]);
+    useEffect(() => {
+        if (event) {
+             fetch(`${backendUrl}/event/${event.id}`)
+              .then(res => res.json())
+              .then(data => {
+                setEventDetails(data.details)
+                setSelectedObjectThumbnail(data.img_url)
+              })
+              .catch(err => console.error("Event details fetch error:", err));
+         }
+    }, [event]);
 
 
 
@@ -42,7 +42,7 @@ const EventBox: React.FC<EventBoxProps> = ({event, setSelectedObjectThumbnail}) 
       <h3>{event.battle}</h3>
      
       
-        {/* {eventDetails && (
+        {eventDetails && (
           
             <div className="event-details-container ">
               <h2>{event.name}- {event.id}</h2>
@@ -65,7 +65,7 @@ const EventBox: React.FC<EventBoxProps> = ({event, setSelectedObjectThumbnail}) 
                 
                 
             </div>
-            )} */}
+            )}
       </> 
     );
 };

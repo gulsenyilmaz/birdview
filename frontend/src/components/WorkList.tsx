@@ -17,6 +17,8 @@ const WorkList: React.FC<WorkListProps> = ({person, selectedYear, backendUrl, se
     const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
     const [works, setWorks] = useState<Work[]>([]);
     const [filteredWorks, setFilteredWorks] = useState<Work[]>([]);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [updateError, setUpdateError] = useState<string | null>(null);
 
 
     useEffect(() => {
@@ -43,6 +45,35 @@ const WorkList: React.FC<WorkListProps> = ({person, selectedYear, backendUrl, se
     const closeImageModal = () => {
         setModalImageUrl(null);
       };
+
+    const handleUpdateWorkDetails = async (w_id: number) => {
+     
+      setIsUpdating(true);
+      setUpdateError(null);
+
+      try {
+        // 🔧 endpoint’i backend’ine göre değiştir
+        const res = await fetch(
+          `${backendUrl}/works/${w_id}/update`,
+          {
+                method: "PUT",          
+                headers: {
+                "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+      } catch (err: any) {
+        console.error(" update error:", err);
+        setUpdateError("kaydedilirken bir hata oldu.");
+      } finally {
+        setIsUpdating(false);
+      }
+    };
     
   return (
     <>
@@ -63,10 +94,23 @@ const WorkList: React.FC<WorkListProps> = ({person, selectedYear, backendUrl, se
                       ) : <p>Image not available</p>}
                   <a href={a.url} target="_blank" rel="noreferrer" className="timeline-item-title">
                     <strong>{a.title}</strong>
-                  </a>
+                  </a>- {a.qid}
                   <div className="timeline-item-meta">
                      · {a.created_date} · {a.description} 
                   </div>
+                   <button
+                        onClick={() => handleUpdateWorkDetails(a.id)}
+                        disabled={isUpdating}
+                        style={{ marginLeft:"0.4rem", marginTop: "0.4rem" }}
+                      >
+                        {isUpdating ? "UPDATING..." : "UPDATE"}
+                    </button>
+
+                    {updateError && (
+                    <p style={{ color: "red", marginTop: "0.3rem" }}>
+                        {updateError}
+                    </p>
+                    )}
                 </div>
               ) : null
           )}
