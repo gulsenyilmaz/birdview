@@ -7,8 +7,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV DB_PATH=/app/birdview.db
+# ENV DB_PATH=/app/birdview.db
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+ENV DB_PATH=/app/birdview.db
+CMD ["sh", "-c", "python scripts/fetch_db.py && uvicorn main:app --host 0.0.0.0 --port 8000"]

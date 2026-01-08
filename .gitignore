@@ -26,7 +26,11 @@ dist-ssr
 
 backend/venv/
 backend/data/
+design/
 
+backend/*.db
+backend/*backup*.db
+*.db
 
 .env
 
