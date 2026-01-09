@@ -370,7 +370,7 @@ const layers = useMemo(() => {
             id: 'humans-layer',
             data: processedHumans,
             getSourcePosition: (d) => [d.lon, d.lat],
-            getTargetPosition: (d) => [d.lonOffsetTarget, d.latOffsetTarget],
+            getTargetPosition: (d) => [d.lonOffsetTarget, d.latOffset],
             getSourceColor: d => d.fillColor,
             getTargetColor: d => d.fillTColor,
             getWidth: 5,

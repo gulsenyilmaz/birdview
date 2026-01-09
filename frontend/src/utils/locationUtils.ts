@@ -66,7 +66,7 @@ export function offsetFibonacciPosition(
 ): [number, number] {
 
   const baseAngle = age * 2*Math.PI/60; // altın oran ile ilişkili açı
-  const angleOffset = -cityIndex * ((2*Math.PI/60) /6); // aynı yaş+şehirdekiler azıcık sapma alır
+  const angleOffset = -cityIndex * ((2*Math.PI/60) /zoom); // aynı yaş+şehirdekiler azıcık sapma alır
   const angle = baseAngle+ angleOffset;
 
 

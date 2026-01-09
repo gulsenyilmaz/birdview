@@ -65,7 +65,7 @@ const Dashboard: React.FC<DashboardProps> = ({ humans, setColorFilterType, color
 
   const citiesLabels = topCities.map((c) => c.name);
   const citiesValues = topCities.map((c) => c.count);
-  const citiesIds = topCities.map((c) => c.id);
+  // const citiesIds = topCities.map((c) => c.id);
 
   return (
     <div className="dashboard-container">
