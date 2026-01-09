@@ -170,8 +170,8 @@ const MapScene: React.FC<MapSceneProps> = ({
           let fillColor: [number, number, number, number];
           let fillTColor: [number, number, number, number];
           let [lonOffsetSource, latOffsetSource] = offsetFibonacciPosition(h.lon, h.lat, age, viewState.zoom, h.city_index || 0);
-          let lonOffsetTarget = lonOffsetSource + Math.random()*20;
-          let latOffsetTarget = latOffsetSource + Math.random()*20;
+          let lonOffsetTarget = lonOffsetSource + Math.random()*10;
+          let latOffsetTarget = latOffsetSource + Math.random()*10;
           
           switch (colorFilterType) {
             case "gender":
@@ -370,7 +370,7 @@ const layers = useMemo(() => {
             id: 'humans-layer',
             data: processedHumans,
             getSourcePosition: (d) => [d.lon, d.lat],
-            getTargetPosition: (d) => [d.lonOffsetTarget, d.latOffset],
+            getTargetPosition: (d) => [d.lonOffsetTarget, d.latOffsetTarget],
             getSourceColor: d => d.fillColor,
             getTargetColor: d => d.fillTColor,
             getWidth: 5,
