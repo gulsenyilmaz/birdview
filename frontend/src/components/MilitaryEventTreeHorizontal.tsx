@@ -33,6 +33,7 @@ const MilitaryEventTreeHorizontal: React.FC<MilitaryEventTreeProps> = ({
   
   const [militaryEventsTree, setMilitaryEventsTree] = useState<EventNode>({ id: 0, name: "Root", children: [] });
   const [maxNumberOfNodesAtDepth, setMaxNumberOfNodesAtDepth] = useState<number>(0);
+   const [maxNumberDepth, setMaxNumbeDepth] = useState<number>(0);
 
     
   useEffect(() => {
@@ -70,8 +71,7 @@ const MilitaryEventTreeHorizontal: React.FC<MilitaryEventTreeProps> = ({
       parentNode.isLeaf = false;
     });
     setMaxNumberOfNodesAtDepth(Math.max(...Array.from(mapDepthLevel.values())));
-    
-
+    setMaxNumbeDepth(Math.max(...Array.from(mapDepthLevel.keys())))
     setMilitaryEventsTree(root.children![0] || root);
 
   }, [militaryEvents, selectedYear]);
@@ -84,8 +84,9 @@ const MilitaryEventTreeHorizontal: React.FC<MilitaryEventTreeProps> = ({
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const dx = 1400/(maxNumberOfNodesAtDepth<150?maxNumberOfNodesAtDepth:150);
-    const dy = 170;
+    // const dx = 1400/(maxNumberOfNodesAtDepth<150?maxNumberOfNodesAtDepth:150);
+    const dx = (700/maxNumberOfNodesAtDepth)<8?8:(700/maxNumberOfNodesAtDepth);
+    const dy = 700/maxNumberDepth;
 
     const root = d3.hierarchy<EventNode>(militaryEventsTree as EventNode);
     const treeLayout = d3.tree<EventNode>().nodeSize([dx, dy]);
@@ -106,7 +107,7 @@ const MilitaryEventTreeHorizontal: React.FC<MilitaryEventTreeProps> = ({
     const paddingY = 50;
 
     const autoWidth = (xMax - xMin) + paddingX * 2;
-    const autoHeight = (yMax - yMin) + dy * 2;
+    const autoHeight = (yMax - yMin) + dy ;
 
 
     svg.attr("width", autoWidth).attr("height", autoHeight);

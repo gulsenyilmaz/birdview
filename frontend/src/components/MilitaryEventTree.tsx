@@ -86,8 +86,8 @@ const MilitaryEventTree: React.FC<MilitaryEventTreeProps> = ({
 
 
 
-    const dx = (1200/maxNumberOfNodesAtDepth)<8?8:(1200/maxNumberOfNodesAtDepth);
-    const dy = 1200/maxNumberDepth;
+    const dx = (700/maxNumberOfNodesAtDepth)<8?8:(700/maxNumberOfNodesAtDepth);
+    const dy = 700/maxNumberDepth;
 
     const root = d3.hierarchy<EventNode>(militaryEventsTree as EventNode);
     const treeLayout = d3.tree<EventNode>().nodeSize([dx, dy]);

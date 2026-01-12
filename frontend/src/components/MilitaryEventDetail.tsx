@@ -1,6 +1,6 @@
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 // import MilitaryEventBox from '../components/MilitaryEventBox';
-import MilitaryEventTree from '../components/MilitaryEventTree';
+import MilitaryEventTreeHorizontal from '../components/MilitaryEventTreeHorizontal';
 import './MilitaryEventDetail.css';
 
 
@@ -27,7 +27,7 @@ const MilitaryEventDetail: React.FC<MilitaryEventDetailProps> = ({
           />
       </div> */}
       <div className="military_event_tree_box">
-         <MilitaryEventTree
+         <MilitaryEventTreeHorizontal
               selectedYear={selectedYear}
               militaryEvents={militaryEvents}
               setSelectedObject = {setSelectedObject}

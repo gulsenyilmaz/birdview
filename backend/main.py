@@ -832,23 +832,7 @@ def human_update(human_id: int):
     cur = conn.cursor()
 
     human = Human(id=human_id, cursor=cur)
-    if human.qid is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Human {human_id} not found"
-        )
-    
-    try:
-        human_wiki_entity = HumanFromWikidata(human.qid)
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Wikidata fetch failed: {str(e)}"
-        )
-
-    human.update_from_wikidata(human_wiki_entity)
-
-    # print(f"human.get_wikidata_qid(): {human.get_wikidata_qid()}")
+    human.update_from_wikidata()
 
     conn.commit()
     conn.close()
@@ -867,21 +851,7 @@ def location_update(location_id: int):
     cur = conn.cursor()
 
     location = Location(id=location_id, cursor=cur)
-    if location.qid is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Location {location_id} not found"
-        )
-
-    try:
-        location_wiki_entity = LocationFromWikidata(location.qid)
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Wikidata fetch failed: {str(e)}"
-        )
-
-    location.update_from_wikidata(location_wiki_entity)
+    location.update_from_wikidata()
 
     conn.commit()
     conn.close()
@@ -899,24 +869,7 @@ def work_update(work_id: int):
     cur = conn.cursor()
 
     work = Work(id=work_id, cursor=cur)
-  
-    try:
-        work_qid =work.get_wikidata_qid()
-    except Exception as e:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Work {work_id} not found"
-        )
-
-    try:
-        work_wiki_entity = WorkFromWikidata(work_qid)
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Wikidata fetch failed: {str(e)}"
-        )
-
-    work.update_from_wikidata(work_wiki_entity)
+    work.update_from_wikidata()
 
     conn.commit()
     conn.close()

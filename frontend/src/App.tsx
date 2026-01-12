@@ -387,7 +387,7 @@ function App() {
               />
 
           </div>
-           <div className={`bottom-panel ${detailMode&&!eventDetailMode ? "squeezed" : ""}`}>
+           <div className={`bottom-panel ${detailMode&&eventDetailMode ? "squeezed" : ""}`}>
 
             <TimeWindowSlider
               fullRange={fullRange}

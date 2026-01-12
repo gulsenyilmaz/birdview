@@ -1,4 +1,6 @@
 from entities.BaseEntity import BaseEntity
+from dataparsers.LocationFromWikidata import LocationFromWikidata
+from fastapi import HTTPException
 
 class Location(BaseEntity):
     TABLE_NAME = "locations"
@@ -16,7 +18,37 @@ class Location(BaseEntity):
         "inception"
     ]
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        SPARQL_QUERY = f"""
+            SELECT ?qid 
+            WHERE {{
+                ?location
+                rdfs:label "{self.name}"@en;
+                BIND(STRAFTER(STR(?location), "entity/") AS ?qid)
+            }}
+            LIMIT 1
+            
+            """
+        self.SPARQL_QUERY = SPARQL_QUERY
+
     def update_from_wikidata(self, location_wiki_entity):
+
+        if self.qid is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Location {self.id} not found"
+            )
+
+        try:
+            location_wiki_entity = LocationFromWikidata(self.qid)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Wikidata fetch failed: {str(e)}"
+            )
+
+
         self.update({
             "name": location_wiki_entity.name,
             "lat": location_wiki_entity.lat,

@@ -2,6 +2,8 @@ from dataparsers.StateFromWikidata import StateFromWikidata
 from dataparsers.LocationFromWikidata import LocationFromWikidata
 from dataparsers.EntityFromWikidata import EntityFromWikidata
 from dataparsers.MovementFromWikidata import MovementFromWikidata
+from dataparsers.HumanFromWikidata import HumanFromWikidata
+from fastapi import HTTPException
 
 from entities.HumanLocation import HumanLocation
 from entities.HumanLocationType import HumanLocationType
@@ -213,7 +215,6 @@ class Human(BaseEntity):
             )
 
             if location_database_entity.id is None:
-                
                 location_database_entity.set_data(location_wiki_entity.to_dict())
                     
             humanlocationtype_database_entity = HumanLocationType(
@@ -370,7 +371,7 @@ class Human(BaseEntity):
                     }
                 )
 
-    def add_collection(self, collection_id):
+    def add_collection(self, collection_id, constituent_id):
 
         if not collection_id:
             self.log_results(self.id, "", "❌ Failed to fetch collection_id")
@@ -395,17 +396,66 @@ class Human(BaseEntity):
         )
 
         if human_collection_database_entity.id:
-            self.log_results(self.id, human_collection_database_entity.id, "connection is already established")
+            human_collection_database_entity.update(
+                {"constituent_id": constituent_id}
+            )
             return
        
         human_collection_database_entity.set_data(
             {
                 "human_id": self.id,
-                "collection_id": collection_database_entity.id
+                "collection_id": collection_database_entity.id,
+                "constituent_id": constituent_id
             }
         )
 
-    def update_from_wikidata(self, human_wiki_entity):
+    def save_from_wikidata(self, qid):
+        self.qid = qid
+
+        try:
+            human_wiki_entity = HumanFromWikidata(self.qid)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Wikidata fetch failed: {str(e)}"
+            )
+        self.set_data(
+            {   
+                "name": human_wiki_entity.name,
+                "qid": human_wiki_entity.qid,
+                "description": human_wiki_entity.description,
+                "img_url": human_wiki_entity.image_url,
+                "signature_url": human_wiki_entity.signature_url,
+                "birth_date": human_wiki_entity.birth_date,
+                "death_date": human_wiki_entity.death_date,
+                "num_of_identifiers": human_wiki_entity.num_of_identifiers
+            }
+        )   
+
+        
+        self.update_nationality(human_wiki_entity.nationality)
+        self.update_gender(human_wiki_entity.gender)
+        self.update_citizenships(human_wiki_entity.citizenships)
+        self.update_locations(human_wiki_entity.locations)
+        self.update_movements(human_wiki_entity.movements)
+        self.update_occupations(human_wiki_entity.occupations)
+
+    def update_from_wikidata(self):
+
+        if self.qid is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Human {self.id} not found"
+            )
+
+        try:
+            human_wiki_entity = HumanFromWikidata(self.qid)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Wikidata fetch failed: {str(e)}"
+            )
+
         self.update({
             "name": human_wiki_entity.name,
             "birth_date": human_wiki_entity.birth_date,
