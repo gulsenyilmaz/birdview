@@ -59,12 +59,13 @@ export function getFullRange<T extends Record<string, any>>(
     someoneAlive = items.some((item) => {
       const birth = item[start];
       const death = item[end];
+      console.log(`getFullRange [${mode}] -> typeof death: ${typeof death}, death: ${death}`);
       return (
         typeof birth === "number" &&
         (
-          death === null ||
+          (death === null ||
           death === undefined ||
-          typeof death !== "number" ||
+          typeof death !== "number" )&&
           (birth as number) + 100 > currentYear
         )
       );

@@ -119,7 +119,7 @@ function App() {
       .then(data => {
         setMilitaryEvents(data.military_events)
         
-        setFullRange(getFullRange(data.military_events , "start_date", "end_date","events"));
+        // setFullRange(getFullRange(data.military_events , "start_date", "end_date","events"));
         console.log("Fetched military events:", data.military_events);
       })  
       .catch(err => console.error("API error:", err));
@@ -411,7 +411,7 @@ function App() {
                   selectedYear={selectedYear}
                   setSelectedYear={setSelectedYear}
                   windowRange={windowRange}
-                  aliveCounts={eventCounts.length>0?eventCounts:aliveCounts}          // ⬅️ histogram artık “o yıl hayatta olanlar”
+                  aliveCounts={aliveCounts}          // ⬅️ histogram artık “o yıl hayatta olanlar”
                          // ⬅️ histogram artık “o yıl aktif olan eventler”
                   binAggregation="sum"               // istersen "sum"
                   distinctDates= {distinctDates}            // opsiyonel

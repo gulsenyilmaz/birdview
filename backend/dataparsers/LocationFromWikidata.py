@@ -115,6 +115,18 @@ class LocationFromWikidata:
             country_entity = LocationFromWikidata(country_qid)
             self.lat = country_entity.lat
             self.lon = country_entity.lon
+        elif "P749" in claims:
+            # Eğer koordinatlar yoksa, kıtaya bak
+            continent_qid = claims["P749"][0]["mainsnak"]["datavalue"]["value"]["id"]
+            continent_entity = LocationFromWikidata(continent_qid)
+            self.lat = continent_entity.lat
+            self.lon = continent_entity.lon
+        elif "P276" in claims:
+            # Eğer koordinatlar yoksa, locationa bak
+            ocean_qid = claims["P276"][0]["mainsnak"]["datavalue"]["value"]["id"]
+            ocean_entity = LocationFromWikidata(ocean_qid)
+            self.lat = ocean_entity.lat
+            self.lon = ocean_entity.lon
 
         if self.instance_qid:
             label_url = f"https://www.wikidata.org/wiki/Special:EntityData/{self.instance_qid}.json"
