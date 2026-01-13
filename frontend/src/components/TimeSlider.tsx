@@ -12,6 +12,7 @@ interface TimeSliderProps {
 
   /** Yeni: her yıl için hayatta olan sayısı (buildAliveCounts çıktısı) */
   aliveCounts?: YearCount[];
+  eventCounts?: YearCount[];
   /** Bin değerini nasıl toplayalım: 'avg' (standart) ya da 'sum' */
   binAggregation?: "avg" | "sum";
 }
@@ -22,12 +23,14 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   distinctDates = [],
   windowRange = [1200, 2025],
   aliveCounts = [],               // ⬅️ yeni
+  eventCounts = [],               // ⬅️ yeni
   binAggregation = "avg",           // ⬅️ yeni
 }) => {
 
   const [minYear, maxYear] = windowRange;
   const totalRange = maxYear - minYear;
 
+  console.log("TimeSlider eventCounts:", eventCounts.length);
   // console.log("TimeSlider windowRange:", windowRange);
 
   const step = useMemo(() => {

@@ -412,7 +412,7 @@ function App() {
                   setSelectedYear={setSelectedYear}
                   windowRange={windowRange}
                   aliveCounts={aliveCounts}          // ⬅️ histogram artık “o yıl hayatta olanlar”
-                         // ⬅️ histogram artık “o yıl aktif olan eventler”
+                  eventCounts={eventCounts}       // ⬅️ histogram artık “o yıl aktif olan eventler”
                   binAggregation="sum"               // istersen "sum"
                   distinctDates= {distinctDates}            // opsiyonel
                 />
