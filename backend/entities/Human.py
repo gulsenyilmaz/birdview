@@ -83,7 +83,10 @@ class Human(BaseEntity):
         nationality_str = "NOT_FOUND"
 
         if nationality:
-            nationality_str = nationality
+            nationality_str = nationality.split("-")[1].strip() if "-" in nationality else nationality
+            nationality_str = nationality_str.split("–")[1].strip() if "–" in nationality_str else nationality_str
+            nationality_str = nationality_str.split(",")[0].strip() if "," in nationality_str else nationality_str
+            nationality_str = nationality_str.split(";")[0].strip() if ";" in nationality_str else nationality_str
         else:
             self.log_results(self.id, self.name, f"❌ nationality not provided.")
 
@@ -93,14 +96,24 @@ class Human(BaseEntity):
             w=self.w
         )
 
-        if nationality_database_entity.id is None:
-            nationality_database_entity.set_data(
-                {
-                    "name": nationality_str
-                }
-            )
+        # if nationality_database_entity.id is None:
+        #     nationality_database_entity.set_data(
+        #         {
+        #             "name": nationality_str
+        #         } 
+        #     )
 
-        self.update({"nationality_id":nationality_database_entity.id})
+        if nationality_database_entity.id is None:
+
+            self.log_results(self.id, self.name, f"❌ there is no {nationality_str} in the database.")
+            return
+
+        current_id = int(self.nationality_id) if self.nationality_id is not None else None
+        new_id = int(nationality_database_entity.id)
+        if current_id != new_id:
+
+            self.update({"nationality_id":nationality_database_entity.id})
+            return
 
 
 
@@ -194,7 +207,7 @@ class Human(BaseEntity):
 
     def update_locations(self, locations):
         if not locations:
-            self.log_results(self.id, "", "❌ Failed to fetch locations")
+            self.log_results(self.id, "", "ℹ️ no locations")
             return
 
         for location in locations:
@@ -255,7 +268,8 @@ class Human(BaseEntity):
 
     def update_uniqueplace(self, unique_place_type_id, place_qid, date):
         if not place_qid:
-            self.log_results(self.id, "", "❌ Failed to fetch place")
+            
+            self.log_results(self.id, "", f"ℹ️ no qid for unique place: {unique_place_type_id}")
             return
 
         location_wiki_entity = LocationFromWikidata(place_qid)
@@ -299,7 +313,7 @@ class Human(BaseEntity):
     def update_citizenships(self, citizenships):
 
         if not citizenships:
-            self.log_results(self.id, "", "❌ Failed to fetch citizenships")
+            self.log_results(self.id, "", "ℹ️ no citizenships")
             return
 
         for state in citizenships:
@@ -439,17 +453,26 @@ class Human(BaseEntity):
         self.update_locations(human_wiki_entity.locations)
         self.update_movements(human_wiki_entity.movements)
         self.update_occupations(human_wiki_entity.occupations)
+        self.update_uniqueplace(4, human_wiki_entity.birth_place, human_wiki_entity.birth_date)
+        self.update_uniqueplace(5, human_wiki_entity.death_place, human_wiki_entity.death_date) 
 
     def update_from_wikidata(self):
+        print("update_from_wikidata---------------------------")
+        qid = self.qid
 
-        if self.qid is None:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Human {self.id} not found"
-            )
+        if qid is None or qid == "NOT_FOUND":
+            qid = self.get_wikidata_qid()
+            
+            if  not qid:
+                
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Qid for human ({self.id}) not found"
+                )
+            print("qid---------------------------", qid)
 
         try:
-            human_wiki_entity = HumanFromWikidata(self.qid)
+            human_wiki_entity = HumanFromWikidata(qid)
         except Exception as e:
             raise HTTPException(
                 status_code=500,
@@ -457,6 +480,7 @@ class Human(BaseEntity):
             )
 
         self.update({
+            "qid": human_wiki_entity.qid,
             "name": human_wiki_entity.name,
             "birth_date": human_wiki_entity.birth_date,
             "death_date": human_wiki_entity.death_date,
@@ -472,7 +496,32 @@ class Human(BaseEntity):
         self.update_movements(human_wiki_entity.movements)
         self.update_occupations(human_wiki_entity.occupations)
         self.update_uniqueplace(4, human_wiki_entity.birth_place, human_wiki_entity.birth_date)
-        self.update_uniqueplace(5, human_wiki_entity.death_place, human_wiki_entity.death_date)    
+        self.update_uniqueplace(5, human_wiki_entity.death_place, human_wiki_entity.death_date) 
+
+    def update_from_wikidata_birth_death_place(self):
+        print("update_from_wikidata---------------------------")
+        qid = self.qid
+
+        if qid is None or qid == "NOT_FOUND":
+            qid = self.get_wikidata_qid()
+            
+            if  not qid:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Qid for human ({self.id}) not found"
+                )
+            print("qid---------------------------", qid)
+
+        try:
+            human_wiki_entity = HumanFromWikidata(qid)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Wikidata fetch failed: {str(e)}"
+            )
+
+        self.update_uniqueplace(4, human_wiki_entity.birth_place, human_wiki_entity.birth_date)
+        self.update_uniqueplace(5, human_wiki_entity.death_place, human_wiki_entity.death_date)   
 
 
     

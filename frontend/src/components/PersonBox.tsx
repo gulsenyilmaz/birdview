@@ -21,6 +21,8 @@ interface PersonDetails {
   collections: string[];
   citizenships: string[];
   locations: Location[];
+nationality: string;
+gender: string;
 }
 
 const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedObjectThumbnail}) => {
@@ -57,28 +59,30 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
     };
 
     useEffect(() => {
-        if (person) {
-            fetch(`${backendUrl}/person/${person.id}`)
-                .then(res => res.json())
-                .then(data => {
-                    console.log("setPersonDetails", data);
-                    setPersonDetails(data);
-                    const cv_locs:Location[] = (data.locations as Location[])
-                            .filter(l => l.relationship_type_name !== "has_works_in");
+        if(!isUpdating) {
+            if (person) {
+                fetch(`${backendUrl}/person/${person.id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log("setPersonDetails", data);
+                        setPersonDetails(data);
+                        const cv_locs:Location[] = (data.locations as Location[])
+                                .filter(l => l.relationship_type_name !== "has_works_in");
 
-                    const museum_locs:Location[] = (data.locations as Location[])
-                            .filter(l => l.relationship_type_name === "has_works_in");
+                        const museum_locs:Location[] = (data.locations as Location[])
+                                .filter(l => l.relationship_type_name === "has_works_in");
 
-                    setMuseums(museum_locs);
-                    setCvLocations(cv_locs);                                                       
-                    setLocations(cv_locs);
-                    // setSelectedObjectThumbnail(data.img_url);
-                    if (!data.img_url) {
-                        getWikipediaImage(person.name).then(setFallbackImage);
-                    }
-                })
-         }
-    }, [person]);
+                        setMuseums(museum_locs);
+                        setCvLocations(cv_locs);                                                       
+                        setLocations(cv_locs);
+                        // setSelectedObjectThumbnail(data.img_url);
+                        if (!data.img_url) {
+                            getWikipediaImage(person.name).then(setFallbackImage);
+                        }
+                    })
+            }
+        }
+    }, [person, isUpdating]);
 
 
     useEffect(() => {
@@ -183,8 +187,10 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
                         {updateError}
                     </p>
                     )}
-                    <p><strong>Occupations:</strong> {personDetails.occupations.join(", ")}</p>
-                    <p><strong> {person.nationality} -  {person.gender}</strong></p>
+                    {personDetails.occupations && personDetails.occupations.length > 0 && (
+                        <p><strong>Occupations:</strong> {personDetails.occupations.join(", ")}</p>
+                    )}
+                    <p><strong> {personDetails.nationality} -  {personDetails.gender}</strong></p>
 
                     {personDetails.citizenships && personDetails.citizenships.length > 0 && (
                         <p><strong>Citizenships:</strong> {personDetails.citizenships.join(", ")}</p>

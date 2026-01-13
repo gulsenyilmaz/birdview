@@ -84,8 +84,6 @@ const MilitaryEventTree: React.FC<MilitaryEventTreeProps> = ({
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-
-
     const dx = (700/maxNumberOfNodesAtDepth)<8?8:(700/maxNumberOfNodesAtDepth);
     const dy = 700/maxNumberDepth;
 

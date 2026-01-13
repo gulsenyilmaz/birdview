@@ -32,7 +32,7 @@ class Location(BaseEntity):
             """
         self.SPARQL_QUERY = SPARQL_QUERY
 
-    def update_from_wikidata(self, location_wiki_entity):
+    def update_from_wikidata(self):
 
         if self.qid is None:
             raise HTTPException(

@@ -62,7 +62,7 @@ class BaseEntity:
                 for field in self.FIELDS:
                     setattr(self, field, row[field])
 
-                field_updates = ", ".join([f"{col}={repr(getattr(self, col, None))}" for col in self.FIELDS])
+                # field_updates = ", ".join([f"{col}={repr(getattr(self, col, None))}" for col in self.FIELDS])
 
                 # self.log_results(
                 #     self.id if hasattr(self, "id") else "-",
@@ -196,6 +196,7 @@ class BaseEntity:
         results = data.get("results", {}).get("bindings", [])
         if results:
             qid = results[0]["qid"]["value"]
+            print(f"✅ Found QID: {qid} for {self.TABLE_NAME}")
             return qid
         
         return None

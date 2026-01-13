@@ -286,7 +286,7 @@ const FilterList: React.FC<FilterListProps> = ({
                     <ul>
                         {searchResults.humans.map((result) => (
                        <li key={`human-${result.id}`} onClick={() => getSearhResultPage(result)}>
-                            👤 <strong>{result.name}</strong>
+                            👤 <strong>{result.name}({result.id})</strong>
                         </li>
                         ))}
                     </ul>

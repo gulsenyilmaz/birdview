@@ -33,6 +33,8 @@ design/
 backend/*.db
 backend/*backup*.db
 
+backend/*.csv
+
 # documents
 *.pdf
 design/*.pdf

@@ -36,7 +36,6 @@ def add_human(file_path):
             if human.id is not None:
 
                 log_results(writer, qid, name, "Already exists")
-                
                 human.add_collection(2, constituent_id)  # MET koleksiyonu
                 
                 continue

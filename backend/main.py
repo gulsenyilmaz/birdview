@@ -168,14 +168,20 @@ def get_person_details(human_id: int):
     cur = conn.cursor()
 
     cur.execute(
-        "SELECT description, img_url, signature_url FROM humans WHERE id = ?",
+        """
+        SELECT h.description, h.img_url, h.signature_url, g.name AS gender, n.name AS nationality 
+        FROM humans AS h
+        INNER JOIN genders g ON g.id = h.gender_id
+        INNER JOIN nationalities n ON n.id = h.nationality_id
+        WHERE h.id = ?
+    """,
         (human_id,),
     )
     row = cur.fetchone()
     if not row:
         return {"error": "person not found"}
 
-    description, img_url, signature_url = row
+    description, img_url, signature_url, gender, nationality = row
 
     cur.execute(
         """
@@ -243,6 +249,8 @@ def get_person_details(human_id: int):
 
     return {
         "description": description,
+        "gender": gender,
+        "nationality": nationality,
         "img_url": img_url,
         "signature_url": signature_url,
         "locations": locs,
@@ -826,7 +834,7 @@ def militaryevent_update(event_id: int, payload: dict):
 
 @app.put("/humans/{human_id}/update")
 def human_update(human_id: int):
-
+    print("human_update---------------------------")
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
