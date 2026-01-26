@@ -1,7 +1,7 @@
 import type { Human } from "../entities/Human";
 import type { Location } from "../entities/Location";
 // import type { Work } from "../entities/Work";
-import type { Event } from "../entities/Event";
+// import type { Event } from "../entities/Event";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 
 export function isHuman(obj: any): obj is Human {
