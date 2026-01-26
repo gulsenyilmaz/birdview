@@ -22,14 +22,7 @@ export function isLocation(obj: any): obj is Location {
   );
 }
 
-export function isEvent(obj: any): obj is Event {
-  return (
-    obj &&
-    typeof obj === "object" &&
-    "scale" in obj &&
-    "description_json" in obj
-  );
-}
+
 export function isMilitaryEvent(obj: any): obj is MilitaryEvent {
   return (
     obj &&

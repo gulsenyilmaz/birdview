@@ -160,7 +160,7 @@ class BaseEntity:
             self.log_results(
                     self.id,
                     field_updates,
-                    f"✅ UPDATED in {self.TABLE_NAME} table",
+                    f"✅ UPDATED in {self.TABLE_NAME} table:",
                 )
         
         except Exception as e:
@@ -177,7 +177,7 @@ class BaseEntity:
 
     def get_wikidata_qid(self):
 
-        print(f"Executing SPARQL query for {self.TABLE_NAME}:\n{self.SPARQL_QUERY}\n")
+        # print(f"Executing SPARQL query for {self.TABLE_NAME}:\n{self.SPARQL_QUERY}\n")
         
         response = requests.get(WIKIDATA_ENDPOINT, headers=HEADERS, params={"query": self.SPARQL_QUERY})
        

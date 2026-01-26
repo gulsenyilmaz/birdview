@@ -1,0 +1,10 @@
+.layer-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  
+  
+  width: 100%;
+  
+}

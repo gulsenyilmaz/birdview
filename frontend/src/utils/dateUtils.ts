@@ -89,34 +89,73 @@ export function getFullRange<T extends Record<string, any>>(
   return [min, max];
 }
 
-// export function getFullRange<T extends Record<string, any>>(items: T[], start:keyof T, end:keyof T): [number, number] {
-//   const currentYear = new Date().getFullYear();
+export function getFullRangeByYearField<T extends Record<string, any>>(
+  items: T[],
+  yearField: keyof T,
+  opts?: { clampMin?: number; fallback?: [number, number] }
+): [number, number] {
+  const currentYear = new Date().getFullYear();
+  const fallback: [number, number] = opts?.fallback ?? [currentYear - 10, currentYear];
+  const clampMin = opts?.clampMin ?? -1500;
 
-//   const startYears = items
-//     .map((item) => item[start] as unknown)
-//     .filter((d): d is number => typeof d === "number");
+  const years = items
+    .map((item) => item[yearField] as unknown)
+    .filter((y): y is number => typeof y === "number");
+  
+  console.log(`getFullRangeByYearField fallback: ${fallback}`);
+  if (years.length === 0) return fallback;
 
-//   const endYears = items
-//     .map((item) => item[end] as unknown)
-//     .filter((d): d is number => typeof d === "number");
+  const rawMin = Math.min(...years);
+  const rawMax = Math.max(...years);
 
-//   const someoneAlive = items.some((item) => {
-//     const birth = item[start];
-//     const death = item[end];
-//     return (
-//       typeof birth === "number" &&
-//       (death === null || death === undefined || typeof death !== "number" || birth + 100 > currentYear)
-//     );
-//   });
+  console.log(`getFullRangeByYearField min: ${rawMin}, max: ${rawMax}`);
 
-//   const min = Math.min(...startYears)<-1500 ? -1500 : Math.min(...startYears);
-//   const max = someoneAlive
-//     ? currentYear
-//     : endYears.length > 0
-//     ? Math.max(...endYears)
-//     : currentYear; // fallback
+  const min = rawMin < clampMin ? clampMin : rawMin;
+  const max = rawMax;
 
-//   return [min, max];
-// }
+  return [min, max];
+}
+
+export type YearRange = [number, number];
+
+export function isValidRange(r: unknown): r is YearRange {
+  return (
+    Array.isArray(r) &&
+    r.length === 2 &&
+    Number.isFinite(r[0]) &&
+    Number.isFinite(r[1]) &&
+    r[0] <= r[1]
+  );
+}
+
+/** aktif layer range'lerini kapsayan tek bir range döndürür (union) */
+export function unionRanges(ranges: Array<YearRange | null | undefined>): YearRange {
+  const valid = ranges.filter(isValidRange);
+  if (valid.length === 0) return [1800, 2025];
+
+  let minY = valid[0][0];
+  let maxY = valid[0][1];
+
+  for (const [a, b] of valid) {
+    if (a < minY) minY = a;
+    if (b > maxY) maxY = b;
+  }
+  return [minY, maxY];
+}
+
+export function clampRange(
+  windowRange: [number, number],
+  fullRange: [number, number]
+): [number, number] {
+  const [w0, w1] = windowRange;
+  const [f0, f1] = fullRange;
+
+  let a = Math.max(w0, f0);
+  let b = Math.min(w1, f1);
+
+  if (a > b) return [f0, f1]; // window tamamen dışarıdaysa resetle
+  return [a, b];
+}
+
 
 

@@ -71,7 +71,7 @@ export default function TimeWindowSlider({
                 allowCross={true}
                 pushable={maxYear-minYear<200?maxYear-minYear:200}
 
-                railStyle={{ backgroundColor: "#2a2a2a74",  borderRadius:0, height: 15 }}
+                railStyle={{ backgroundColor: "#827b7b74",  borderRadius:0, height: 15 }}
                 trackStyle={[{ backgroundColor: "#50a6ff88", borderRadius:0, height: 15 }]}
                 handleStyle={[
                     { borderColor: "#50a6ff", borderRadius:0, backgroundColor: "#50a6ff", width: 7, height: 25 },

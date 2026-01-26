@@ -12,7 +12,7 @@ def log_results(w, id, name, message):
     w.writerow([id, name, message])
     print(f"🎨 {name} ({id}) result: {message}")
 
-def add_human(file_path):
+def add_humans(file_path):
 
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -24,7 +24,7 @@ def add_human(file_path):
 
         df = pd.read_csv(file_path, low_memory=False)
 
-        log_results(writer, qid, name, "Already exists")
+        
 
         for row in df.itertuples(index=False, name="HumanRow"):
             
@@ -36,17 +36,17 @@ def add_human(file_path):
             if human.id is not None:
 
                 log_results(writer, qid, name, "Already exists")
-                human.add_collection(2, constituent_id)  # MET koleksiyonu
+                # human.add_collection(2, constituent_id)  # MET koleksiyonu
                 
                 continue
 
-            human.save_from_wikidata(qid)
-            human.add_collection(2, constituent_id)
+            # human.save_from_wikidata(qid)
+            # human.add_collection(2, constituent_id)
             log_results(writer, qid, name, "Added successfully")
-            conn.commit()
+            # conn.commit()
 
         conn.close()
 
 
 if __name__ == "__main__":
-    add_human("data/MET/MET_artist_list.csv")
+    add_humans("data/MET/MET_artist_list.csv")

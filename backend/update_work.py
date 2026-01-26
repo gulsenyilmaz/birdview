@@ -4,7 +4,7 @@ import csv
 from entities.Work import Work
 from entities.Human import Human
 
-OUTPUT_CSV = "MET_artist_list_report.csv"
+OUTPUT_CSV = "MET_artwork_list_report.csv"
 DB_PATH = "birdview.db"
 
 

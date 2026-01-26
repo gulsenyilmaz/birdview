@@ -2,8 +2,8 @@
   position:relative; 
   width: 100%; 
   height: 100%; 
-  color: #9d9c9cc4; 
-  background-color: rgba(49, 47, 47, 0.868); 
+  color: #9d9c9c00; 
+  background-color: rgba(49, 47, 47, 0.077); 
   padding: 0.5rem;
   box-sizing: border-box;
 
@@ -56,7 +56,7 @@
   width: 2%;
   padding: 0.7rem;
   font-size: .9rem;
-  color: #eff3f2;
+  color: #292929;
   font-weight: bold;
   user-select: none;
   z-index: 200;   

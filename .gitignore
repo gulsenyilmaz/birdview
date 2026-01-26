@@ -34,6 +34,7 @@ backend/*.db
 backend/*backup*.db
 
 backend/*.csv
+*.csv
 
 # documents
 *.pdf

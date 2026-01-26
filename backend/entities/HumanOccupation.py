@@ -6,5 +6,6 @@ class HumanOccupation(BaseEntity):
     FIELDS = [
         "id",
         "occupation_id", 
-        "human_id"
+        "human_id",
+        "is_primary"
     ]

@@ -102,7 +102,7 @@ def get_humans(request: Request):
     if occupation_id:
         base_query += """
             AND h.id IN (
-                SELECT human_id FROM human_occupation WHERE occupation_id = ?
+                SELECT human_id FROM human_occupation WHERE is_primary=1 AND occupation_id = ?
             )
         """
         params.append(occupation_id)
@@ -136,6 +136,37 @@ def get_humans(request: Request):
             h["city_index"] = city_counter[key]
 
     return JSONResponse({"humans": humans})
+
+@app.get("/allworks")
+def get_allworks(request: Request):
+    qp = request.query_params
+
+    human_id = qp.get("human_id")
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    base_query ="""
+        SELECT w.id, w.qid, w.title, w.created_date
+        FROM works AS w
+
+    """
+    params = []
+
+    if human_id:
+        base_query += " WHERE w.creator_id = ?"
+        params.append(human_id)
+
+    base_query += """
+        ORDER BY w.created_date ASC"""
+    
+    results = cur.execute(base_query, params).fetchall()
+    conn.close()
+
+    works = [dict(row) for row in results]
+
+    
+    return JSONResponse({"works": works})
 
 
 @app.get("/works/{creator_id}")
@@ -317,7 +348,7 @@ def get_movements(request: Request):
     if occupation_id:
         conditions.append("""
             hm.human_id IN (
-                SELECT human_id FROM human_occupation WHERE occupation_id = ?
+                SELECT human_id FROM human_occupation WHERE occupation_id = ? AND is_primary = 1
             )
         """)
         params.append(occupation_id)
@@ -371,7 +402,7 @@ def get_occupations(request: Request):
         SELECT 
            o.id, o.name, COUNT(ho.human_id) AS count
         FROM human_occupation ho
-        INNER JOIN occupations o ON ho.occupation_id = o.id
+        INNER JOIN occupations o ON ho.occupation_id = o.id AND ho.is_primary = 1
         
     """
     params = []
@@ -452,7 +483,7 @@ def get_genders(request: Request):
     if occupation_id:
         conditions.append("""
             h.id IN (
-                SELECT human_id FROM human_occupation WHERE occupation_id = ?
+                SELECT human_id FROM human_occupation WHERE occupation_id = ? AND is_primary = 1
             )
         """)
         params.append(occupation_id)
@@ -514,7 +545,7 @@ def get_nationalities(request: Request):
     if occupation_id:
         conditions.append("""
             h.id IN (
-                SELECT human_id FROM human_occupation WHERE occupation_id = ?
+                SELECT human_id FROM human_occupation WHERE occupation_id = ? AND is_primary = 1
             )
         """)
         params.append(occupation_id)

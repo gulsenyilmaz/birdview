@@ -139,11 +139,24 @@ export const getColorForAgeString = (
             case "ongoing":
               return "#d02d2dff"; // soft coral
             case "upcoming":
-              return "#3d839aff"; // sky blue
+              return "#1892bbff"; // sky blue
             case "ended":
               return "#84878eff"; // cool gray
             default:
               return "#b37c29ff"; // warm apricot
+          }
+        };
+
+
+  export const getLayerColor = (layerName?: string) => {
+          switch (layerName?.toLowerCase()) {
+            case "humans":
+              return "#af7aa1"; // soft coral
+            case "wars":
+              return "#59a14f"; // sky blue
+           
+            default:
+              return "#f58e2fff"; // warm apricot
           }
         };
 

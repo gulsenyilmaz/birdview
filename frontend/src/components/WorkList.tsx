@@ -9,11 +9,15 @@ import { extractSortedDates } from "../utils/dateUtils";
 interface WorkListProps {
   person:Human; 
   selectedYear:number;
-  backendUrl:string
-  setDistinctDates:(list: number[]) => void;
+  backendUrl:string;
+  // setDistinctDates:(list: number[]) => void;
 }
 
-const WorkList: React.FC<WorkListProps> = ({person, selectedYear, backendUrl, setDistinctDates}) => {
+const WorkList: React.FC<WorkListProps> = ({person, 
+  selectedYear, 
+  backendUrl, 
+  // setDistinctDates
+}) => {
     const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
     const [works, setWorks] = useState<Work[]>([]);
     const [filteredWorks, setFilteredWorks] = useState<Work[]>([]);
@@ -26,7 +30,7 @@ const WorkList: React.FC<WorkListProps> = ({person, selectedYear, backendUrl, se
                                 .then(res => res.json())
                                 .then(data => {
                                 
-                                setDistinctDates(extractSortedDates(data, "created_date"));   
+                                // setDistinctDates(extractSortedDates(data, "created_date"));   
                                 setWorks(data);
                                 })
                                 .catch(err => console.error("Works fetch error:", err));

@@ -9,7 +9,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 
-OUTPUT_CSV = "MET_artist_list_report.csv"
+OUTPUT_CSV = "MET_artwork_list_report_qid_001.csv"
 DB_PATH = "birdview.db"
 
 
@@ -77,6 +77,7 @@ def fetch_met_thumb(session: requests.Session, object_id: str, max_tries: int = 
             print(f"⚠️ ağ hatası (try {attempt}/{max_tries}): {e} → {wait:.2f}s bekle")
             time.sleep(wait)
 
+    return None
     # buraya geldiyse olmadı
     raise requests.HTTPError(
         f"MET API thumb alınamadı (objectID={object_id}): {last_err}"
@@ -106,41 +107,90 @@ def add_works(file_path):
             artwork_qid = row.o_qid
             type = row.type
             location = row.location
-            is_public_domain = bool(row['Is Public Domain'])
+            is_public_domain = row.is_public
 
             
            
-            work = Work(constituent_id=constituent_id, collection_id=2, cursor=cursor, w=writer)
-            if work.id is not None:
+            work = Work(qid=artwork_qid, cursor=cursor, w=writer)
 
-                log_results(writer, artwork_qid, title, "Already exists")
-                work.update_type(type)
-                work.update_location(location)
-                work.update({
-                    "qid": artwork_qid
+            if work.id is None:
+
+                work.set_data({
+                    "title": title,
+                    "creator_id": None,
+                    "date": created_date,
+                    "description": description,
+                    "image_url": fetch_met_thumb(session, constituent_id) if is_public_domain else f"https://collectionapi.metmuseum.org/api/collection/v1/iiif/{constituent_id}/restricted",
+                    "url": url,
+                    "created_date": created_date,
+                    "collection_id": 2,  # MET koleksiyonu      
+                    "type_id": None,  # artwork
+                    "qid": artwork_qid,
+                    "constituent_id": constituent_id
                 })
-                
-                continue
-            
-            creator = Human(qid=creator_qid, cursor=cursor)
-            if creator.id is None:
-                log_results(writer, artwork_qid, title, f"❌ Creator with QID {creator_qid} not found. Work skipped.")
-                continue
+                log_results(writer, artwork_qid, title, f"Added successfully {is_public_domain} - constituent_id: {constituent_id}")
 
-            work.set_data({
-                "title": title,
-                "creator_id": creator.id,
-                "date": created_date,
-                "description": description,
-                "image_url": fetch_met_thumb(session, constituent_id) if is_public_domain else f"https://collectionapi.metmuseum.org/api/collection/v1/iiif/{constituent_id}/restricted",
-                "url": url,
-                "created_date": created_date,
-                "collection_id": 2,  # MET koleksiyonu      
-                "type_id": None,  # artwork
-                "qid": artwork_qid
+            else: 
+                log_results(writer, artwork_qid, title, f"Already exists {is_public_domain} - constituent_id: {constituent_id} ")
+
+            work.update_type(type)
+            work.update_location(location)
+            work.update({
+                "qid": artwork_qid,
+                "constituent_id": constituent_id
             })
+                
+            conn.commit()
+
+        conn.close()
+
+def update_works(file_path):
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    with open(OUTPUT_CSV, mode="w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["id", "name", "Result"])
+
+        df = pd.read_csv(file_path, low_memory=False)
+        session = make_session()
+
+        for row in df.itertuples(index=False, name="HumanRow"):
+
+            constituent_id = row.obj_id
+            title = row.title
+            creator_qid = row.creator_qid
+            created_date = row.created_date
+            description = row.description
+            url = row.url
+            artwork_qid = row.o_qid
+            type = row.type
+            location = row.location
+            is_public_domain = row.is_public
+
+            work = Work(creator_qid=creator_qid, created_date=created_date, url=url, title=title, description=description,cursor=cursor, w=writer)
+
+            if work.id is None:
+
+                log_results(writer, creator_qid, title, f"No work exists {is_public_domain} - constituent_id: {constituent_id} ")
+
+                return
+            
+            log_results(writer, artwork_qid, title, f"Already exists {is_public_domain} - constituent_id: {constituent_id} ")
+
+           
+            work.update({
+                "qid": artwork_qid,
+                "constituent_id": constituent_id
+            })
+                
+            #conn.commit()
+
+        conn.close()
           
 
 
 if __name__ == "__main__":
-    add_works("data/MET/MET_artwork_list.csv")
+    add_works("data/MET/MET_artworks_list_with_qid.csv")

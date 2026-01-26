@@ -161,7 +161,49 @@ class Human(BaseEntity):
                     }
                 )
                         
-                
+    def add_occupation(self, occupation_name, is_primary=False):
+
+        if not occupation_name:
+            self.log_results(self.id, "", "❌ Failed to fetch occupation_name")
+            return
+
+            
+        occupation_database_entity = Occupation(
+            name=occupation_name,
+            cursor=self.cursor,
+            w=self.w
+        )
+
+        if occupation_database_entity.id is None:
+            self.log_results(self.name, occupation_name, "❌ Failed to fetch this occupation_id")
+
+            occupation_database_entity.set_data(
+                {
+                    "name": occupation_name
+                }
+            )   
+            
+
+        human_occupation_database_entity = HumanOccupation(
+            human_id=self.id,
+            occupation_id=occupation_database_entity.id,
+            cursor=self.cursor,
+            w=self.w
+        )
+
+        if human_occupation_database_entity.id:
+            human_occupation_database_entity.update(
+                {"is_primary": is_primary}
+            )
+            return
+       
+        human_occupation_database_entity.set_data(
+            {
+                "human_id": self.id,
+                "occupation_id": occupation_database_entity.id,
+                "is_primary": is_primary
+            }
+        )          
 
 
     def update_movements(self, movements):
@@ -489,12 +531,12 @@ class Human(BaseEntity):
             "signature_url": human_wiki_entity.signature_url,
             "num_of_identifiers": human_wiki_entity.num_of_identifiers
         })
-        self.update_nationality(human_wiki_entity.nationality)
-        self.update_gender(human_wiki_entity.gender)        
-        self.update_citizenships(human_wiki_entity.citizenships)
-        self.update_locations(human_wiki_entity.locations)
-        self.update_movements(human_wiki_entity.movements)
-        self.update_occupations(human_wiki_entity.occupations)
+        # self.update_nationality(human_wiki_entity.nationality)
+        # self.update_gender(human_wiki_entity.gender)        
+        # self.update_citizenships(human_wiki_entity.citizenships)
+        # self.update_locations(human_wiki_entity.locations)
+        # self.update_movements(human_wiki_entity.movements)
+        # self.update_occupations(human_wiki_entity.occupations)
         self.update_uniqueplace(4, human_wiki_entity.birth_place, human_wiki_entity.birth_date)
         self.update_uniqueplace(5, human_wiki_entity.death_place, human_wiki_entity.death_date) 
 

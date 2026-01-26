@@ -16,9 +16,10 @@ import { CollisionFilterExtension } from '@deck.gl/extensions';
 import type {CollisionFilterExtensionProps} from '@deck.gl/extensions';
 import type { Location } from "../entities/Location";
 import type { Human } from "../entities/Human";
-// import type { Event } from "../entities/Event";
+import type { Work } from "../entities/Work";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import type { HumanEnriched } from "../entities/HumanEnriched";
+//import type { Layer } from "../layers/Layer";
 import { getColorForGender, getColorForAge, getColorForLabel, getColorForRelationType } from "../utils/colorUtils";
 import { computeBounds, offsetFibonacciPosition } from "../utils/locationUtils"
 
@@ -130,21 +131,22 @@ interface MapSceneProps {
 
   locations:Location[];
   humans:Human[];
-  // events:Event[];
   militaryEvents:MilitaryEvent[];
+  works:Work[];
   selectedYear:number;
   setSelectedObject: (obj: any) => void;
   colorFilterType:string;
   detailMode:Boolean;
-  selectedObjectThumbnail:string | null
+  selectedObjectThumbnail:string | null;
+
 
 }
 
 const MapScene: React.FC<MapSceneProps> = ({
                                               locations,
                                               humans,
-                                              // events,
                                               militaryEvents,
+                                              works,
                                               selectedYear,
                                               setSelectedObject,
                                               colorFilterType,
@@ -156,8 +158,8 @@ const MapScene: React.FC<MapSceneProps> = ({
   const [processedHumans, setProcessedHumans] = useState<HumanEnriched[]>([]);
   // const [layers, setLayers] = useState<any[]>([]); 
   const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text'>('text');
-  const [showEvents, setShowEvents] = useState(true);
-  const [showHumans, setShowHumans] = useState(false);
+  const [showEvents, setShowEvents] = useState(false);
+  const [showHumans, setShowHumans] = useState(true);
   const [manuelMode, setManuelMode] = useState(true)
 
  
@@ -231,7 +233,7 @@ const MapScene: React.FC<MapSceneProps> = ({
       longitude: centerLon,
       latitude: centerLat,
       zoom: zoomME+0.2,
-      transitionInterpolator: new FlyToInterpolator({ speed: 1 }),
+      transitionInterpolator: new FlyToInterpolator({ speed: 2 }),
       transitionDuration: 'auto',
     }));
 
@@ -249,26 +251,12 @@ const layers = useMemo(() => {
   // console.log("sizeMaxPixels:", sizeMaxPixels, "sizeMinPixels:", sizeMinPixels);
 
   const SCATTER_FACTOR = 0.04 * 111320;
-  console.log(viewState.zoom)
+ 
 
-    // const eventLayer = new ScatterplotLayer({
-    //   id: "events-layer",
-    //   data: events,
-    //   stroked: true,
-    //   getPosition: (d) => [d.lon, d.lat],
-    //   getRadius: (d) => 20000 * (d.scale+3 -(selectedYear-d.start_date)),
-    //   getFillColor: [255, 255, 255, 0],//(d) => colorScale(1+100*(selectedYear-d.start_date)/(d.scale+1)),//[200-d.scale*30, 100, 100, 100-100*(selectedYear-d.start_date)/(d.scale+1)],
-    //   getLineColor: (d) => colorScale(1+100*(selectedYear-d.start_date)/(d.scale+1)),
-    //   lineWidthMinPixels: 3,
-    //   pickable: true,
-    //   radiusUnits: "meters",
-    // });
-
-    // layersArray.push(eventLayer);
    
   if (showEvents) {
 
-   const militaryEventLayer = new ScatterplotLayer<MilitaryEvent>({
+    const militaryEventLayer = new ScatterplotLayer<MilitaryEvent>({
       id: "military_events-layer0",
       data:militaryEvents.filter(me => me.descendant_count==0),
       stroked: true,
@@ -282,9 +270,7 @@ const layers = useMemo(() => {
       pickable: true,
       radiusUnits: "meters",
     });
-
     layersArray.push(militaryEventLayer);
-
 
     const militaryEventTextLayer = new TextLayer<MilitaryEvent, CollisionFilterExtensionProps<MilitaryEvent>>(
       {
@@ -295,7 +281,7 @@ const layers = useMemo(() => {
 
         getText: d =>   d.name.toLocaleUpperCase(),
         getPosition: d => [d.lon, d.lat],
-        getColor: [50, 50, 50, 250],
+        getColor: [80, 80, 50, 250],
         getSize: d => Math.log2(d.descendant_count + 32) / 10,
         sizeScale: fontSize,
         sizeMinPixels,
@@ -306,15 +292,14 @@ const layers = useMemo(() => {
         pickable: true,
         collisionEnabled: true,
         getCollisionPriority: d =>  Math.log2(d.descendant_count + 1),
-        collisionTestProps: {
-        sizeScale: fontSize * 2,
-        sizeMaxPixels: sizeMaxPixels * 2,
-        sizeMinPixels: sizeMinPixels * 2
+          collisionTestProps: {
+            sizeScale: fontSize * 2,
+            sizeMaxPixels: sizeMaxPixels * 2,
+            sizeMinPixels: sizeMinPixels * 2
         },
         getTextAnchor: 'middle',        
         getAlignmentBaseline: 'center',
         extensions: [new CollisionFilterExtension()]
-    
       }
     );
     layersArray.push(militaryEventTextLayer);
@@ -332,6 +317,19 @@ const layers = useMemo(() => {
   });
   layersArray.push(locationLayer);
 
+  
+
+  const workLayer = new ScatterplotLayer({
+    id: "works-layer",
+    data: works,
+    getPosition: (d) => [d.lon, d.lat],
+    getRadius: 200000,
+    getFillColor: [0, 0, 0],
+    pickable: true,
+    radiusUnits: "meters",
+  });
+  layersArray.push(workLayer);
+
 
   if (showHumans) {
 
@@ -346,7 +344,7 @@ const layers = useMemo(() => {
       const thumbnailLayer = new IconLayer({
         id: 'nodes',
         data: filteredL,
-        getPosition: d => [d.loc_lon, d.loc_lat],
+        getPosition: (d) => [d.loc_lon, d.loc_lat],
         getIcon: () => ({
           url: selectedObjectThumbnail || ICON_MISSING,
           width: ICON_SIZE,
@@ -384,9 +382,6 @@ const layers = useMemo(() => {
 
           
           const data = processedHumans
-          
-          
-          console.log("Scatter factor (meters per zoom level):", SCATTER_FACTOR);
           const lineLayer = new ScatterplotLayer<HumanEnriched>({
             id: 'ScatterplotLayer-for-lines',
             data:processedHumans,
@@ -397,13 +392,10 @@ const layers = useMemo(() => {
             getLineColor: (d) => d.fillColor,
             lineWidthMinPixels: 0.1,
             pickable: false,
-            radiusUnits: "meters",
-            
+            radiusUnits: "meters"
           
           });
           layersArray.push(lineLayer);
-
-          
 
           const humanTextLayer = new TextLayer<HumanEnriched, CollisionFilterExtensionProps<HumanEnriched>>(
             {
@@ -412,7 +404,7 @@ const layers = useMemo(() => {
               characterSet: 'auto',
               fontSettings: { buffer: 8, sdf: true },
 
-              getText: d => (d.awarded?"✨":"")+d.name +" ("+d.age +")",
+              getText: d => (d.awarded?"✨":" ")+d.name+" ",//+" ("+d.age +")",
               getPosition: d => [d.lonOffsetSource, d.latOffsetSource],
               // getColor: d =>  grayColorScale((d.num_of_identifiers ?? 0) + 1), 
               getSize: d => Math.pow((d.num_of_identifiers+10)*30*d.age, 0.25) / 40,
@@ -446,10 +438,6 @@ const layers = useMemo(() => {
 
 }, [locations, processedHumans, viewState.zoom, selectedLayerType, selectedObjectThumbnail, showEvents, showHumans, militaryEvents]);
 
-
-
-
-  
   return (
     <div>
       <div>
@@ -472,7 +460,7 @@ const layers = useMemo(() => {
           
           getTooltip={({ object }) =>
                     object ? {
-                      text: `${object.tooltip_text? object.tooltip_text :object.name }`,
+                      text: `${object.tooltip_text? object.tooltip_text :object.name?object.name:object.title }`,
                       style: { fontSize: "14px", color: "white" }
                     } : null
                   }

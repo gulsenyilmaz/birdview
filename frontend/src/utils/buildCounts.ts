@@ -12,6 +12,13 @@ type EventLike = {
   end_date?: number | string | Date | null;
 };
 
+type WorkLike = {
+  created_date?: number | string | Date | null;
+};
+
+
+
+
 const coerceYear = (v: unknown): number | null => {
   if (typeof v === "number" && Number.isFinite(v)) return Math.trunc(v);
   if (v instanceof Date && Number.isFinite(v.getFullYear())) return v.getFullYear();
@@ -118,4 +125,47 @@ export function buildEventCounts(
   }
 
   return out;
+}
+
+
+/**
+ * Verilen windowRange için her yıl üretilen eser sayısını döner.
+ * created_date tek yıl varsayımıyla "flow" histogram üretir.
+ */
+export function buildWorkCountsByCreatedDate(
+  works: WorkLike[],
+  windowRange: [number, number]
+): YearCount[] {
+  const [minY, maxY] = windowRange;
+
+  // yıl -> o yıl üretilen eser sayısı
+  const counts = new Map<number, number>();
+  console.log("buildWorkCountsByCreatedDate", works)
+  for (const w of works) {
+    const y = coerceYear(w.created_date);
+
+    console.log("coerceYear", y)
+    if (y == null) continue;
+    if (y < minY || y > maxY) continue;
+
+    counts.set(y, (counts.get(y) ?? 0) + 1);
+  }
+
+  const out: YearCount[] = [];
+  for (let y = minY; y <= maxY; y++) {
+    out.push({ year: y, count: counts.get(y) ?? 0 });
+  }
+  return out;
+}
+
+export function buildCumulativeWorkCountsByCreatedDate(
+  works: WorkLike[],
+  windowRange: [number, number]
+): YearCount[] {
+  const yearly = buildWorkCountsByCreatedDate(works, windowRange);
+  let running = 0;
+  return yearly.map(({ year, count }) => {
+    running += count;
+    return { year, count: running };
+  });
 }

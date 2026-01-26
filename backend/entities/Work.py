@@ -108,17 +108,26 @@ class Work(BaseEntity):
             if location_database_entity.id is None:
 
                 l_qid = location_database_entity.get_wikidata_qid()
-                location_wiki_entity = LocationFromWikidata(l_qid)
 
-                if location_wiki_entity is None:
-                    self.log_results(
-                        self.id,
-                        location_name,
-                        "❌ Failed to fetch location"
-                    )
-                    return
-                else:
-                    location_database_entity.set_data(location_wiki_entity.to_dict())
+                location_database_entity = Location(
+                    qid=l_qid,
+                    cursor=self.cursor,
+                    w=self.w
+                )
+
+                if location_database_entity.id is None:
+                
+                    location_wiki_entity = LocationFromWikidata(l_qid)
+
+                    if location_wiki_entity is None:
+                        self.log_results(
+                            self.id,
+                            location_name,
+                            "❌ Failed to fetch location"
+                        )
+                        return
+                    else:
+                        location_database_entity.set_data(location_wiki_entity.to_dict())
 
             self.update({
                 "location_id": location_database_entity.id
