@@ -2,7 +2,7 @@
 import type { Work } from "../entities/Work";
 import type { Human } from "../entities/Human";
 import { useEffect, useState } from "react";
-import { extractSortedDates } from "../utils/dateUtils";
+// import { extractSortedDates } from "../utils/dateUtils";
 // import './WorkList.css';
 
 
@@ -21,8 +21,8 @@ const WorkList: React.FC<WorkListProps> = ({person,
     const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
     const [works, setWorks] = useState<Work[]>([]);
     const [filteredWorks, setFilteredWorks] = useState<Work[]>([]);
-    const [isUpdating, setIsUpdating] = useState(false);
-    const [updateError, setUpdateError] = useState<string | null>(null);
+    // const [isUpdating, setIsUpdating] = useState(false);
+    // const [updateError, setUpdateError] = useState<string | null>(null);
 
 
     useEffect(() => {
@@ -38,7 +38,7 @@ const WorkList: React.FC<WorkListProps> = ({person,
 
     useEffect(() => {
 
-        setFilteredWorks(works.filter(w => w.created_date == selectedYear));
+        setFilteredWorks(works.filter(w => w.created_date <=selectedYear+1 && w.created_date >selectedYear-1));
 
     }, [selectedYear, works]);
 
@@ -50,34 +50,34 @@ const WorkList: React.FC<WorkListProps> = ({person,
         setModalImageUrl(null);
       };
 
-    const handleUpdateWorkDetails = async (w_id: number) => {
+    // const handleUpdateWorkDetails = async (w_id: number) => {
      
-      setIsUpdating(true);
-      setUpdateError(null);
+    //   setIsUpdating(true);
+    //   setUpdateError(null);
 
-      try {
-        // 🔧 endpoint’i backend’ine göre değiştir
-        const res = await fetch(
-          `${backendUrl}/works/${w_id}/update`,
-          {
-                method: "PUT",          
-                headers: {
-                "Content-Type": "application/json",
-                },
-            }
-        );
+    //   try {
+    //     // 🔧 endpoint’i backend’ine göre değiştir
+    //     const res = await fetch(
+    //       `${backendUrl}/works/${w_id}/update`,
+    //       {
+    //             method: "PUT",          
+    //             headers: {
+    //             "Content-Type": "application/json",
+    //             },
+    //         }
+    //     );
 
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
+    //     if (!res.ok) {
+    //       throw new Error(`HTTP ${res.status}`);
+    //     }
 
-      } catch (err: any) {
-        console.error(" update error:", err);
-        setUpdateError("kaydedilirken bir hata oldu.");
-      } finally {
-        setIsUpdating(false);
-      }
-    };
+    //   } catch (err: any) {
+    //     console.error(" update error:", err);
+    //     setUpdateError("kaydedilirken bir hata oldu.");
+    //   } finally {
+    //     setIsUpdating(false);
+    //   }
+    // };
     
   return (
     <>
@@ -102,7 +102,7 @@ const WorkList: React.FC<WorkListProps> = ({person,
                   <div className="timeline-item-meta">
                      · {a.created_date} · {a.description} 
                   </div>
-                   <button
+                   {/* <button
                         onClick={() => handleUpdateWorkDetails(a.id)}
                         disabled={isUpdating}
                         style={{ marginLeft:"0.4rem", marginTop: "0.4rem" }}
@@ -114,7 +114,7 @@ const WorkList: React.FC<WorkListProps> = ({person,
                     <p style={{ color: "red", marginTop: "0.3rem" }}>
                         {updateError}
                     </p>
-                    )}
+                    )} */}
                 </div>
               ) : null
           )}

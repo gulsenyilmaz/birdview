@@ -98,8 +98,8 @@ function App() {
 
   const activeFullRange = unionRanges([
     humanLayer.fullRange,
-    militaryLayer.fullRange,
-    workLayer.fullRange
+    // militaryLayer.fullRange,
+    // workLayer.fullRange
     // eventsLayer.fullRange,
   ]);
 
