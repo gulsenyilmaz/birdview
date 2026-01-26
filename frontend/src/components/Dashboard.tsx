@@ -45,14 +45,16 @@ const Dashboard: React.FC<DashboardProps> = ({ humans, setColorFilterType, color
   );
   const topNationalities = nationalities.slice(0, 10);
 
+   const nationalityLabels = topNationalities.map(([label]) => label);
+  const nationalityValues = topNationalities.map(([, value]) => value);
+
+
   const genders = Object.entries(genderCounter).sort((a, b) => b[1] - a[1]);
 
   const genderLabels = genders.map(([label]) => label);
   const genderValues = genders.map(([, value]) => value);
 
-  const nationalityLabels = topNationalities.map(([label]) => label);
-  const nationalityValues = topNationalities.map(([, value]) => value);
-
+ 
   const cities = Object.entries(cityCounter)
     .map(([id, { name, count }]) => ({
       id: Number(id),
@@ -111,7 +113,7 @@ const Dashboard: React.FC<DashboardProps> = ({ humans, setColorFilterType, color
           data={[
             {
               values: genderValues,
-              labels:genderLabels,
+              labels: genderLabels,
               type: "pie",
               hole: 0.5,
               textinfo: "label+percent",

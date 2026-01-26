@@ -2,23 +2,26 @@
 .time-container {
   width: 100%;
   height: 100%;
-  padding: 0.5rem;;
+  padding: 0.2rem;;
   background-color: rgb(79, 79, 79);
   box-shadow: 0 0 10px rgba(0,0,0,0);
   display: flex;
   flex-direction: row;
   box-sizing: border-box;
+  border-bottom: 2px solid #d8d8d8db;
   z-index: 1000;
 }
 
 .time-slider {
   
-  width: 95%;
+  width: 96%;
   height: 100%;
-  /* padding: 0.5rem; */
+  padding: 0.5rem;
   z-index: 1000;
   font-family: 'Helvetica', sans-serif;
   box-sizing: border-box;
+   /* background-color: rgb(120, 119, 121); */
+   
   
 }
 
@@ -136,6 +139,25 @@
   box-sizing: border-box;
 
   
+}
+
+.play-button{
+  display: flex;
+  
+  width: 4%;
+  height: 100%;
+  padding: 0.5rem;
+  z-index: 1000;
+  font-family: 'Helvetica', sans-serif;
+  box-sizing: border-box;
+  align-self: right;
+
+
+  
+}
+.play-button button{
+width: 100%;
+background-color: #d1be15;
 }
 
 

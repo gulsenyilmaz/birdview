@@ -270,7 +270,7 @@ function App() {
             locations={locations}
             humans={humanLayer.filteredHumans}
             militaryEvents={militaryLayer.filteredMilitaryEvents}
-            works={workLayer.filteredWorks}
+            // works={workLayer.filteredWorks}
             selectedYear={selectedYear}
             setSelectedObject={setSelectedObject}
             colorFilterType={colorFilterType}

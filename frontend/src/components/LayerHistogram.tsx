@@ -83,6 +83,14 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
 
   return (
     <div className="time-container">
+      <div className="play-button">
+
+        <label>
+              
+              {layerTypeName}
+            </label>
+        
+      </div>
       <div className="time-slider">
         
          {/* ⬇️ Tam windowRange boyunca "o yıl hayatta olanlar" histogramı */}
@@ -108,13 +116,7 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
         )}
         
       </div>
-      <div className="label-group">
-            <label>
-              
-              {layerTypeName}
-            </label>
-           
-        </div>
+     
     </div>
   );
 };

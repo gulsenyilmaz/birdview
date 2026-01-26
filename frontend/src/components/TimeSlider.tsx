@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState,useRef  } from "react";
 import "./TimeSlider.css";
 
 // ⬇️ yeni: dışarıdan verilecek "yıl -> hayatta olan sayısı"
@@ -47,10 +47,61 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   const getWidthPercent = (year: number, n_year:number): number =>
     ((n_year - year) / step) * 100;
 
+  // ▶️ Play state + interval
+  const [isPlaying, setIsPlaying] = useState(false);
+  const intervalRef = useRef<number | null>(null);
+
+  const yearRef = useRef(selectedYear);
+  useEffect(() => {
+    yearRef.current = selectedYear;
+  }, [selectedYear]);
+
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    intervalRef.current = window.setInterval(() => {
+      const next = yearRef.current + 1;
+
+      if (next > maxYear) {
+        // başa sar:
+        setSelectedYear(minYear);
+        yearRef.current = minYear; // ref'i de güncelle
+      } else {
+        setSelectedYear(next);
+        yearRef.current = next;
+      }
+    }, 100);
+
+    return () => {
+      if (intervalRef.current) window.clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    };
+  }, [isPlaying, minYear, maxYear, setSelectedYear]);
+
+  // Eğer kullanıcı slider'ı elle sona getirirse otomatik durdur (opsiyonel)
+  useEffect(() => {
+    if (isPlaying && selectedYear >= maxYear) {
+      setIsPlaying(false);
+    }
+  }, [isPlaying, selectedYear, maxYear]);
+
+  const handlePlayAction = () => {
+    setIsPlaying((p) => !p);
+  };
+
+  const stopAndSetSelectedYear= (n_year:number) => {
+    setIsPlaying(false);
+    setSelectedYear(n_year)
+  };
 
 
   return (
     <div className="time-container">
+      <div className="play-button">
+        <button onClick={handlePlayAction}>
+        {isPlaying ? "⏸" : "▶"}
+      </button>
+      </div>
       <div className="time-slider">
         
         <div className="year-labels">
@@ -98,20 +149,18 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
             max={maxYear}
             step={1}
             value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            onChange={(e) => stopAndSetSelectedYear(Number(e.target.value))}
           />
         </div>
 
        
         
       </div>
-      <div className="label-group">
-            <label>
-              
-              {maxYear}
-            </label>
-           
-        </div>
+      {/* <div className="label-group">
+        <label>
+          {maxYear}
+        </label>
+      </div> */}
     </div>
   );
 };

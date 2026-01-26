@@ -16,7 +16,7 @@ import { CollisionFilterExtension } from '@deck.gl/extensions';
 import type {CollisionFilterExtensionProps} from '@deck.gl/extensions';
 import type { Location } from "../entities/Location";
 import type { Human } from "../entities/Human";
-import type { Work } from "../entities/Work";
+// import type { Work } from "../entities/Work";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import type { HumanEnriched } from "../entities/HumanEnriched";
 //import type { Layer } from "../layers/Layer";
@@ -132,7 +132,7 @@ interface MapSceneProps {
   locations:Location[];
   humans:Human[];
   militaryEvents:MilitaryEvent[];
-  works:Work[];
+  // works:Work[];
   selectedYear:number;
   setSelectedObject: (obj: any) => void;
   colorFilterType:string;
@@ -146,7 +146,7 @@ const MapScene: React.FC<MapSceneProps> = ({
                                               locations,
                                               humans,
                                               militaryEvents,
-                                              works,
+                                              // works,
                                               selectedYear,
                                               setSelectedObject,
                                               colorFilterType,
@@ -319,16 +319,16 @@ const layers = useMemo(() => {
 
   
 
-  const workLayer = new ScatterplotLayer({
-    id: "works-layer",
-    data: works,
-    getPosition: (d) => [d.lon, d.lat],
-    getRadius: 200000,
-    getFillColor: [0, 0, 0],
-    pickable: true,
-    radiusUnits: "meters",
-  });
-  layersArray.push(workLayer);
+  // const workLayer = new ScatterplotLayer({
+  //   id: "works-layer",
+  //   data: works,
+  //   getPosition: (d) => [d.lon, d.lat],
+  //   getRadius: 200000,
+  //   getFillColor: [0, 0, 0],
+  //   pickable: true,
+  //   radiusUnits: "meters",
+  // });
+  // layersArray.push(workLayer);
 
 
   if (showHumans) {
@@ -391,7 +391,7 @@ const layers = useMemo(() => {
             getFillColor: [0, 0, 0,0],
             getLineColor: (d) => d.fillColor,
             lineWidthMinPixels: 0.1,
-            pickable: false,
+            pickable: true,
             radiusUnits: "meters"
           
           });
