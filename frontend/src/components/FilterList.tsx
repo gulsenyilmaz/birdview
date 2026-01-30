@@ -132,9 +132,7 @@ const FilterList: React.FC<FilterListProps> = ({
         .then(data => {
             setNationalities(data.nationalities);  // 👈 dikkat!
         });
-    }, [selectedGender,selectedMovement,selectedOccupation]);
-
-    
+    }, [selectedGender, selectedMovement, selectedOccupation]);
 
     useEffect(() => {
 

@@ -3,7 +3,7 @@
   width: 100%;
   height: 100%;
   padding: 0.2rem;;
-  background-color: rgb(79, 79, 79);
+  background-color: #333333;
   box-shadow: 0 0 10px rgba(0,0,0,0);
   display: flex;
   flex-direction: row;
@@ -11,6 +11,7 @@
   border-bottom: 2px solid #d8d8d8db;
   z-index: 1000;
 }
+
 
 .time-slider {
   
@@ -25,13 +26,21 @@
   
 }
 
+.hist-bar-container{
+   width: 96%;
+  height: 100%;
+  padding: 0.5rem;
+  z-index: 1000;
+  font-family: 'Helvetica', sans-serif;
+  box-sizing: border-box;
+  background-color: rgb(55, 55, 55);
+}
+
 .slider-wrapper {
   display: flex;
   position: relative;
   width: 100%;
   box-sizing: border-box;
-  
-  
 }
 
 .time-slider label {
@@ -45,10 +54,10 @@
 
 .time-slider input[type="range"] {
   width: 100%;
-  height: 6px;
-  background: linear-gradient(to right, #2c517007, #46b45c00);
+  height: 2px;
+  background: linear-gradient(to right, #2c517079, #46b45c05);
   border-radius: 0px;
-  border-bottom: 3px dotted rgba(214, 213, 214, 0.731);
+  border: 1px solid rgba(214, 213, 214, 0.731);
   
   appearance: none;
   cursor: pointer;
@@ -57,11 +66,12 @@
 
 .time-slider input[type="range"]::-webkit-slider-thumb {
   appearance: none;
-  width: 10px;
-  height: 8vh;
-  background: #97a7b400;
+  width: 1.5vh;
+  height: 1.5vh;
+  background: #669dc9e0;
+  border-radius: 50px;
   /* border: 2px solid #4682B4; */
-  border-right: 3px dotted rgba(222, 218, 218, 1);
+  border: 1px solid rgba(222, 218, 218, 1);
   transition: transform 0.2s ease;
 }
 
@@ -75,7 +85,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #7d7d7d9c;
+  background: #7d7d7dc5;
   border: 2px solid #676767;
 }
 

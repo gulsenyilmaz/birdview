@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   align-self: flex-end;
-  width: 100%;
+  width:30%;
   height: 100%;
   padding: 1rem;
   box-sizing: border-box;
@@ -94,7 +94,7 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   flex: 1;
-  height: 20vh;
+  height: 10vh;
   width: auto;
   padding: 0.3rem;
   box-sizing: border-box;

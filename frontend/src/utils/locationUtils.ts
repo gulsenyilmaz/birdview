@@ -38,8 +38,8 @@ export function computeBounds(locations: Location[], detailMode: Boolean = false
   const centerLon = (minLon + maxLon) / 2 - (detailMode ? 40 / zoom : 0); 
   const centerLat = (minLat + maxLat) / 2;
 
-//   console.log("Computed bounds:", { maxDiff, centerLon, centerLat, zoom });
-  // console.log("Computed bounds:", maxDiff, centerLon, centerLat, zoom );
+  console.log("Computed bounds:", { maxDiff, centerLon, centerLat, zoom });
+  console.log("Computed bounds:", maxDiff, centerLon, centerLat, zoom );
 
   return { centerLon, centerLat, zoom };
 }

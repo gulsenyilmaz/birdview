@@ -82,7 +82,7 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
     (size / totalRange) * 100;
 
   return (
-    <div className="time-container">
+    <div className="time-container" style={{backgroundColor:'#454444ff'}}>
       <div className="play-button">
 
         <label>

@@ -138,21 +138,22 @@ html, body, #root {
 
 .right-panel {
   position: absolute;
-  top: 0;
+  top: 5vh;
   right: 0;
 
   display: flex;
   flex-direction: row;
-  width: 12vw;
-  height: 70vh;
+  width: 8vw;
+  height: auto;
   background-color: rgba(212, 12, 12, 0);
   padding: 0;
   box-sizing: border-box;
-  border: 1px solid #7474748d;
+  
   z-index: 1500;
 
   transition: transform 0.9s ease-in-out;
   transform: translateX(0%);
+  
 }
 
 .right-panel.hide {
@@ -194,17 +195,17 @@ html, body, #root {
   position: absolute;
   display: flex;
   flex-direction: row;
-  justify-content: center; 
-  justify-self: center; 
+  justify-content: space-between; 
+ 
 
-  width: 100%;
-  /* height: 16vh; */
-  gap:1rem;
+  width: 70vw;
+  height: 20vh;
+  gap:3rem;
   background-color: #3a3ae800;
   padding: 1rem; 
   box-sizing: border-box;
   border: 4px solid #74747400;
-  z-index: 1400;
+  z-index: 50;
   transition: transform 0.9s ease-in-out;
   transform: translateY(0%);
 }

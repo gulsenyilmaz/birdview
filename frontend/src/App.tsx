@@ -20,7 +20,8 @@ import MapScene from './components/MapScene';
 import TimeSlider from "./components/TimeSlider";
 import TimeWindowSlider from "./components/TimeWindowSlider";
 import LayerHistogram from "./components/LayerHistogram";
-import Dashboard from "./components/Dashboard";
+// import Dashboard from "./components/Dashboard";
+import DashboardAdvanced from "./components/DashboardAdvanced";
 
 import FilterList from "./components/FilterList";
 import DescriptionBanner from "./components/DescriptionBanner"
@@ -234,7 +235,13 @@ function App() {
         </div>
 
         <div className={`top-filter_description-bar ${selectedObject? "close" : ""}`} >
-          <DescriptionBanner
+          
+           <DashboardAdvanced
+            humans={humanLayer.filteredHumans}
+            setColorFilterType= {setColorFilterType}
+            colorFilterType={colorFilterType}
+          />
+           <DescriptionBanner
             selectedMovement ={selectedMovement}
             selectedOccupation= {selectedOccupation}
             selectedGender={selectedGender}
@@ -250,18 +257,6 @@ function App() {
                 }
               }
             }
-          />
-          <FilterList
-            selectedOccupation = {selectedOccupation}
-            selectedGender  = {selectedGender}
-            selectedNationality = {selectedNationality}
-            selectedMovement = {selectedMovement}
-            setSelectedOccupation= {setSelectedOccupation}
-            setSelectedGender = {setSelectedGender}
-            setSelectedNationality= {setSelectedNationality}
-            setSelectedMovement= {setSelectedMovement}
-            setSelectedObject={setSelectedObject}
-            backendUrl={backendUrl}
           />
         </div>
 
@@ -280,10 +275,18 @@ function App() {
         </div>
 
         <div className={`right-panel ${selectedObject? "hide" : ""}`}>
-          <Dashboard
-            humans={humanLayer.filteredHumans}
-            setColorFilterType= {setColorFilterType}
-            colorFilterType={colorFilterType}
+         
+          <FilterList
+            selectedOccupation = {selectedOccupation}
+            selectedGender  = {selectedGender}
+            selectedNationality = {selectedNationality}
+            selectedMovement = {selectedMovement}
+            setSelectedOccupation= {setSelectedOccupation}
+            setSelectedGender = {setSelectedGender}
+            setSelectedNationality= {setSelectedNationality}
+            setSelectedMovement= {setSelectedMovement}
+            setSelectedObject={setSelectedObject}
+            backendUrl={backendUrl}
           />
         </div>
 
@@ -295,6 +298,13 @@ function App() {
             setSelectedYear={setSelectedYear}
             selectedYear={selectedYear}
             detailMode={detailMode}
+          />
+
+          <TimeSlider
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+            windowRange={windowRange}
+            // distinctDates= {distinctDates}            
           />
 
           <LayerHistogram
@@ -325,12 +335,7 @@ function App() {
             />
           )}
 
-          <TimeSlider
-            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-            windowRange={windowRange}
-            // distinctDates= {distinctDates}            
-          />
+          
         </div>
       </div>
     </div>

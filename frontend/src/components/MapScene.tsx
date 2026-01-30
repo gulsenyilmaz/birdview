@@ -160,7 +160,7 @@ const MapScene: React.FC<MapSceneProps> = ({
   const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text'>('text');
   const [showEvents, setShowEvents] = useState(false);
   const [showHumans, setShowHumans] = useState(true);
-  const [manuelMode, setManuelMode] = useState(true)
+  const [manuelMode, setManuelMode] = useState(false)
 
  
 
@@ -210,7 +210,7 @@ const MapScene: React.FC<MapSceneProps> = ({
   }, [showHumans, humans, selectedYear, colorFilterType, viewState.zoom]);
 
   useEffect(() => {
-    if (manuelMode) return;
+    // if (manuelMode) return;
     
     const combinedLocations:any[] = [];
     
@@ -226,13 +226,13 @@ const MapScene: React.FC<MapSceneProps> = ({
 
     const { centerLon, centerLat, zoom } = computeBounds(combinedLocations, detailMode);
 
-    const zoomME = showEvents && militaryEvents.length > 0? Math.min(...militaryEvents.map(me => me.depth_level)): zoom;
+    // const zoomME = showEvents && militaryEvents.length > 0? Math.min(...militaryEvents.map(me => me.depth_level)): zoom;
 
     setViewState((prev) => ({
       ...prev,
       longitude: centerLon,
       latitude: centerLat,
-      zoom: zoomME+0.2,
+      zoom: zoom+0.2,
       transitionInterpolator: new FlyToInterpolator({ speed: 2 }),
       transitionDuration: 'auto',
     }));
