@@ -47,7 +47,6 @@ export function useWorkLayer(args: {
 
       const list: Work[] = data.works ?? [];
       setWorks(list);
-      console.log("WORKS:", list)
       
       const worksRange = getFullRangeByYearField(list, "created_date");
       setFullRange(worksRange);

@@ -1,17 +1,25 @@
 .description-container {
   position: relative;
-  width:30vw;
-  height: 3vh;
-  /* max-height: 50vh; */
-  background-color: rgb(0, 0, 0);
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.261);
 
-  /* align-items: center; */
-  /* justify-content: top;   */
+  width:100vw;
+  height: 100%;
+
   padding: 0rem;
-  z-index: 1;
- 
+  
+  display: flex;
+  flex-direction: row;
   box-sizing: border-box;
+  align-items: flex-end;
+  justify-content: flex-start;
+  justify-items: flex-start;
+  
+
+  border: none;
+  
+  
+  
+  z-index: 1;
+  
 }
 
 .filter-description{
@@ -43,20 +51,27 @@
   background-color: #3dc5aa00;
   border-radius: 0px;
   padding: 0.1rem 0.1rem;
-  font-size: 0.8rem;
+  font-size: 1rem;
   display: flex;
   align-items: right;
+  color: rgb(65, 65, 65);
+  font-weight: bold;
 }
 
 .remove-btn {
+
+  height: 1.5rem;
+  width: 1.5rem;
+
   background-color:  rgba(182, 72, 72, 0.653);;
   border: none;
   border-radius: 80px;
+  
   margin-left: -0.5rem;
-  margin-top: -2rem;
+  margin-top: -0.6rem;
   cursor: pointer;
-  padding: 0.1rem 0.5rem;
+  padding: 0.1rem 0.2rem;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1.1rem;
   
 }

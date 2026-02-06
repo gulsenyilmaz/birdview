@@ -37,6 +37,7 @@ const DashboardAdvanced: React.FC<DashboardAdvancedProps> = ({ humans, setColorF
 
   return (
     <div className="dashboard-container">
+      
         <div className="button-bar">
             <button
             className={colorFilterType === "age" ? "active" : ""}
@@ -57,6 +58,7 @@ const DashboardAdvanced: React.FC<DashboardAdvancedProps> = ({ humans, setColorF
             Nationality
             </button>
       </div>
+      
       <div className="chart-box">
         <div className="chart-box-title">
           <strong>NATIONALITIES : </strong>

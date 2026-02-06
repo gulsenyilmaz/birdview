@@ -9,6 +9,7 @@ import type { Nationality } from "./entities/Nationality";
 import type { Gender } from "./entities/Gender";
 import type { Occupation } from "./entities/Occupation";
 import type { MilitaryEvent } from "./entities/MilitaryEvent";
+import type { Collection } from "./entities/Collection";
 
 import { isHuman, isLocation, isMilitaryEvent } from "./utils/typeGuards";
 
@@ -20,8 +21,8 @@ import MapScene from './components/MapScene';
 import TimeSlider from "./components/TimeSlider";
 import TimeWindowSlider from "./components/TimeWindowSlider";
 import LayerHistogram from "./components/LayerHistogram";
-// import Dashboard from "./components/Dashboard";
-import DashboardAdvanced from "./components/DashboardAdvanced";
+import Dashboard from "./components/Dashboard";
+// import DashboardAdvanced from "./components/DashboardAdvanced";
 
 import FilterList from "./components/FilterList";
 import DescriptionBanner from "./components/DescriptionBanner"
@@ -38,8 +39,9 @@ import MilitaryEventDetail from './components/MilitaryEventDetail';
 
 import { unionRanges } from "./utils/dateUtils";
 
+
 function App() {
-  const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("nationality");
+  
   const [selectedYear, setSelectedYear] = useState<number>(1921);
   const [detailMode, setDetailMode] = useState<boolean>(false);
   
@@ -57,8 +59,13 @@ function App() {
   const [selectedGender, setSelectedGender] = useState<Gender| null>(null);
   const [selectedNationality, setSelectedNationality] = useState<Nationality| null>(null);
   const [selectedMovement, setSelectedMovement] = useState<Movement| null>(null);
+  const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
 
+  const [movements, setMovements] = useState<Movement[]>([]); 
   const [locations, setLocations] = useState<Location[]>([]);
+
+  const [showEvents, setShowEvents] = useState(false);
+  const [showHumans, setShowHumans] = useState(true);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -71,12 +78,12 @@ function App() {
       gender_id: selectedGender?.id,
       nationality_id: selectedNationality?.id,
       movement_id: selectedMovement?.id,
+      collection_id: selectedCollection?.id,
       location_id: selectedLocation?.id,
       relationship_type_name: selectedLocation?.relationship_type_name,
     },
     selectedYear,
   });
-
 
   const militaryLayer = useMilitaryEventLayer({
     active: true, // şimdilik hep açık
@@ -96,11 +103,10 @@ function App() {
     selectedYear,
   });
 
-
   const activeFullRange = unionRanges([
     humanLayer.fullRange,
-    // militaryLayer.fullRange,
-    // workLayer.fullRange
+   // militaryLayer.fullRange,
+    //workLayer.fullRange
     // eventsLayer.fullRange,
   ]);
 
@@ -108,19 +114,23 @@ function App() {
   useEffect(() => {
 
     if(!selectedObject){
+
       setWindowRange(activeFullRange);
       return ;
+
     }  
 
     setDetailMode(true);
 
     if(isHuman(selectedObject)){
+
       setWindowRange(humanLayer.fullRange)
 
       setSelectedHuman(selectedObject);
 
       setSelectedLocation(null);
       setSelectedMilitaryEvent(null);
+
     }
     else if(isLocation(selectedObject)){
 
@@ -134,20 +144,22 @@ function App() {
     else if(isMilitaryEvent(selectedObject)){
 
       setWindowRange(militaryLayer.fullRange)
-    
       
       setSelectedLocation(null);
       setSelectedHuman(null);
       setLocations([]);
       setSelectedMilitaryEvent(selectedObject);
+
     }
     
     else{
+
       setSelectedHuman(null);
       setSelectedLocation(null);
       setSelectedMilitaryEvent(null);
       setSelectedObject(null);
       setDetailMode(false);
+
     }
     
 
@@ -156,6 +168,7 @@ function App() {
   useEffect(() => {
 
     if(!detailMode){
+
       setSelectedHuman(null);
       setSelectedLocation(null);
       setSelectedObject(null);
@@ -163,6 +176,7 @@ function App() {
       setSelectedObjectThumbnail(null);
       setSelectedMilitaryEvent(null);
       // setDistinctDates([]);
+
     }
 
   }, [detailMode]);
@@ -173,7 +187,7 @@ function App() {
         <div className={`left-panel ${selectedObject? "open" : ""}`}>
           <DetailBox
             selectedYear={selectedYear}
-            detailMode={detailMode}
+            detailMode={detailMode}   
             setDetailMode={setDetailMode}>
 
             {selectedHuman && (
@@ -233,31 +247,40 @@ function App() {
           </ContentStrip>
           )}
         </div>
-
-        <div className={`top-filter_description-bar ${selectedObject? "close" : ""}`} >
+        {/* <div className={`left-panel-dashborad ${selectedObject ? "close" : ""}`}>
           
-           <DashboardAdvanced
-            humans={humanLayer.filteredHumans}
-            setColorFilterType= {setColorFilterType}
-            colorFilterType={colorFilterType}
-          />
-           <DescriptionBanner
-            selectedMovement ={selectedMovement}
-            selectedOccupation= {selectedOccupation}
-            selectedGender={selectedGender}
-            selectedNationality={selectedNationality}
-            onClearFilter={(key) => {
-              console.log("Clearing filter for key:", key);
-              switch (key) {
-                case "nationality": setSelectedNationality(null); break;
-                case "gender": setSelectedGender(null); break;
-                case "occupation": setSelectedOccupation(null); break;
-                case "movement": setSelectedMovement(null); break;
-                default: break;
+            <Dashboard
+              humans={humanLayer.filteredHumans}
+            />
+           
+          </div> */}
+
+        <div className={`top-panel-timeWindowSlider ${selectedObject? "close" : ""}`} >
+          <Dashboard
+              humans={humanLayer.filteredHumans}
+            />
+          <DescriptionBanner
+              humans={humanLayer.filteredHumans}
+              selectedMovement ={selectedMovement}
+              selectedOccupation= {selectedOccupation}
+              selectedGender={selectedGender}
+              selectedNationality={selectedNationality}
+              selectedCollection={selectedCollection}
+              onClearFilter={(key) => {
+                console.log("Clearing filter for key:", key);
+                switch (key) {
+                  case "nationality": setSelectedNationality(null); break;
+                  case "gender": setSelectedGender(null); break;
+                  case "occupation": setSelectedOccupation(null); break;
+                  case "movement": setSelectedMovement(null); break;
+                  case "collection": setSelectedCollection(null); break;
+                  default: break;
+                  }
                 }
               }
-            }
-          />
+            />
+          
+
         </div>
 
         <div className="scene">
@@ -265,12 +288,13 @@ function App() {
             locations={locations}
             humans={humanLayer.filteredHumans}
             militaryEvents={militaryLayer.filteredMilitaryEvents}
-            // works={workLayer.filteredWorks}
+            works={workLayer.filteredWorks}
             selectedYear={selectedYear}
             setSelectedObject={setSelectedObject}
-            colorFilterType={colorFilterType}
             detailMode={detailMode}
             selectedObjectThumbnail ={selectedObjectThumbnail}
+            showEvents={showEvents}
+            showHumans={showHumans}
           />
         </div>
 
@@ -281,17 +305,21 @@ function App() {
             selectedGender  = {selectedGender}
             selectedNationality = {selectedNationality}
             selectedMovement = {selectedMovement}
+            selectedCollection = {selectedCollection}
             setSelectedOccupation= {setSelectedOccupation}
             setSelectedGender = {setSelectedGender}
             setSelectedNationality= {setSelectedNationality}
-            setSelectedMovement= {setSelectedMovement}
+            setSelectedMovement = {setSelectedMovement}
+            setSelectedCollection = {setSelectedCollection}
             setSelectedObject={setSelectedObject}
             backendUrl={backendUrl}
+            setMovements={setMovements}
+            movements={movements}
           />
         </div>
 
         <div className={`bottom-panel ${selectedObject ? "squeezed" : ""}`}>
-          <TimeWindowSlider
+           <TimeWindowSlider
             fullRange={activeFullRange}
             windowRange={windowRange}
             setWindowRange={setWindowRange}
@@ -303,16 +331,22 @@ function App() {
           <TimeSlider
             selectedYear={selectedYear}
             setSelectedYear={setSelectedYear}
+            fullRange={activeFullRange}
             windowRange={windowRange}
-            // distinctDates= {distinctDates}            
-          />
+            setWindowRange={setWindowRange}
+            // distinctDates= {distinctDates}   
+            setSelectedMovement= {setSelectedMovement}
+            movements={movements}         
+          >
 
           <LayerHistogram
             setSelectedYear={setSelectedYear}
             windowRange={windowRange}
             aliveCounts={militaryLayer.eventCounts}
             binAggregation="sum"   
-            layerTypeName ="WARS"   
+            layerTypeName ="WARS" 
+            showLayer={showEvents}
+            setShowLayer={setShowEvents}  
           />
 
           {selectedHuman && workLayer.workCounts.length > 0  &&(
@@ -331,10 +365,12 @@ function App() {
               windowRange={windowRange}
               aliveCounts={humanLayer.aliveCounts}
               binAggregation="sum" 
-              layerTypeName ="HUMANS"                        
+              layerTypeName ="HUMANS"  
+              showLayer={showHumans}
+              setShowLayer={setShowHumans}                      
             />
           )}
-
+          </TimeSlider>
           
         </div>
       </div>

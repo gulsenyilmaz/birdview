@@ -16,10 +16,10 @@ import { CollisionFilterExtension } from '@deck.gl/extensions';
 import type {CollisionFilterExtensionProps} from '@deck.gl/extensions';
 import type { Location } from "../entities/Location";
 import type { Human } from "../entities/Human";
-// import type { Work } from "../entities/Work";
+import type { Work } from "../entities/Work";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import type { HumanEnriched } from "../entities/HumanEnriched";
-//import type { Layer } from "../layers/Layer";
+
 import { getColorForGender, getColorForAge, getColorForLabel, getColorForRelationType } from "../utils/colorUtils";
 import { computeBounds, offsetFibonacciPosition } from "../utils/locationUtils"
 
@@ -44,7 +44,6 @@ const INITIAL_VIEW_STATE: ViewStateType = {
 
 
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
-
 const ICON_MISSING = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iLTQtNCA4IDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSByPSI0IiBmaWxsPSIjY2NjIi8+PHRleHQgeT0iLjUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiIGZpbGw9IiNmZmYiPj88L3RleHQ+PC9zdmc+';
 const ICON_SIZE = 50;
 
@@ -132,12 +131,14 @@ interface MapSceneProps {
   locations:Location[];
   humans:Human[];
   militaryEvents:MilitaryEvent[];
-  // works:Work[];
+  works:Work[];
   selectedYear:number;
   setSelectedObject: (obj: any) => void;
-  colorFilterType:string;
+  
   detailMode:Boolean;
   selectedObjectThumbnail:string | null;
+  showEvents: boolean;
+  showHumans: boolean;
 
 
 }
@@ -146,22 +147,32 @@ const MapScene: React.FC<MapSceneProps> = ({
                                               locations,
                                               humans,
                                               militaryEvents,
-                                              // works,
+                                              works,
                                               selectedYear,
                                               setSelectedObject,
-                                              colorFilterType,
+                                             
                                               detailMode,
-                                              selectedObjectThumbnail
+                                              selectedObjectThumbnail,
+                                              showEvents,
+                                              showHumans
                                             }) => {
 
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE); 
   const [processedHumans, setProcessedHumans] = useState<HumanEnriched[]>([]);
-  // const [layers, setLayers] = useState<any[]>([]); 
+ 
   const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text'>('text');
-  const [showEvents, setShowEvents] = useState(false);
-  const [showHumans, setShowHumans] = useState(true);
-  const [manuelMode, setManuelMode] = useState(false)
+  const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("age");
 
+  const [manuelMode, setManuelMode] = useState(true)
+
+  
+
+  
+ console.log("MapScene rendered with props:", {
+
+  worksCount: works.length,
+ 
+});
  
 
   useEffect(() => {
@@ -226,8 +237,6 @@ const MapScene: React.FC<MapSceneProps> = ({
 
     const { centerLon, centerLat, zoom } = computeBounds(combinedLocations, detailMode);
 
-    // const zoomME = showEvents && militaryEvents.length > 0? Math.min(...militaryEvents.map(me => me.depth_level)): zoom;
-
     setViewState((prev) => ({
       ...prev,
       longitude: centerLon,
@@ -248,11 +257,7 @@ const layers = useMemo(() => {
   const sizeMaxPixels = (scale / 3) * fontSize;
   const sizeMinPixels = Math.min(scale / 1000, 0.5) * fontSize;
 
-  // console.log("sizeMaxPixels:", sizeMaxPixels, "sizeMinPixels:", sizeMinPixels);
-
   const SCATTER_FACTOR = 0.04 * 111320;
- 
-
    
   if (showEvents) {
 
@@ -261,7 +266,6 @@ const layers = useMemo(() => {
       data:militaryEvents.filter(me => me.descendant_count==0),
       stroked: true,
       getPosition: d => [d.lon ,d.lat],
-      // getRadius: d => (d.end_date+3 >= selectedYear)?(50000/viewState.zoom)*(4-selectedYear+d.end_date):(150000/viewState.zoom)* (0.5),
       getRadius: d => getRadiusForEvent(d, selectedYear, viewState.zoom),
 
       getFillColor: (d) => fillColorScale(100*(1+selectedYear-d.start_date)/((1+d.end_date-d.start_date)*1.25)),
@@ -309,7 +313,7 @@ const layers = useMemo(() => {
   const locationLayer = new ScatterplotLayer({
     id: "locations-layer",
     data: locations,
-    getPosition: (d) => [d.loc_lon, d.loc_lat],
+    getPosition: d => [d.loc_lon, d.loc_lat],
     getRadius: 200000 / Math.pow(viewState.zoom, 2),
     getFillColor: d => getColorForRelationType(d.relationship_type_name),
     pickable: true,
@@ -444,18 +448,22 @@ const layers = useMemo(() => {
         <DeckGL
           views={new MapView({repeat: false})}
           layers={layers}
-          initialViewState={viewState}
+          viewState={viewState}
           onViewStateChange={( obj :any) => {
             
-             setViewState({
-                latitude: obj.viewState.latitude,
-                longitude: obj.viewState.longitude,
-                zoom: obj.viewState.zoom,
-                pitch: obj.viewState.pitch,
-                bearing: obj.viewState.bearing,
-              });
+             setViewState(
+              obj.viewState
+              // {
+              //   latitude: obj.viewState.latitude,
+              //   longitude: obj.viewState.longitude,
+              //   zoom: obj.viewState.zoom,
+              //   pitch: obj.viewState.pitch,
+              //   bearing: obj.viewState.bearing,
+              // }
+            );
 
           }}
+          
           controller={true}
           
           getTooltip={({ object }) =>
@@ -483,50 +491,68 @@ const layers = useMemo(() => {
         </DeckGL>
         
       </div>
-      <div className="layer-selector">
-         <div className="radio-group">
-          <label>
-            <input
-              type="radio"
-              value="arc"
-              checked={selectedLayerType === 'arc'}
-              onChange={() => setSelectedLayerType('arc')}
-            />
-            Arc Layer
-          </label>
+        
+      {showHumans && (
+          <div className="layer-selector">
+            <div className="radio-group">
+              <label>
+                <input
+                  type="radio"
+                  value="arc"
+                  checked={selectedLayerType === "arc"}
+                  onChange={() => setSelectedLayerType("arc")}
+                />
+                Arc
+              </label>
 
-          <label>
-            <input
-              type="radio"
-              value="text"
-              checked={selectedLayerType === 'text'}
-              onChange={() => setSelectedLayerType('text')}
-            />
-            Text Layer
-          </label>
+              <label>
+                <input
+                  type="radio"
+                  value="text"
+                  checked={selectedLayerType === 'text'}
+                  onChange={() => setSelectedLayerType('text')}
+                />
+                Text Layer
+              </label>
+            </div>
+            <div className="radio-group">
+              <label>
+                <input
+                  type="radio"
+                  value="age"
+                  checked={colorFilterType === "age"}
+                  onChange={() => setColorFilterType("age")}
+                />
+                Age
+              </label>
+
+              <label>
+                <input
+                  type="radio"
+                  value="gender"
+                  checked={colorFilterType === "gender"}
+                  onChange={() => setColorFilterType("gender")}
+                />
+                Gender
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="nationality"
+                  checked={colorFilterType === "nationality"}
+                  onChange={() => setColorFilterType("nationality")}
+                />
+                Nationality
+              </label>
+              {/* <hr className="divider" /> */}
+            </div>
+            
+            
+          
+            
         </div>
-        <hr className="divider" />
-        <div className="checkbox-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={showEvents}
-                onChange={(e) => setShowEvents(e.target.checked)}
-              />
-              WARS
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={showHumans}
-                onChange={(e) => setShowHumans(e.target.checked)}
-              />
-              HUMANS
-            </label>
-        </div>
-      </div>
-      
-    </div>
+      )}
+  </div>
   );
 };
 

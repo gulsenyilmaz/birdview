@@ -28,7 +28,6 @@ const ContentStrip: React.FC<ContentStripProps> = ({
         </div>
         
         <div className="content-strip-content">
-          
             {isOpen && (
               <Timeline>
                       {children}
@@ -38,11 +37,8 @@ const ContentStrip: React.FC<ContentStripProps> = ({
           
           <div className="content-strip-header">
             <strong className="person-name">{selectedObject? selectedObject.name: ""} in {selectedYear}</strong>
-          
           </div>
         </div>
-        
-      
     </>
   );
 };

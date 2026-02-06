@@ -155,6 +155,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
     <>
         {personDetails && (
             <div className="person-details-container ">
+                <h2>{person.name}</h2>
                 {(personDetails.img_url || fallbackImage) ? (
                     <img
                         src={personDetails.img_url || fallbackImage!}
@@ -170,7 +171,6 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
                         />
                 )}
                 <div className="person-details">
-
                     
                     <h3><i>{personDetails.description} ({person.id} )</i></h3>
                     <a href={`https://www.wikidata.org/wiki/${person.qid}`} target="_blank" rel="noreferrer" className="timeline-item-title">{person.qid}</a>

@@ -45,6 +45,7 @@ def get_humans(request: Request):
     movement_id = qp.get("movement_id")
     gender_id = qp.get("gender_id")
     nationality_id = qp.get("nationality_id")
+    collection_id = qp.get("collection_id")
     location_id = qp.get("location_id")
     relationship_type_id = qp.get("relationship_type_id")  # optional
 
@@ -99,6 +100,14 @@ def get_humans(request: Request):
         """
         params.append(movement_id)
 
+    if collection_id:
+        base_query += """
+            AND h.id IN (
+                SELECT human_id FROM human_collection WHERE collection_id = ?
+            )
+        """
+        params.append(collection_id)
+
     if occupation_id:
         base_query += """
             AND h.id IN (
@@ -142,6 +151,10 @@ def get_allworks(request: Request):
     qp = request.query_params
 
     human_id = qp.get("human_id")
+
+    if not human_id:
+        return JSONResponse({"works": []})
+    
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
@@ -337,7 +350,11 @@ def get_movements(request: Request):
 
     base_query = """
         SELECT 
-           m.id, m.name, COUNT(hm.human_id) AS count
+           m.id, 
+           m.name, 
+           COUNT(hm.human_id) AS count, 
+           COALESCE(m.inception, m.start_date) AS start_date,
+           m.end_date
         FROM human_movement hm
         INNER JOIN movements m ON hm.movement_id = m.id
     """
@@ -373,7 +390,11 @@ def get_movements(request: Request):
         base_query += f" WHERE {' AND '.join(conditions)}"
 
     base_query += """
-        GROUP BY hm.movement_id
+        GROUP BY m.id,
+                m.name,
+                m.start_date,
+                m.inception,
+                m.end_date
         ORDER BY count DESC
         LIMIT 200;
     """
@@ -558,6 +579,8 @@ def get_nationalities(request: Request):
         """)
         params.append(gender_id)
 
+    
+
     if conditions:
         base_query += f" WHERE {' AND '.join(conditions)}"
 
@@ -572,6 +595,76 @@ def get_nationalities(request: Request):
     nationalities = [dict(row) for row in results]
 
     return JSONResponse({"nationalities": nationalities})
+
+@app.get("/collections")
+def get_collections(request: Request):
+    qp = request.query_params
+
+    movement_id = qp.get("movement_id")
+    occupation_id = qp.get("occupation_id")
+    gender_id = qp.get("gender_id")
+    nationality_id = qp.get("nationality_id")
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    base_query = """
+       SELECT 
+           c.id, c.name, COUNT(hc.human_id) AS count
+        FROM human_collection hc
+        INNER JOIN collections c ON hc.collection_id = c.id
+        
+    """
+    params = []
+    conditions = []
+
+    if movement_id:
+        conditions.append("""
+            h.id IN (
+                SELECT human_id FROM human_movement WHERE movement_id = ?
+            )
+        """)
+        params.append(movement_id)
+
+    if occupation_id:
+        conditions.append("""
+            h.id IN (
+                SELECT human_id FROM human_occupation WHERE occupation_id = ? AND is_primary = 1
+            )
+        """)
+        params.append(occupation_id)
+
+    if gender_id:
+        conditions.append("""
+            h.id IN (
+                SELECT id FROM humans WHERE gender_id = ?
+            )
+        """)
+        params.append(gender_id)
+    
+    if nationality_id:
+        conditions.append("""
+            h.id IN (
+                SELECT id FROM humans WHERE nationality_id = ?
+            )
+        """)
+        params.append(nationality_id)
+
+    if conditions:
+        base_query += f" WHERE {' AND '.join(conditions)}"
+
+    base_query += """
+        GROUP BY c.id
+        ORDER BY count DESC
+    """
+
+    results = cur.execute(base_query, params).fetchall()
+    conn.close()
+
+    collections = [dict(row) for row in results]
+
+    return JSONResponse({"collections": collections})
 
 
 @app.get("/search")
@@ -734,7 +827,7 @@ def get_military_events(request: Request):
 
     base_query += """
         GROUP BY me.id
-        ORDER BY me.depth_level ASC, me.start_time ASC
+        ORDER BY me.start_time ASC, me.depth_level ASC
     """
 
     results = cur.execute(base_query, params).fetchall()

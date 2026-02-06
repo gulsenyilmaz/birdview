@@ -16,7 +16,7 @@ export function useMilitaryEventLayer(args: {
   const { active, backendUrl, filters, selectedYear } = args;
 
   const [militaryEvents, setMilitaryEvents] = useState<MilitaryEvent[]>([]);
-  const [fullRange, setFullRange] = useState<[number, number]>([-1600, 2025]);
+  const [fullRange, setFullRange] = useState<[number, number]>([-3000, 2025]);
   const [eventCounts, setEventCounts] = useState<{ year: number; count: number }[]>([]);
 
   useEffect(() => {

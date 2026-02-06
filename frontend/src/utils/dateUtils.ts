@@ -76,7 +76,8 @@ export function getFullRange<T extends Record<string, any>>(
   }
 
   const rawMin = Math.min(...startYears);
-  const min = rawMin < -1500 ? -1500 : rawMin;
+  // const min = rawMin < -3000 ? -3000 : rawMin;
+  const min = rawMin < -10000 ? -10000 : rawMin;
 
   const max = someoneAlive
     ? currentYear

@@ -3,7 +3,6 @@ import "./TimeSlider.css";
 import { getLayerColor } from "../utils/colorUtils";
 
 
-// ⬇️ yeni: dışarıdan verilecek "yıl -> hayatta olan sayısı"
 type YearCount = { year: number; count: number };
 
 interface LayerHistogramProps {
@@ -13,7 +12,8 @@ interface LayerHistogramProps {
   aliveCounts?: YearCount[];
   binAggregation?: "avg" | "sum";
   layerTypeName:string;
-  // setSelectedLayer:(ch: boolean) => void;
+  showLayer?: boolean;
+  setShowLayer?: (ch: boolean) => void;
 }
 
 const LayerHistogram: React.FC<LayerHistogramProps> = ({
@@ -23,7 +23,9 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
   aliveCounts = [],   
   binAggregation = "avg", 
   layerTypeName,  
-  // setSelectedLayer,
+  showLayer,
+  setShowLayer
+  
 }) => {
 
   const [minYear, maxYear] = windowRange;
@@ -82,42 +84,48 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
     (size / totalRange) * 100;
 
   return (
-    <div className="time-container" style={{backgroundColor:'#454444ff'}}>
-      <div className="play-button">
+    // <div className="component-container">
+      <div className="time-container" >
+        <div className="time-slider">
+          {/* ⬇️ Tam windowRange boyunca "o yıl olanlar" histogramı */}
+          {bins.length > 0 && (
+            <div className="histogram">
+              {bins.map((b, i) => {
+                const left = getLeftPercent(b.start);
+                const width = getWidthPercentForBin(binSize);
+                const pct = maxVal > 0 ? Math.round((b.value / maxVal) * 100) : 0;
+                const height = b.value > 0 ? Math.max(2, pct) : 0; // 0 ise gizle
+                // const mid = Math.round((b.start + b.end) / 2);
+                return (
+                  <div
+                    key={`${b.start}-${i}`}
+                    className={`hist-bar ${b.value > 0 ? "active" : ""}`}
+                    style={{ left: `${left}%`, width: `${width}%`, height: `${height}%`, color:getLayerColor(layerTypeName) }}
+                    title={`${b.start}–${b.end}: ${binAggregation === "avg" ? "avg" : "sum"}=${b.value.toFixed(0)}`}
+                    onClick={() => b.value > 0 && setSelectedYear(b.start)}
+                  />
+                );
+              })}
+            </div>
+          )}
+          
+        </div>
 
-        <label>
-              
-              {layerTypeName}
-            </label>
-        
-      </div>
-      <div className="time-slider">
-        
-         {/* ⬇️ Tam windowRange boyunca "o yıl hayatta olanlar" histogramı */}
-        {bins.length > 0 && (
-          <div className="histogram">
-            {bins.map((b, i) => {
-              const left = getLeftPercent(b.start);
-              const width = getWidthPercentForBin(binSize);
-              const pct = maxVal > 0 ? Math.round((b.value / maxVal) * 100) : 0;
-              const height = b.value > 0 ? Math.max(2, pct) : 0; // 0 ise gizle
-              // const mid = Math.round((b.start + b.end) / 2);
-              return (
-                <div
-                  key={`${b.start}-${i}`}
-                  className={`hist-bar ${b.value > 0 ? "active" : ""}`}
-                  style={{ left: `${left}%`, width: `${width}%`, height: `${height}%`, color:getLayerColor(layerTypeName) }}
-                  title={`${b.start}–${b.end}: ${binAggregation === "avg" ? "avg" : "sum"}=${b.value.toFixed(0)}`}
-                  onClick={() => b.value > 0 && setSelectedYear(b.start)}
+        <div className="label-group">
+          <label>
+              <span className="label-title">{layerTypeName}    </span>
+              <input
+                  type="checkbox"
+                  checked={showLayer}
+                  onChange={(e) => setShowLayer && setShowLayer(e.target.checked)}
                 />
-              );
-            })}
-          </div>
-        )}
-        
+            
+          </label>
+        </div>
+      
       </div>
-     
-    </div>
+      // </div>
+    
   );
 };
 

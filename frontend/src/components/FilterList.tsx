@@ -8,6 +8,7 @@ import type { Gender } from "../entities/Gender";
 import type { Occupation } from "../entities/Occupation";
 import type { Human } from "../entities/Human";
 import type { Location } from "../entities/Location";
+import type { Collection } from "../entities/Collection";
 
 interface Results{
 
@@ -20,12 +21,16 @@ interface FilterListProps {
     selectedGender:Gender| null;
     selectedNationality:Nationality| null;
     selectedMovement:Movement| null;
+    selectedCollection:Collection| null;
     setSelectedOccupation: (obj: Occupation) => void;
     setSelectedGender: (obj: Gender) => void;
     setSelectedNationality: (obj: Nationality) => void;
     setSelectedMovement: (obj: Movement) => void;
+    setSelectedCollection: (obj: Collection) => void;
     setSelectedObject: (obj: any) => void;
     backendUrl:string;
+    setMovements: (movements: Movement[]) => void;
+    movements: Movement[];
 }
 
 const FilterList: React.FC<FilterListProps> = ({
@@ -33,20 +38,25 @@ const FilterList: React.FC<FilterListProps> = ({
     selectedGender,
     selectedNationality,
     selectedMovement,
+    selectedCollection,
     setSelectedOccupation, 
     setSelectedGender,
     setSelectedNationality,
     setSelectedMovement,
+    setSelectedCollection,
 
     setSelectedObject,
-    backendUrl
+    backendUrl,
+    setMovements,
+    movements
 
     }) => {
 
     const [occupations, setOccupations] = useState<Occupation[]>([]); 
     const [genders, setGenders] = useState<Gender[]>([]); 
     const [nationalities, setNationalities] = useState<Nationality[]>([]); 
-    const [movements, setMovements] = useState<Movement[]>([]); 
+    const [collections, setCollections] = useState<Collection[]>([]); 
+    
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [searchResults, setSearchResults] = useState<Results | null>(null);
 
@@ -55,7 +65,7 @@ const FilterList: React.FC<FilterListProps> = ({
     const [listSearchInput, setListSearchInput] = useState<string>("");
     const [listData, setListData] = useState<any[]>([]);    
 
-    const panelRef = useRef<HTMLDivElement>(null);
+    const panelRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
 
     useEffect(() => {
     
@@ -81,13 +91,14 @@ const FilterList: React.FC<FilterListProps> = ({
         if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
         if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
         if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+        if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
 
         fetch(`${backendUrl}/movements/?${queryParams.toString()}`)
         .then(res => res.json())
         .then(data => {
             setMovements(data.movements);  // 👈 dikkat!
         });
-    }, [selectedGender,selectedOccupation,selectedNationality]);
+    }, [selectedGender,selectedOccupation,selectedNationality,selectedCollection]);
 
     useEffect(() => {
 
@@ -96,13 +107,14 @@ const FilterList: React.FC<FilterListProps> = ({
         if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
         if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
         if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+        if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
 
         fetch(`${backendUrl}/occupations/?${queryParams.toString()}`)
         .then(res => res.json())
         .then(data => {
             setOccupations(data.occupations);  // 👈 dikkat!
         });
-    }, [selectedGender,selectedNationality,selectedMovement]);
+    }, [selectedGender,selectedNationality,selectedMovement,selectedCollection]);
 
     useEffect(() => {
 
@@ -111,13 +123,14 @@ const FilterList: React.FC<FilterListProps> = ({
         if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
         if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
         if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+        if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
 
         fetch(`${backendUrl}/genders/?${queryParams.toString()}`)
         .then(res => res.json())
         .then(data => {
             setGenders(data.genders);  // 👈 dikkat!
         });
-    }, [selectedMovement,selectedOccupation,selectedNationality]);
+    }, [selectedMovement,selectedOccupation,selectedNationality,selectedCollection]);
 
     useEffect(() => {
 
@@ -126,13 +139,30 @@ const FilterList: React.FC<FilterListProps> = ({
         if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
         if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
         if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
+        if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
 
         fetch(`${backendUrl}/nationalities/?${queryParams.toString()}`)
         .then(res => res.json())
         .then(data => {
             setNationalities(data.nationalities);  // 👈 dikkat!
         });
-    }, [selectedGender, selectedMovement, selectedOccupation]);
+    }, [selectedGender, selectedMovement, selectedOccupation, selectedCollection]);
+
+    useEffect(() => {
+
+        const queryParams = new URLSearchParams();
+
+        if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
+        if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
+        if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
+        if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+
+        fetch(`${backendUrl}/collections/?${queryParams.toString()}`)
+        .then(res => res.json())
+        .then(data => {
+            setCollections(data.collections);  // 👈 dikkat!
+        });
+    }, [selectedGender, selectedMovement, selectedOccupation, selectedNationality]);
 
     useEffect(() => {
 
@@ -158,6 +188,11 @@ const FilterList: React.FC<FilterListProps> = ({
                 setSearchResults(null);  
                 setSearchTerm("");
                 break;
+            case "collections":
+                setListData(collections);
+                setSearchResults(null);  
+                setSearchTerm("");
+                break;
             default:
                 setListData([]);
                 break;
@@ -169,6 +204,8 @@ const FilterList: React.FC<FilterListProps> = ({
 
 
     useEffect(() => {
+
+        console.log("activeCategory:", selectedItem);
         
         if (activeCategory){
             
@@ -188,6 +225,9 @@ const FilterList: React.FC<FilterListProps> = ({
                     case "movements":
                         setSelectedMovement(selectedItem);
                         break;
+                    case "collections":
+                        setSelectedCollection(selectedItem);
+                        break;
                     default:
                         break;
                 }
@@ -197,7 +237,9 @@ const FilterList: React.FC<FilterListProps> = ({
     }, [selectedItem]);
 
     useEffect(() => {
+        console.log("Selected item changed out:", panelRef.current);
         const handleClickOutside = (event: MouseEvent) => {
+            console.log("Selected item changed:", panelRef.current, event.target);
             if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
                 clearAsInitial();
             }
@@ -205,6 +247,7 @@ const FilterList: React.FC<FilterListProps> = ({
 
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
+            console.log("Selected item changed in:", selectedItem);
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
@@ -229,98 +272,101 @@ const FilterList: React.FC<FilterListProps> = ({
 
   return (
     <>
-    <div className="filter_list_panel_container" ref={panelRef}>
         <NavBar
             activeCategory={activeCategory}
             setActiveCategory = {setActiveCategory}
-        />
-      <div className="filter_list_panel">
-        {/* 🔍 SEARCH BAR */}
-        {activeCategory=="searchbar" && (
-            <input
-                type="text"
-                className="search-bar"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search people or places..."
-                style={{ marginBottom: "0.5rem" }}
-                />
-        )}
-        {activeCategory && activeCategory !== "searchbar" && (
-            <input
-                type="text"
-                placeholder={`Search ${activeCategory}...`}
-                value={listSearchInput}
-                onChange={(e) => setListSearchInput(e.target.value)}
-                className="search-bar"
-                style={{ marginBottom: "0.5rem" }}
-                />
-        )}
-        {listData && listData.length>0 && (
-            <div className="category-list">
-                <ul>
-                    {listData
-                    .filter((item) =>
-                        item.name.toLowerCase().includes(listSearchInput.toLowerCase())
-                    )
-                    .map((item) => (
-                        <li
-                        key={item.id}
-                        onClick={() => setSelectedItem(item)}
-                        className={selectedItem?.id === item.id ? "selected" : ""}
-                        >
-                        {item.name} ({item.count})
-                        </li>
-                    ))}
-                </ul>
+            panelRef={panelRef}
+        >
+ 
+        {activeCategory  && (
+            <div className="filter_list_panel" >
+                {/* 🔍 SEARCH BAR */}
+                {activeCategory=="searchbar" && (
+                    <input
+                        type="text"
+                        className="search-bar"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="Search people or places..."
+                        style={{ marginBottom: "0.5rem" }}
+                        />
+                )}
+                {activeCategory !== "searchbar" && (
+                    <input
+                        type="text"
+                        placeholder={`Search ${activeCategory}...`}
+                        value={listSearchInput}
+                        onChange={(e) => setListSearchInput(e.target.value)}
+                        className="search-bar"
+                        style={{ marginBottom: "0.5rem" }}
+                        />
+                )}
+                {listData && listData.length>0 && (
+                    <div className="category-list">
+                        <ul>
+                            {listData
+                            .filter((item) =>
+                                item.name.toLowerCase().includes(listSearchInput.toLowerCase())
+                            )
+                            .map((item) => (
+                                <li
+                                key={item.id}
+                                onClick={() => setSelectedItem(item)}
+                                className={selectedItem?.id === item.id ? "selected" : ""}
+                                >
+                                {item.name} ({item.count})
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+                {/* SEARCH RESULTS */}
+                {searchResults && (
+                    <div className="search-results">
+                        {searchResults.humans?.length > 0 && (
+                            <>
+                            <h4>People</h4>
+                            <ul>
+                                {searchResults.humans.map((result) => (
+                            <li key={`human-${result.id}`} onClick={() => getSearhResultPage(result)}>
+                                    👤 <strong>{result.name}({result.id})</strong>
+                                </li>
+                                ))}
+                            </ul>
+                            </>
+                        )}
+
+                        {searchResults.locations?.length > 0 && (
+                            <>
+                            <h4>Places</h4>
+                            <ul>
+                                {searchResults.locations.map((result) => (
+                                <li key={`location-${result.id}`} onClick={() => getSearhResultPage(result)}>
+                                    📍 <strong>{result.name}</strong>
+                                </li>
+                                ))}
+                            </ul>
+                            </>
+                        )}
+
+                        {searchResults.events?.length > 0 && (
+                            <>
+                            <h4>Events</h4>
+                            <ul>
+                                {searchResults.events.map((result) => (
+                                <li key={`event-${result.id}`} onClick={() => getSearhResultPage(result)}>
+                                    📍 <strong>{result.name}</strong>
+                                </li>
+                                ))}
+                            </ul>
+                            </>
+                        )}
+                    </div>
+                )}
+                {/* END OF SEARCH RESULTS */}
             </div>
         )}
-        {/* SEARCH RESULTS */}
-        {searchResults && (
-            <div className="search-results">
-                {searchResults.humans?.length > 0 && (
-                    <>
-                    <h4>People</h4>
-                    <ul>
-                        {searchResults.humans.map((result) => (
-                       <li key={`human-${result.id}`} onClick={() => getSearhResultPage(result)}>
-                            👤 <strong>{result.name}({result.id})</strong>
-                        </li>
-                        ))}
-                    </ul>
-                    </>
-                )}
-
-                {searchResults.locations?.length > 0 && (
-                    <>
-                    <h4>Places</h4>
-                    <ul>
-                        {searchResults.locations.map((result) => (
-                        <li key={`location-${result.id}`} onClick={() => getSearhResultPage(result)}>
-                            📍 <strong>{result.name}</strong>
-                        </li>
-                        ))}
-                    </ul>
-                    </>
-                )}
-
-                {searchResults.events?.length > 0 && (
-                    <>
-                    <h4>Events</h4>
-                    <ul>
-                        {searchResults.events.map((result) => (
-                        <li key={`event-${result.id}`} onClick={() => getSearhResultPage(result)}>
-                            📍 <strong>{result.name}</strong>
-                        </li>
-                        ))}
-                    </ul>
-                    </>
-                )}
-            </div>
-        )}
-        {/* END OF SEARCH RESULTS */}
-        </div> 
-      </div>
+      </NavBar>
     </>
   );
 }

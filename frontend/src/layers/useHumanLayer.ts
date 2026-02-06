@@ -9,6 +9,7 @@ export type HumanLayerFilters = {
   gender_id?: number;
   nationality_id?: number;
   movement_id?: number;
+  collection_id?: number;
   location_id?: number;
   relationship_type_name?: string;
 };
@@ -35,6 +36,7 @@ export function useHumanLayer(args: {
     if (filters.gender_id) qp.append("gender_id", String(filters.gender_id));
     if (filters.nationality_id) qp.append("nationality_id", String(filters.nationality_id));
     if (filters.movement_id) qp.append("movement_id", String(filters.movement_id));
+    if (filters.collection_id) qp.append("collection_id", String(filters.collection_id));
 
     if (filters.location_id) {
       qp.append("location_id", String(filters.location_id));
@@ -76,6 +78,7 @@ export function useHumanLayer(args: {
     filters.gender_id,
     filters.nationality_id,
     filters.movement_id,
+    filters.collection_id,
     filters.location_id,
     filters.relationship_type_name,
   ]);
