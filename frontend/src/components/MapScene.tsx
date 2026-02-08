@@ -16,7 +16,7 @@ import { CollisionFilterExtension } from '@deck.gl/extensions';
 import type {CollisionFilterExtensionProps} from '@deck.gl/extensions';
 import type { Location } from "../entities/Location";
 import type { Human } from "../entities/Human";
-import type { Work } from "../entities/Work";
+// import type { Work } from "../entities/Work";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import type { HumanEnriched } from "../entities/HumanEnriched";
 
@@ -131,7 +131,7 @@ interface MapSceneProps {
   locations:Location[];
   humans:Human[];
   militaryEvents:MilitaryEvent[];
-  works:Work[];
+  // works:Work[];
   selectedYear:number;
   setSelectedObject: (obj: any) => void;
   
@@ -139,22 +139,24 @@ interface MapSceneProps {
   selectedObjectThumbnail:string | null;
   showEvents: boolean;
   showHumans: boolean;
-
-
+  manuelMode:boolean;
+  setManuelMode:(obj: boolean) => void
 }
 
 const MapScene: React.FC<MapSceneProps> = ({
                                               locations,
                                               humans,
                                               militaryEvents,
-                                              works,
+                                              // works,
                                               selectedYear,
                                               setSelectedObject,
                                              
                                               detailMode,
                                               selectedObjectThumbnail,
                                               showEvents,
-                                              showHumans
+                                              showHumans,
+                                              manuelMode,
+                                              setManuelMode
                                             }) => {
 
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE); 
@@ -163,16 +165,16 @@ const MapScene: React.FC<MapSceneProps> = ({
   const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text'>('text');
   const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("age");
 
-  const [manuelMode, setManuelMode] = useState(true)
-
   
 
   
- console.log("MapScene rendered with props:", {
 
-  worksCount: works.length,
+  
+//  console.log("MapScene rendered with props:", {
+
+//   worksCount: works.length,
  
-});
+// });
  
 
   useEffect(() => {
@@ -221,7 +223,7 @@ const MapScene: React.FC<MapSceneProps> = ({
   }, [showHumans, humans, selectedYear, colorFilterType, viewState.zoom]);
 
   useEffect(() => {
-    // if (manuelMode) return;
+    if (manuelMode) return;
     
     const combinedLocations:any[] = [];
     
@@ -241,7 +243,7 @@ const MapScene: React.FC<MapSceneProps> = ({
       ...prev,
       longitude: centerLon,
       latitude: centerLat,
-      zoom: zoom+0.2,
+      zoom: zoom,
       transitionInterpolator: new FlyToInterpolator({ speed: 2 }),
       transitionDuration: 'auto',
     }));
@@ -453,13 +455,6 @@ const layers = useMemo(() => {
             
              setViewState(
               obj.viewState
-              // {
-              //   latitude: obj.viewState.latitude,
-              //   longitude: obj.viewState.longitude,
-              //   zoom: obj.viewState.zoom,
-              //   pitch: obj.viewState.pitch,
-              //   bearing: obj.viewState.bearing,
-              // }
             );
 
           }}
@@ -474,11 +469,18 @@ const layers = useMemo(() => {
                   }
           onClick={({ object }) => {
                 if (object) {
-                  console.log("Clicked object:", object);
-                  setManuelMode(true);
+                 
+                  // setManuelMode(true);
                   setSelectedObject(object);
                 }
             }}
+          onDragStart={({ object }) => {
+                
+                  console.log("onDragStart object:",object);
+                  setManuelMode(true);
+                
+            }}
+          
 
           >
           <Map

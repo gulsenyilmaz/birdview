@@ -1,7 +1,7 @@
 import type { Human } from "../entities/Human";
 import type { Location } from "../entities/Location";
 // import type { Work } from "../entities/Work";
-// import type { Event } from "../entities/Event";
+import type { Movement } from "../entities/Movement";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 
 export function isHuman(obj: any): obj is Human {
@@ -29,6 +29,15 @@ export function isMilitaryEvent(obj: any): obj is MilitaryEvent {
     typeof obj === "object" &&
     "depth_level" in obj &&
     "depth_index" in obj
+  );
+}
+
+export function isMovement(obj: any): obj is Movement {
+  return (
+    obj &&
+    typeof obj === "object" &&
+    "instance_label" in obj &&
+    "start_date" in obj
   );
 }
 

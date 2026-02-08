@@ -28,17 +28,16 @@ export function computeBounds(locations: Location[], detailMode: Boolean = false
   if (maxDiff > 220) return { centerLon:6.0- (detailMode ? 55 : 0), centerLat:4.0, zoom:1.5 };
   else if (maxDiff > 150) zoom = 1.7;
   else if (maxDiff > 80) zoom = 2.5;
-  else if (maxDiff > 30) zoom = 3;
-  else if (maxDiff > 15) zoom = 4;
+  else if (maxDiff > 30) zoom = 2.9;
+  else if (maxDiff > 15) zoom = 3.8;
   else if (maxDiff > 8) zoom = 4.6;
   else if (maxDiff > 4) zoom = 5.2;
   else if (maxDiff > 3) zoom = 5.7;
-  else zoom = 7;
+  else zoom = 6;
 
-  const centerLon = (minLon + maxLon) / 2 - (detailMode ? 40 / zoom : 0); 
-  const centerLat = (minLat + maxLat) / 2;
+  const centerLon = (minLon + maxLon) / 2 - (detailMode ? 20 / zoom : 0); 
+  const centerLat = (minLat + maxLat) / 2 ;
 
-  console.log("Computed bounds:", { maxDiff, centerLon, centerLat, zoom });
   console.log("Computed bounds:", maxDiff, centerLon, centerLat, zoom );
 
   return { centerLon, centerLat, zoom };

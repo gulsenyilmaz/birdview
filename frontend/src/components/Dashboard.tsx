@@ -69,7 +69,7 @@ const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
     <>
     {humans && humans.length>0 && (
     <div className="dashboard-container">
-      
+      <div className="dashboard-charts">
 
       <div className="chart-box">
         {/* <div className="chart-box-title">
@@ -92,11 +92,11 @@ const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
             yaxis: {
               autorange: "reversed",
               tickfont: {
-                color: "gray",
+                color: "white",
                 family: "'Inter', sans-serif",
               },
               title: {
-                font: { color: "gray", family: "'Inter', sans-serif" },
+                font: { color: "white", family: "'Inter', sans-serif" },
               },
             },
             xaxis: {
@@ -105,13 +105,13 @@ const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
               showline: false,
               zeroline: false,
             },
-            margin: { t: 5, l: 65, r: 0, b: 5 },
+            margin: { t: 5, l: 85, r: 0, b: 5 },
             paper_bgcolor: "rgba(0, 0, 0, 0)",
             plot_bgcolor: "rgba(0, 0, 0, 0)",
             font: {
               family: "'Inter', sans-serif",
               size: 10,
-              color: "#2f2f2f",
+              color: "#e0e0e0",
             },
           }}
           config={{ displayModeBar: false, staticPlot: false }}
@@ -137,14 +137,14 @@ const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
           ]}
           layout={{
             yaxis: {
-              color: "gray",
+              color: "white",
               autorange: "reversed",
               tickfont: {
-                color: "gray",
+                color: "white",
                 family: "'Inter', sans-serif",
               },
               title: {
-                font: { color: "gray", family: "'Inter', sans-serif" },
+                font: { color: "white", family: "'Inter', sans-serif" },
               },
             },
             xaxis: {
@@ -153,7 +153,7 @@ const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
               showline: false,
               zeroline: false,
             },
-            margin: { t: 5, l: 65, r: 0, b: 5 },
+            margin: { t: 5, l: 85, r: 0, b: 5 },
             paper_bgcolor: "rgba(0, 0, 0, 0)",
             plot_bgcolor: "rgba(0, 0, 0, 0)",
             font: {
@@ -190,11 +190,11 @@ const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
             yaxis: {
               autorange: "reversed",
               tickfont: {
-                color: "gray",
+                color: "white",
                 family: "'Inter', sans-serif",
               },
               title: {
-                font: { color: "gray", family: "'Inter', sans-serif" },
+                font: { color: "white", family: "'Inter', sans-serif" },
               },
             },
             xaxis: {
@@ -209,13 +209,14 @@ const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
             font: {
               family: "'Inter', sans-serif",
               size: 10,
-              color: "#2f2f2f",
+              color: "#f0f0f0",
             },
           }}
           config={{ displayModeBar: false, staticPlot: false }}
           useResizeHandler={false}
           style={{ width: "100%", height: "100%" }}
         />
+      </div>
       </div>
      
       

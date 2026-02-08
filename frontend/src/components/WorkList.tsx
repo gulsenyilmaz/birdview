@@ -1,46 +1,17 @@
 
 import type { Work } from "../entities/Work";
-import type { Human } from "../entities/Human";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 // import { extractSortedDates } from "../utils/dateUtils";
 // import './WorkList.css';
 
 
 interface WorkListProps {
-  person:Human; 
-  selectedYear:number;
-  backendUrl:string;
-  // setDistinctDates:(list: number[]) => void;
+  filteredWorks:Work[];
 }
 
-const WorkList: React.FC<WorkListProps> = ({person, 
-  selectedYear, 
-  backendUrl, 
-  // setDistinctDates
-}) => {
+const WorkList: React.FC<WorkListProps> = ({filteredWorks}) => {
     const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
-    const [works, setWorks] = useState<Work[]>([]);
-    const [filteredWorks, setFilteredWorks] = useState<Work[]>([]);
-    // const [isUpdating, setIsUpdating] = useState(false);
-    // const [updateError, setUpdateError] = useState<string | null>(null);
-
-
-    useEffect(() => {
-        fetch(`${backendUrl}/works/${person.id}`)
-                                .then(res => res.json())
-                                .then(data => {
-                                
-                                // setDistinctDates(extractSortedDates(data, "created_date"));   
-                                setWorks(data);
-                                })
-                                .catch(err => console.error("Works fetch error:", err));
-    }, [person]);
-
-    useEffect(() => {
-
-        setFilteredWorks(works.filter(w => w.created_date <=selectedYear+1 && w.created_date >selectedYear-1));
-
-    }, [selectedYear, works]);
+    
 
     const openImageModal = (url: string) => {
         setModalImageUrl(url);
@@ -98,7 +69,15 @@ const WorkList: React.FC<WorkListProps> = ({person,
                       ) : <p>Image not available</p>}
                   <a href={a.url} target="_blank" rel="noreferrer" className="timeline-item-title">
                     <strong>{a.title}</strong>
-                  </a>- {a.qid}
+                  </a>
+                  {a.qid ? (
+                    
+                    <a href={`https://www.wikidata.org/wiki/${a.qid}`} target="_blank" rel="noreferrer" className="timeline-item-meta">
+                        <span> <strong>{a.qid}</strong></span>
+                    </a>
+                  ):""}
+                  
+
                   <div className="timeline-item-meta">
                      · {a.created_date} · {a.description} 
                   </div>

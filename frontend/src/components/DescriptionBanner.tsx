@@ -48,8 +48,8 @@ const DescriptionBanner: React.FC<DescriptionBannerProps> = ({
 
 
         const mainPart = parts.length > 0
-            ? `YOU ARE VIEWING ${aliveCount}`
-            : `YOU ARE VIEWING ${aliveCount} INDIVIDUALS. ONLY ${femaleCount} (${femalePct}%) OF THEM ARE FEMALE.`;
+            ? `You are viewing ${aliveCount} individuals, who are `
+            : `You are viewing ${aliveCount} individuals. Only ${femaleCount} (${femalePct}%) of them are female.`;
 
         const renderLabel = (
                 idx:number,
@@ -57,12 +57,12 @@ const DescriptionBanner: React.FC<DescriptionBannerProps> = ({
                 label: string
                 ) => {
                     if(key =="movement") {
-                        return ` AFFILIATED WITH ${label.toUpperCase()}.`;
+                        return ` Affilated with ${label.toUpperCase()}.`;
                     }
                     if(key =="collection") {
-                        return ` FROM THE ${label.toUpperCase()} COLLECTION.`;
+                        return ` from ${label.toUpperCase()} Collection.`;
                     }
-                    return label+ (parts.length==idx+1?"s.":" ");
+                    return label+ (parts.length==idx+1?".":" ");
 
                         
         };

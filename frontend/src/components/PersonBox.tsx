@@ -9,6 +9,7 @@ interface PersonBoxProps {
   person:Human;
   setLocations: (arr: Location[]) => void;
   setSelectedObjectThumbnail: (str:string | null) => void;
+  setManuelMode:(obj: boolean) => void
   
 }
 
@@ -21,11 +22,11 @@ interface PersonDetails {
   collections: string[];
   citizenships: string[];
   locations: Location[];
-nationality: string;
-gender: string;
+  nationality: string;
+  gender: string;
 }
 
-const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedObjectThumbnail}) => {
+const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedObjectThumbnail, setManuelMode}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [personDetails, setPersonDetails] = useState<PersonDetails | null>(null);
@@ -99,9 +100,12 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
 
     useEffect(() => {
         if (selectedTab=="cv") {
-           setLocations(cv_locations);
+            setManuelMode(false)
+            setLocations(cv_locations);
+           
          }
          else if(selectedTab=="museums"){
+            setManuelMode(false)
             setLocations(museums);
          }
          else{

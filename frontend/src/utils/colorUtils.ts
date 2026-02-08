@@ -154,6 +154,8 @@ export const getColorForAgeString = (
               return "#af7aa1"; // soft coral
             case "wars":
               return "#59a14f"; // sky blue
+            case "disasters":
+              return "#e74c3c"; // red
            
             default:
               return "#f58e2fff"; // warm apricot

@@ -205,7 +205,7 @@ const FilterList: React.FC<FilterListProps> = ({
 
     useEffect(() => {
 
-        console.log("activeCategory:", selectedItem);
+        
         
         if (activeCategory){
             
@@ -237,9 +237,7 @@ const FilterList: React.FC<FilterListProps> = ({
     }, [selectedItem]);
 
     useEffect(() => {
-        console.log("Selected item changed out:", panelRef.current);
         const handleClickOutside = (event: MouseEvent) => {
-            console.log("Selected item changed:", panelRef.current, event.target);
             if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
                 clearAsInitial();
             }
@@ -247,7 +245,6 @@ const FilterList: React.FC<FilterListProps> = ({
 
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            console.log("Selected item changed in:", selectedItem);
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);

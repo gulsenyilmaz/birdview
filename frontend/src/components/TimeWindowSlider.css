@@ -19,6 +19,10 @@
   
 }
 
+.tw-container.hide{
+  display: none;
+}
+
 .tw-window { 
   position: relative; 
 

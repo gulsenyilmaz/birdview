@@ -11,7 +11,7 @@ import type { Occupation } from "./entities/Occupation";
 import type { MilitaryEvent } from "./entities/MilitaryEvent";
 import type { Collection } from "./entities/Collection";
 
-import { isHuman, isLocation, isMilitaryEvent } from "./utils/typeGuards";
+import { isHuman, isLocation, isMilitaryEvent,isMovement } from "./utils/typeGuards";
 
 import { useHumanLayer } from "./layers/useHumanLayer";
 import { useMilitaryEventLayer } from "./layers/useMilitaryEventLayer";
@@ -31,6 +31,7 @@ import DetailBox from "./components/DetailBox";
 import PersonBox from './components/PersonBox';
 import LocationBox from './components/LocationBox';
 import MilitaryEventBox from './components/MilitaryEventBox';
+import MovementBox from './components/MovementBox';
 
 import ContentStrip from "./components/ContentStrip";
 import WorkList from './components/WorkList';
@@ -44,6 +45,7 @@ function App() {
   
   const [selectedYear, setSelectedYear] = useState<number>(1921);
   const [detailMode, setDetailMode] = useState<boolean>(false);
+  const [manuelMode, setManuelMode] = useState(false)
   
   // const [distinctDates, setDistinctDates] = useState<number[]>([]);
   const [windowRange, setWindowRange] = useState<[number, number]>([1850, 1950]);
@@ -105,7 +107,7 @@ function App() {
 
   const activeFullRange = unionRanges([
     humanLayer.fullRange,
-   // militaryLayer.fullRange,
+    showEvents?militaryLayer.fullRange:null,
     //workLayer.fullRange
     // eventsLayer.fullRange,
   ]);
@@ -113,9 +115,12 @@ function App() {
 
   useEffect(() => {
 
+    setManuelMode(false)
+
     if(!selectedObject){
 
       setWindowRange(activeFullRange);
+      setDetailMode(false);
       return ;
 
     }  
@@ -130,6 +135,7 @@ function App() {
 
       setSelectedLocation(null);
       setSelectedMilitaryEvent(null);
+      setSelectedMovement(null);
 
     }
     else if(isLocation(selectedObject)){
@@ -139,6 +145,7 @@ function App() {
 
       setSelectedHuman(null);
       setSelectedMilitaryEvent(null);
+      setSelectedMovement(null);
 
     }
     else if(isMilitaryEvent(selectedObject)){
@@ -147,8 +154,22 @@ function App() {
       
       setSelectedLocation(null);
       setSelectedHuman(null);
+      setSelectedMovement(null);
       setLocations([]);
       setSelectedMilitaryEvent(selectedObject);
+
+    }
+
+    else if(isMovement(selectedObject)){
+
+      setSelectedLocation(null);
+      setSelectedHuman(null);
+      setLocations([]);
+      setSelectedMilitaryEvent(null);
+      setSelectedMovement(selectedObject);
+      
+      setWindowRange([selectedObject.start_date?selectedObject.start_date:humanLayer.fullRange[0], 
+                      selectedObject.end_date?selectedObject.end_date:humanLayer.fullRange[1]]);
 
     }
     
@@ -157,6 +178,7 @@ function App() {
       setSelectedHuman(null);
       setSelectedLocation(null);
       setSelectedMilitaryEvent(null);
+      setSelectedMovement(null);
       setSelectedObject(null);
       setDetailMode(false);
 
@@ -175,6 +197,7 @@ function App() {
       setLocations([]);
       setSelectedObjectThumbnail(null);
       setSelectedMilitaryEvent(null);
+      setSelectedMovement(null);
       // setDistinctDates([]);
 
     }
@@ -195,6 +218,7 @@ function App() {
                 person={selectedHuman}
                 setLocations={setLocations}
                 setSelectedObjectThumbnail ={setSelectedObjectThumbnail}
+                setManuelMode={setManuelMode}
               />
             )}
 
@@ -211,21 +235,24 @@ function App() {
               />
             )}
 
+            {selectedMovement && (
+              <MovementBox 
+                movement={selectedMovement} 
+              />
+            )}
+
           </DetailBox>
         </div>
 
-        <div className={`top-panel ${selectedObject ? "open" : ""}`}>
-          {selectedObject &&(
+        <div className={`top-panel ${selectedObject && !selectedMovement ? "open" : ""}`}>
+          {selectedObject && !selectedMovement && (
           <ContentStrip 
             selectedYear = {selectedYear}
             selectedObject = {selectedObject}>
 
             {selectedHuman && (
               <WorkList
-                person={selectedHuman}
-                selectedYear={selectedYear}
-                backendUrl = {backendUrl}
-                // setDistinctDates = {setDistinctDates}
+                filteredWorks = {workLayer.filteredWorks}
               />
             )}
 
@@ -255,7 +282,7 @@ function App() {
            
           </div> */}
 
-        <div className={`top-panel-timeWindowSlider ${selectedObject? "close" : ""}`} >
+        <div className={`top-panel-dashboard ${selectedObject? (selectedMovement? "squeezed" : "close"): ""}`} >
           <Dashboard
               humans={humanLayer.filteredHumans}
             />
@@ -272,7 +299,7 @@ function App() {
                   case "nationality": setSelectedNationality(null); break;
                   case "gender": setSelectedGender(null); break;
                   case "occupation": setSelectedOccupation(null); break;
-                  case "movement": setSelectedMovement(null); break;
+                  case "movement": setSelectedObject(null); break;
                   case "collection": setSelectedCollection(null); break;
                   default: break;
                   }
@@ -288,17 +315,19 @@ function App() {
             locations={locations}
             humans={humanLayer.filteredHumans}
             militaryEvents={militaryLayer.filteredMilitaryEvents}
-            works={workLayer.filteredWorks}
+            // works={workLayer.filteredWorks}
             selectedYear={selectedYear}
             setSelectedObject={setSelectedObject}
             detailMode={detailMode}
             selectedObjectThumbnail ={selectedObjectThumbnail}
             showEvents={showEvents}
             showHumans={showHumans}
+            manuelMode={manuelMode}
+            setManuelMode={setManuelMode}
           />
         </div>
 
-        <div className={`right-panel ${selectedObject? "hide" : ""}`}>
+        <div className={`right-panel ${selectedObject && !selectedMovement? "hide" : ""}`}>
          
           <FilterList
             selectedOccupation = {selectedOccupation}
@@ -309,7 +338,7 @@ function App() {
             setSelectedOccupation= {setSelectedOccupation}
             setSelectedGender = {setSelectedGender}
             setSelectedNationality= {setSelectedNationality}
-            setSelectedMovement = {setSelectedMovement}
+            setSelectedMovement = {setSelectedObject}
             setSelectedCollection = {setSelectedCollection}
             setSelectedObject={setSelectedObject}
             backendUrl={backendUrl}
@@ -319,7 +348,8 @@ function App() {
         </div>
 
         <div className={`bottom-panel ${selectedObject ? "squeezed" : ""}`}>
-           <TimeWindowSlider
+          {/* {!selectedObject && (  */}
+          <TimeWindowSlider
             fullRange={activeFullRange}
             windowRange={windowRange}
             setWindowRange={setWindowRange}
@@ -327,6 +357,8 @@ function App() {
             selectedYear={selectedYear}
             detailMode={detailMode}
           />
+          {/* )} */}
+          
 
           <TimeSlider
             selectedYear={selectedYear}
@@ -335,8 +367,10 @@ function App() {
             windowRange={windowRange}
             setWindowRange={setWindowRange}
             // distinctDates= {distinctDates}   
-            setSelectedMovement= {setSelectedMovement}
-            movements={movements}         
+            setSelectedMovement= {setSelectedObject}
+            movements={movements}    
+            detailMode={detailMode}    
+            setManuelMode={setManuelMode} 
           >
 
           <LayerHistogram
@@ -348,6 +382,17 @@ function App() {
             showLayer={showEvents}
             setShowLayer={setShowEvents}  
           />
+        {selectedHuman && workLayer.workCounts.length > 0  &&(
+          <LayerHistogram
+            setSelectedYear={setSelectedYear}
+            windowRange={windowRange}
+            aliveCounts={militaryLayer.eventCounts}
+            binAggregation="sum"   
+            layerTypeName ="DISASTERS" 
+            showLayer={showEvents}
+            setShowLayer={setShowEvents}  
+          />
+          )}
 
           {selectedHuman && workLayer.workCounts.length > 0  &&(
             <LayerHistogram

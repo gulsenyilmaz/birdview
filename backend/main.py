@@ -160,8 +160,9 @@ def get_allworks(request: Request):
     cur = conn.cursor()
 
     base_query ="""
-        SELECT w.id, w.qid, w.title, w.created_date
+        SELECT w.id, w.qid, w.title, w.created_date, w.description, w.image_url, w.url, c.name AS collection_name
         FROM works AS w
+        JOIN collections AS c ON w.collection_id = c.id
 
     """
     params = []
@@ -335,6 +336,35 @@ def get_location_details(location_id: int):
         }
     )
 
+@app.get("/movement/{movement_id}")
+def get_movement_details(movement_id: int):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT  qid, description, image_url, inception, instance_label FROM movements WHERE id = ?",
+        (movement_id,),
+    )
+    row = cur.fetchone()
+    if not row:
+        return {"error": "movement not found"}
+    qid, description, image_url, inception, instance_label = row
+
+    conn.close()
+
+    return JSONResponse(
+        {
+            "details": {
+                "qid": qid,
+                "description": description,
+                "img_url": image_url,
+                "inception": inception,
+                "instance_label": instance_label,
+            }
+        }
+    )
+
 
 @app.get("/movements")
 def get_movements(request: Request):
@@ -354,7 +384,8 @@ def get_movements(request: Request):
            m.name, 
            COUNT(hm.human_id) AS count, 
            COALESCE(m.inception, m.start_date) AS start_date,
-           m.end_date
+           m.end_date,
+           m.instance_label
         FROM human_movement hm
         INNER JOIN movements m ON hm.movement_id = m.id
     """

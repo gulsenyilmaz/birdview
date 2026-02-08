@@ -15,6 +15,8 @@ interface TimeSliderProps {
   setSelectedMovement: (obj: Movement) => void;
   movements: Movement[];
   children: React.ReactNode;
+  detailMode?: boolean; 
+  setManuelMode:(obj: boolean) => void
 }
 
 const TimeSlider: React.FC<TimeSliderProps> = ({
@@ -26,7 +28,9 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   setWindowRange,
   setSelectedMovement,
   movements,
-  children
+  children,
+  detailMode = false,
+  setManuelMode
         
 }) => {
 
@@ -125,6 +129,8 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
 
   const handlePlayAction = () => {
     setIsPlaying((p) => !p);
+    setManuelMode(false);
+    
   };
 
   const stopAndSetSelectedYear= (n_year:number) => {
@@ -167,7 +173,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   return (
     <div className="component-container">
        
-      <div className="zoom-container">
+      <div className={`zoom-container ${detailMode ? "hide" : ""}`}>
         {movements && movements.length>0 && (
                 <div className="movements-wrapper">
                     
@@ -187,7 +193,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
                             // right: `${(1 - (item.end_date! - minYear) / (maxYear - minYear)) * 100}%`
                           
                             }}
-                            title={`Jump to ${item.name}`}
+                            title={`Jump to ${item.name} `}
                             onClick={() => setSelectedMovement(item)}
                             onMouseOver={() => console.log(`${item.name} (${item.start_date})`)}    
                             
@@ -224,8 +230,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
               ref={stripRef}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUpOrLeave}
-              onMouseLeave={handleMouseUpOrLeave}>
+              onMouseUp={handleMouseUpOrLeave}>
               {Array.from(
                 { length: Math.floor((maxYear - minYear) / step) + 1 },
                 (_, index) => {
