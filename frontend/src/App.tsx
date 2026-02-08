@@ -140,6 +140,8 @@ function App() {
     }
     else if(isLocation(selectedObject)){
 
+      setWindowRange(humanLayer.fullRange)
+
       setSelectedLocation(selectedObject);
       setLocations([selectedObject]);
 
@@ -162,15 +164,14 @@ function App() {
 
     else if(isMovement(selectedObject)){
 
+      setWindowRange([selectedObject.start_date?selectedObject.start_date:humanLayer.fullRange[0], 
+                      selectedObject.end_date?selectedObject.end_date:humanLayer.fullRange[1]]);
+
       setSelectedLocation(null);
       setSelectedHuman(null);
       setLocations([]);
       setSelectedMilitaryEvent(null);
       setSelectedMovement(selectedObject);
-      
-      setWindowRange([selectedObject.start_date?selectedObject.start_date:humanLayer.fullRange[0], 
-                      selectedObject.end_date?selectedObject.end_date:humanLayer.fullRange[1]]);
-
     }
     
     else{

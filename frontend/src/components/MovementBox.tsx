@@ -19,8 +19,8 @@ const MovementBox: React.FC<MovementBoxProps> = ({movement}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [movementDetails, setMovementDetails] = useState<MovementDetails | null>(null);
-    const [isUpdating, setIsUpdating] = useState(false);
-    const [updateError, setUpdateError] = useState<string | null>(null);
+    // const [isUpdating, setIsUpdating] = useState(false);
+    // const [updateError, setUpdateError] = useState<string | null>(null);
 
     useEffect(() => {
         if (movement) {
@@ -33,34 +33,34 @@ const MovementBox: React.FC<MovementBoxProps> = ({movement}) => {
          }
     }, [movement]);
 
-    const handleUpdateMovementDetails = async () => {
-      if (!movement) return;
-      setIsUpdating(true);
-      setUpdateError(null);
+    // const handleUpdateMovementDetails = async () => {
+    //   if (!movement) return;
+    //   setIsUpdating(true);
+    //   setUpdateError(null);
 
-      try {
-        // 🔧 endpoint’i backend’ine göre değiştir
-        const res = await fetch(
-          `${backendUrl}/movements/${movement.id}/update`,
-          {
-                method: "PUT",          
-                headers: {
-                "Content-Type": "application/json",
-                },
-            }
-        );
+    //   try {
+    //     // 🔧 endpoint’i backend’ine göre değiştir
+    //     const res = await fetch(
+    //       `${backendUrl}/movements/${movement.id}/update`,
+    //       {
+    //             method: "PUT",          
+    //             headers: {
+    //             "Content-Type": "application/json",
+    //             },
+    //         }
+    //     );
 
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
+    //     if (!res.ok) {
+    //       throw new Error(`HTTP ${res.status}`);
+    //     }
 
-      } catch (err: any) {
-        console.error(" update error:", err);
-        setUpdateError("kaydedilirken bir hata oldu.");
-      } finally {
-        setIsUpdating(false);
-      }
-    };
+    //   } catch (err: any) {
+    //     console.error(" update error:", err);
+    //     setUpdateError("kaydedilirken bir hata oldu.");
+    //   } finally {
+    //     setIsUpdating(false);
+    //   }
+    // };
 
     return (
       <>
@@ -82,13 +82,13 @@ const MovementBox: React.FC<MovementBoxProps> = ({movement}) => {
                         style={{ marginLeft:"0.4rem", marginTop: "0.4rem" }}
                       >
                         {isUpdating ? "UPDATING..." : "UPDATE"}
-                    </button> */}
+                    </button> 
 
                     {updateError && (
                     <p style={{ color: "red", marginTop: "0.3rem" }}>
                         {updateError}
                     </p>
-                    )}
+                    )} */}
                     <p>{movementDetails.description}</p>
                     {movementDetails.instance_label && (<p><strong>INSTANCE:</strong> {movementDetails.instance_label}</p>)}
                     {movementDetails.inception && (<p><strong>INCEPTION:</strong> {movementDetails.inception}</p>)}
