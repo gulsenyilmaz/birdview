@@ -15,7 +15,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "rgba(0,0,0,0.35)",
+        background: "rgba(252, 252, 252, 0.35)",
         zIndex: 9999,
         pointerEvents: "none",
       }}
@@ -24,8 +24,8 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
         style={{
           padding: "10px 14px",
           borderRadius: 10,
-          background: "rgba(20,20,20,0.85)",
-          color: "white",
+          background: "rgb(206, 201, 201)",
+          color: "rgba(38, 38, 38)",
           fontSize: 14,
         }}
       >

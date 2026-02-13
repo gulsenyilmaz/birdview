@@ -52,6 +52,7 @@ function App() {
   const [detailMode, setDetailMode] = useState<boolean>(false);
   const [manuelMode, setManuelMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [loadingText, setLoadingText] = useState("Loading data...")
   
   // const [distinctDates, setDistinctDates] = useState<number[]>([]);
   const [windowRange, setWindowRange] = useState<[number, number]>([-800, 1950]);
@@ -122,6 +123,8 @@ function App() {
 
    useEffect(() => {
 
+    
+    setLoadingText(`Loading Data of  ${humanLayer.loadingHumans?"Human Layer...":""}  ${militaryLayer.loadingEvents?" Military Layer...":""}`)
     setIsLoading(humanLayer.loadingHumans || militaryLayer.loadingEvents);
 
   }, [humanLayer.loadingHumans, militaryLayer.loadingEvents]);
@@ -224,7 +227,7 @@ function App() {
   return (
     <div className="app-container">
       <div className="main-content">
-        {isLoading && <LoadingOverlay text="Loading data…" />}
+        {isLoading && <LoadingOverlay text={loadingText} />}
         <div className={`left-panel ${selectedObject? "open" : ""}`}>
           <DetailBox
             selectedYear={selectedYear}
