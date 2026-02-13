@@ -496,6 +496,15 @@ const layers = useMemo(() => {
         
       {(showHumans && !detailMode) && (
           <div className="layer-selector">
+            <label>
+              <span className="label-title">Manuel Mode    </span>
+              <input
+                  type="checkbox"
+                  checked={manuelMode}
+                  onChange={(e) => setManuelMode(e.target.checked)}
+                />
+            
+            </label>
             <div className="radio-group">
               <label>
                 <input
