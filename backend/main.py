@@ -490,7 +490,7 @@ def get_occupations(request: Request):
     base_query += """
         GROUP BY ho.occupation_id
         ORDER BY count DESC
-        LIMIT 200;
+        
     """
 
     results = cur.execute(base_query, params).fetchall()

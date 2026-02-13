@@ -22,6 +22,8 @@ export function useHumanLayer(args: {
 }) {
   const { active, backendUrl, filters, selectedYear } = args;
 
+  const [loadingHumans, setLoadingHumans] = useState(false);
+
   const [humans, setHumans] = useState<Human[]>([]);
   const [fullRange, setFullRange] = useState<[number, number]>([-1600, 2026]);
   const [aliveCounts, setAliveCounts] = useState<{ year: number; count: number }[]>([]);
@@ -46,6 +48,7 @@ export function useHumanLayer(args: {
     }
 
     const controller = new AbortController();
+    setLoadingHumans(true);
 
     (async () => {
       const res = await fetch(`${backendUrl}/allhumans?${qp.toString()}`, {
@@ -64,6 +67,7 @@ export function useHumanLayer(args: {
       setFullRange(range);
 
       setAliveCounts(list.length > 1 ? buildAliveCounts(list, range, { maxAge: 100 }) : []);
+      setLoadingHumans(false);
     })().catch((err) => {
       if (controller.signal.aborted) return;
       console.error("useHumanLayer error:", err);
@@ -93,5 +97,5 @@ export function useHumanLayer(args: {
     );
   }, [active, humans, selectedYear]);
 
-  return { humans, filteredHumans, fullRange, aliveCounts };
+  return { humans, filteredHumans, fullRange, aliveCounts, loadingHumans };
 }

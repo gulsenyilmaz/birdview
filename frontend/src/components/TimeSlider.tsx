@@ -51,7 +51,9 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
     if (span <= 500) return 30;
     if (span <= 1500) return 70;
     if (span <= 2500) return 100;
-    return 200;
+    if (span <= 5000) return 200;
+    if (span <= 7000) return 500;
+    return 1000;
   }, [minYear, maxYear]);
 
   useEffect(() => {

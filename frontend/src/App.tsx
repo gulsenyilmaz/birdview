@@ -17,6 +17,7 @@ import { useHumanLayer } from "./layers/useHumanLayer";
 import { useMilitaryEventLayer } from "./layers/useMilitaryEventLayer";
 import { useWorkLayer} from "./layers/useWorkLayer"
 
+import LoadingOverlay from './components/LoadingOverlay'
 import MapScene from './components/MapScene';
 import TimeSlider from "./components/TimeSlider";
 import TimeWindowSlider from "./components/TimeWindowSlider";
@@ -42,13 +43,18 @@ import { unionRanges } from "./utils/dateUtils";
 
 
 function App() {
+
+ 
   
-  const [selectedYear, setSelectedYear] = useState<number>(1921);
+  
+  
+  const [selectedYear, setSelectedYear] = useState<number>(-600);
   const [detailMode, setDetailMode] = useState<boolean>(false);
   const [manuelMode, setManuelMode] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   
   // const [distinctDates, setDistinctDates] = useState<number[]>([]);
-  const [windowRange, setWindowRange] = useState<[number, number]>([1850, 1950]);
+  const [windowRange, setWindowRange] = useState<[number, number]>([-800, 1950]);
 
   const [selectedObject, setSelectedObject] = useState<any>(null);
   const [selectedObjectThumbnail, setSelectedObjectThumbnail]= useState<string | null>(null);
@@ -62,6 +68,7 @@ function App() {
   const [selectedNationality, setSelectedNationality] = useState<Nationality| null>(null);
   const [selectedMovement, setSelectedMovement] = useState<Movement| null>(null);
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
+  
 
   const [movements, setMovements] = useState<Movement[]>([]); 
   const [locations, setLocations] = useState<Location[]>([]);
@@ -83,6 +90,7 @@ function App() {
       collection_id: selectedCollection?.id,
       location_id: selectedLocation?.id,
       relationship_type_name: selectedLocation?.relationship_type_name,
+
     },
     selectedYear,
   });
@@ -111,6 +119,12 @@ function App() {
     //workLayer.fullRange
     // eventsLayer.fullRange,
   ]);
+
+   useEffect(() => {
+
+    setIsLoading(humanLayer.loadingHumans || militaryLayer.loadingEvents);
+
+  }, [humanLayer.loadingHumans, militaryLayer.loadingEvents]);
 
 
   useEffect(() => {
@@ -188,6 +202,8 @@ function App() {
 
   }, [selectedObject, humanLayer.fullRange, militaryLayer.fullRange]);
 
+
+  
   useEffect(() => {
 
     if(!detailMode){
@@ -208,6 +224,7 @@ function App() {
   return (
     <div className="app-container">
       <div className="main-content">
+        {isLoading && <LoadingOverlay text="Loading data…" />}
         <div className={`left-panel ${selectedObject? "open" : ""}`}>
           <DetailBox
             selectedYear={selectedYear}

@@ -15,6 +15,8 @@ export function useMilitaryEventLayer(args: {
 }) {
   const { active, backendUrl, filters, selectedYear } = args;
 
+  const [loadingEvents, setLoadingEvents] = useState(false);
+
   const [militaryEvents, setMilitaryEvents] = useState<MilitaryEvent[]>([]);
   const [fullRange, setFullRange] = useState<[number, number]>([-3000, 2025]);
   const [eventCounts, setEventCounts] = useState<{ year: number; count: number }[]>([]);
@@ -32,6 +34,7 @@ export function useMilitaryEventLayer(args: {
     }
 
     const controller = new AbortController();
+    setLoadingEvents(true);
 
     (async () => {
       const res = await fetch(
@@ -51,6 +54,7 @@ export function useMilitaryEventLayer(args: {
       setFullRange(range);
 
       setEventCounts(list.length > 1 ? buildEventCounts(list, range) : []);
+      setLoadingEvents(false);
     })().catch((err) => {
       if (controller.signal.aborted) return;
       console.error("useMilitaryEventLayer error:", err);
@@ -77,5 +81,6 @@ export function useMilitaryEventLayer(args: {
     filteredMilitaryEvents,
     fullRange,
     eventCounts,
+    loadingEvents
   };
 }

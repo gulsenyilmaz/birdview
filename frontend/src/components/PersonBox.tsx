@@ -67,15 +67,17 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
                     .then(data => {
                         console.log("setPersonDetails", data);
                         setPersonDetails(data);
-                        const cv_locs:Location[] = (data.locations as Location[])
-                                .filter(l => l.relationship_type_name !== "has_works_in");
+                        if(data.locations && data.locations.length>0){
+                            const cv_locs:Location[] = (data.locations as Location[])
+                                    .filter(l => l.relationship_type_name !== "has_works_in");
 
-                        const museum_locs:Location[] = (data.locations as Location[])
-                                .filter(l => l.relationship_type_name === "has_works_in");
+                            const museum_locs:Location[] = (data.locations as Location[])
+                                    .filter(l => l.relationship_type_name === "has_works_in");
 
-                        setMuseums(museum_locs);
-                        setCvLocations(cv_locs);                                                       
-                        setLocations(cv_locs);
+                            setMuseums(museum_locs);
+                            setCvLocations(cv_locs);                                                       
+                            setLocations(cv_locs);
+                        }
                         // setSelectedObjectThumbnail(data.img_url);
                         if (!data.img_url) {
                             getWikipediaImage(person.name).then(setFallbackImage);
@@ -159,7 +161,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
     <>
         {personDetails && (
             <div className="person-details-container ">
-                <h2>{person.name}</h2>
+                <h2>{person.name} ({person.birth_date}-{person.death_date})</h2>
                 {(personDetails.img_url || fallbackImage) ? (
                     <img
                         src={personDetails.img_url || fallbackImage!}

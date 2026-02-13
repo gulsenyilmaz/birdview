@@ -4,7 +4,7 @@ import csv
 from entities.Human import Human
 
 
-OUTPUT_CSV = "MET_artist_list_report.csv"
+OUTPUT_CSV = "philosophers_01_report.csv"
 DB_PATH = "birdview.db"
 
 
@@ -36,17 +36,17 @@ def add_humans(file_path):
             if human.id is not None:
 
                 log_results(writer, qid, name, "Already exists")
-                # human.add_collection(2, constituent_id)  # MET koleksiyonu
-                
+                human.add_collection(6, constituent_id)  
+                conn.commit()
                 continue
 
-            # human.save_from_wikidata(qid)
-            # human.add_collection(2, constituent_id)
+            human.save_from_wikidata(qid)
+            human.add_collection(6, constituent_id)
             log_results(writer, qid, name, "Added successfully")
-            # conn.commit()
+            conn.commit()
 
         conn.close()
 
 
 if __name__ == "__main__":
-    add_humans("data/MET/MET_artist_list.csv")
+    add_humans("data/AHistoryofWesternPhilosophy/philosophers_01.csv")

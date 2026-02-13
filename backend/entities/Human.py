@@ -96,12 +96,12 @@ class Human(BaseEntity):
             w=self.w
         )
 
-        # if nationality_database_entity.id is None:
-        #     nationality_database_entity.set_data(
-        #         {
-        #             "name": nationality_str
-        #         } 
-        #     )
+        if nationality_database_entity.id is None:
+            nationality_database_entity.set_data(
+                {
+                    "name": nationality_str
+                } 
+            )
 
         if nationality_database_entity.id is None:
 
@@ -114,10 +114,28 @@ class Human(BaseEntity):
 
             self.update({"nationality_id":nationality_database_entity.id})
             return
+        
+
+    def check_primary_occupations(self, description):
+        if not description:
+            self.log_results(self.id, "", "❌ Failed to fetch description for primary occupation")
+            return
+        
+        found_occupations = []
+        for occupation_name in Occupation.ARTIST_OCCUPATIONS + Occupation.OTHER_OCCUPATIONS + Occupation.GENERAL_OCCUPATIONS:
+            if occupation_name in description:
+                found_occupations.append(occupation_name)
+      
+        for key in Occupation.TO_CHANGE.keys():
+            if key in description:
+                found_occupations.append(Occupation.TO_CHANGE[key])
+
+        if found_occupations:
+            for occupation_name in found_occupations:
+                    self.add_occupation(occupation_name, 1)
 
 
-
-    def update_occupations(self, occupations):
+    def update_occupations(self, occupations, description):
 
         if not occupations:
             self.log_results(self.id, "", "ℹ️ no occupations")
@@ -130,42 +148,23 @@ class Human(BaseEntity):
 
             print("occupations-------------------------------------------------")
             occupation_wiki_entity = EntityFromWikidata(occupation)
+            is_primary = 0
 
-            occupation_database_entity = Occupation(
-                name=occupation_wiki_entity.name, 
-                cursor=self.cursor,
-                w=self.w
-            )
+            if occupation_wiki_entity.name in description:
+                is_primary = 1
 
-            if occupation_database_entity.id is None:
-                
-                occupation_database_entity.set_data(
-                    {
-                        "name": occupation_wiki_entity.name
-                    }
-                )
-                
-            human_occupations_database_entity = HumanOccupation(
-                human_id=self.id,
-                occupation_id=occupation_database_entity.id,
-                cursor=self.cursor ,
-                w=self.w
-            )
+            self.add_occupation(occupation_wiki_entity.name,is_primary)
 
-            if human_occupations_database_entity.id is None:
-                
-                human_occupations_database_entity.set_data(
-                    {
-                        "human_id": self.id,
-                        "occupation_id": occupation_database_entity.id,
-                    }
-                )
                         
     def add_occupation(self, occupation_name, is_primary=False):
 
         if not occupation_name:
             self.log_results(self.id, "", "❌ Failed to fetch occupation_name")
             return
+        
+        for key in Occupation.TO_CHANGE.keys():
+            if key in occupation_name:
+                occupation_name = Occupation.TO_CHANGE[key]
 
             
         occupation_database_entity = Occupation(
@@ -182,8 +181,7 @@ class Human(BaseEntity):
                     "name": occupation_name
                 }
             )   
-            
-
+           
         human_occupation_database_entity = HumanOccupation(
             human_id=self.id,
             occupation_id=occupation_database_entity.id,
@@ -494,7 +492,8 @@ class Human(BaseEntity):
         self.update_citizenships(human_wiki_entity.citizenships)
         self.update_locations(human_wiki_entity.locations)
         self.update_movements(human_wiki_entity.movements)
-        self.update_occupations(human_wiki_entity.occupations)
+        self.update_occupations(human_wiki_entity.occupations,human_wiki_entity.description)
+        self.check_primary_occupations(human_wiki_entity.description)
         self.update_uniqueplace(4, human_wiki_entity.birth_place, human_wiki_entity.birth_date)
         self.update_uniqueplace(5, human_wiki_entity.death_place, human_wiki_entity.death_date) 
 
@@ -531,12 +530,13 @@ class Human(BaseEntity):
             "signature_url": human_wiki_entity.signature_url,
             "num_of_identifiers": human_wiki_entity.num_of_identifiers
         })
-        # self.update_nationality(human_wiki_entity.nationality)
-        # self.update_gender(human_wiki_entity.gender)        
-        # self.update_citizenships(human_wiki_entity.citizenships)
-        # self.update_locations(human_wiki_entity.locations)
-        # self.update_movements(human_wiki_entity.movements)
-        # self.update_occupations(human_wiki_entity.occupations)
+        self.update_nationality(human_wiki_entity.nationality)
+        self.update_gender(human_wiki_entity.gender)        
+        self.update_citizenships(human_wiki_entity.citizenships)
+        self.update_locations(human_wiki_entity.locations)
+        self.update_movements(human_wiki_entity.movements)
+        self.update_occupations(human_wiki_entity.occupations, human_wiki_entity.description)
+        self.check_primary_occupations(human_wiki_entity.description)
         self.update_uniqueplace(4, human_wiki_entity.birth_place, human_wiki_entity.birth_date)
         self.update_uniqueplace(5, human_wiki_entity.death_place, human_wiki_entity.death_date) 
 

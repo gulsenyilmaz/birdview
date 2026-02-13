@@ -179,7 +179,7 @@ const MapScene: React.FC<MapSceneProps> = ({
 
   useEffect(() => {
     if(showHumans){
-      const enrichedHumans: HumanEnriched[] = humans.map((h) => {
+      const enrichedHumans: HumanEnriched[] = humans.filter(h => h.birth_date<1700 || h.num_of_identifiers>40).map((h) => {
           const age = selectedYear - h.birth_date;
           
           let fillColor: [number, number, number, number];
@@ -494,7 +494,7 @@ const layers = useMemo(() => {
         
       </div>
         
-      {showHumans && (
+      {(showHumans && !detailMode) && (
           <div className="layer-selector">
             <div className="radio-group">
               <label>
@@ -548,10 +548,6 @@ const layers = useMemo(() => {
               </label>
               {/* <hr className="divider" /> */}
             </div>
-            
-            
-          
-            
         </div>
       )}
   </div>

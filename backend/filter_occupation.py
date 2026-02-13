@@ -12,7 +12,7 @@ ARTIST_OCCUPATIONS = ["sculptor","painter","writer","printmaker","photographer",
                     "visual artist","poet","novelist","performance artist","video artist","playwright","actor","screenwriter","composer", "dancer",
                     "actress","singer","film director","ukiyo-e artist","draftsperson"]
 
-OTHER_OCCUPATIONS = ["fashion designer","industrial designer","architect","craftsman","textile artist","draftsman",
+OTHER_OCCUPATIONS = ["king","fashion designer","industrial designer","architect","craftsman","textile artist","draftsman",
                     "instrument maker","graphic designer", "vase painter","photojournalist","inventor","caricaturist",
                     "art director","poet","illustrator","calligrapher","art historian","curator","storyteller","university teacher",
                     "jewelry designer","set designer","typographer","conservationist","physician","chemist","inventor","explorer",
@@ -104,7 +104,7 @@ def filter_occupations():
     cursor.execute(
         """SELECT id, name, num_of_identifiers, birth_date 
         FROM humans 
-        WHERE description IS NOT NULL AND description != '';"""
+        WHERE birth_date<400 AND description IS NOT NULL AND description != '';"""
     )
 
     results = cursor.fetchall()
@@ -149,7 +149,7 @@ def filter_occupations():
                     log_results(writer, id, human.name, f"✅ Artist occupations found: {', '.join(found_occupations)}")
                     for occupation_name in found_occupations:
                          human.add_occupation(occupation_name, 1)
-                    # conn.commit()
+                    conn.commit()
                     continue
 
                 log_results(writer, id, human.name, "❌ No artist occupation found")
@@ -221,4 +221,4 @@ def update_occupations():
 
 
 if __name__ == "__main__":
-    update_occupations()
+    filter_occupations()
