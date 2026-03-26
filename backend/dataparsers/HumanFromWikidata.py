@@ -1,6 +1,6 @@
 import requests
 from urllib.parse import quote
-
+from utils.date_utils import year_from_time
 HEADERS = {"User-Agent": "BirdView-HumanFetcher/1.0 (gulsenyilmaz9@gmail.com)"}
 
 
@@ -28,6 +28,7 @@ class HumanFromWikidata:
         self.locations = []
         self.occupations = []
         self.has_works_in = []
+        self.relatives = []
         self.birth_date = None
         self.birth_place = None
         self.death_date = None
@@ -41,6 +42,7 @@ class HumanFromWikidata:
         self.nationality_qid = None
         self.num_of_identifiers = 0
         self.notable_works = []
+        self.instance_qid=None
 
         self._fetch_and_parse()
 
@@ -94,11 +96,8 @@ class HumanFromWikidata:
                         .get("value", {})
                         .get("time")
                     )
-                    if t:
-                        # print(f"Extracted time for {qid} ({relation_type}): {t}")
-
-                        y = int(t[:5])
-                        return y
+                    return year_from_time(t)
+                    
                 return None
 
             results.append(
@@ -107,6 +106,7 @@ class HumanFromWikidata:
                     "relation_type": relation_type,
                     "start_date": _extract_time("P580"),
                     "end_date": _extract_time("P582"),
+                    "source_url":f"https://www.wikidata.org/wiki/{self.qid}",
                 }
             )
         return results
@@ -166,6 +166,9 @@ class HumanFromWikidata:
         if not self.name:
             self.name = next((v.get("value") for v in labels.values() if v.get("value")), None)
 
+        if "P31" in claims:
+            self.instance_qid = claims["P31"][0]["mainsnak"]["datavalue"]["value"]["id"]
+
         # Image P18
         if "P18" in claims:
             img_sn = claims["P18"][0].get("mainsnak", {}).get("datavalue", {})
@@ -216,22 +219,43 @@ class HumanFromWikidata:
         self.locations += self._parse_location_claims(
             claims.get("P69", []), "educated_at"
         )
+        self.locations += self._parse_location_claims(
+            claims.get("P119", []), "buried_at"
+        )
 
         # Occupations / Collections
         self.occupations = self._extract_field_ids(claims, "P106")
         self.has_works_in = self._extract_field_ids(claims, "P6379")
 
-        # Birth/Death
-        def _year_from_time(t):
-            try:
-                if not t:
-                    return None
-                # t formatı genelde "+1955-00-00T00:00:00Z"
-                # print(f"Extracting year from time: {t}")
-                y = int(t[:5])
-                return y
-            except Exception:
-                return None
+
+        self.relatives += self._parse_location_claims(
+            claims.get("P25", []), "mother"
+        )
+
+        self.relatives += self._parse_location_claims(
+            claims.get("P22", []), "father"
+        )
+
+        self.relatives += self._parse_location_claims(
+            claims.get("P3373", []), "sibling"
+        )
+
+        self.relatives += self._parse_location_claims(
+            claims.get("P26", []), "spouse"
+        )
+
+        self.relatives += self._parse_location_claims(
+            claims.get("P40", []), "child"
+        )
+
+        self.relatives += self._parse_location_claims(
+            claims.get("P737", []), "influenced by"
+        )
+
+        
+        
+
+      
 
         if "P569" in claims:
             dob_t = (
@@ -241,7 +265,7 @@ class HumanFromWikidata:
                 .get("value", {})
                 .get("time", "")
             )
-            self.birth_date = _year_from_time(dob_t)
+            self.birth_date = year_from_time(dob_t)
 
         if "P19" in claims:
             bp_val = (
@@ -270,7 +294,7 @@ class HumanFromWikidata:
                 .get("value", {})
                 .get("time", "")
             )
-            self.death_date = _year_from_time(dod_t)
+            self.death_date = year_from_time(dod_t)
 
         if "P20" in claims:
             dp_val = (
@@ -320,6 +344,7 @@ class HumanFromWikidata:
             "signature_url": self.signature_url,
             "citizenships":self.citizenships,
             "locations": self.locations,
+            "relatives":self.relatives,
             "occupations": self.occupations,
             "has_works_in": self.has_works_in,
             "birth_date": self.birth_date,
@@ -330,6 +355,7 @@ class HumanFromWikidata:
             "movements": self.movements,
             "num_of_identifiers": self.num_of_identifiers,
             "notable_works": self.notable_works,
+            "instance_qid":self.instance_qid
         }
     
     

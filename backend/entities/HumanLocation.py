@@ -9,7 +9,8 @@ class HumanLocation(BaseEntity):
         "location_id", 
         "relationship_type_id", 
         "start_date", 
-        "end_date"
+        "end_date",
+        "source_url"
     ]
 
 

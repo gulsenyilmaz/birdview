@@ -230,7 +230,7 @@ def get_person_details(human_id: int):
 
     cur.execute(
         """
-        SELECT l.id, l.name, hlt.name AS relationship_type_name, hl.start_date, hl.end_date, l.lat AS loc_lat, l.lon As loc_lon, l.qid
+        SELECT l.id, l.name, hlt.name AS relationship_type_name, hl.start_date, hl.end_date, l.lat AS loc_lat, l.lon AS loc_lon, l.qid
         FROM human_location AS hl
         JOIN locations AS l ON l.id = hl.location_id
         JOIN human_location_types AS hlt ON hlt.id = hl.relationship_type_id
@@ -240,6 +240,29 @@ def get_person_details(human_id: int):
     )
 
     locs = [dict(row) for row in cur.fetchall()]
+
+
+    cur.execute(
+        """
+        SELECT h.id, h.name, h.num_of_identifiers, h.qid AS qid, h.birth_date, h.death_date, 
+        hrt.name AS relationship_type_name, 
+        hh.start_date, hh.end_date, 
+        l.lat AS lat, l.lon AS lon
+        FROM human_human AS hh
+        JOIN humans AS h ON h.id = hh.related_human_id
+        JOIN human_relationship_types AS hrt ON hrt.id = hh.relationship_type_id
+        INNER JOIN human_location hl ON hl.human_id = hh.related_human_id
+        INNER JOIN locations l ON hl.location_id = l.id
+       
+        WHERE 
+            hh.human_id = ?
+            AND hl.relationship_type_id = 4
+        
+    """,
+        (human_id,),
+    )
+
+    relatives = [dict(row) for row in cur.fetchall()]
 
     cur.execute(
         """
@@ -303,6 +326,7 @@ def get_person_details(human_id: int):
         "movements": movs,
         "collections": colls,
         "citizenships": citizs,
+        "relatives":relatives,
     }
 
 

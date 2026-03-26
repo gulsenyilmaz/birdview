@@ -41,6 +41,8 @@ class LocationFromWikidata:
         self.name = entity.get("labels", {}).get("en", {}).get("value", "unknown")
         self.description = entity.get("descriptions", {}).get("en", {}).get("value", "")
 
+        print(self.name)
+
         # Image
         if "P18" in claims:
             img_sn = claims["P18"][0].get("mainsnak", {}).get("datavalue", {})
@@ -61,13 +63,23 @@ class LocationFromWikidata:
                 self.logo_url = f"https://commons.wikimedia.org/wiki/Special:FilePath/{quote(logo_name)}"
 
         # Inception (P571)
-        # if "P571" in claims:
-        #     inception_val = claims["P571"][0]["mainsnak"]["datavalue"]["value"]
-        #     self.inception = inception_val.get("time")  # ISO formatta string olabilir
+        if "P571" in claims:
+            inception_val = claims["P571"][0]["mainsnak"]["datavalue"]["value"]
+            self.inception = inception_val.get("time")  # ISO formatta string olabilir
 
         # Country (P17)
         if "P17" in claims:
-            self.country_qid = claims["P17"][0]["mainsnak"]["datavalue"]["value"]["id"]
+            
+            # self.country_qid = claims["P17"][0]["mainsnak"]["datavalue"]["value"]["id"]
+            p17 = claims.get("P17") or []
+            if p17:
+                mainsnak = (p17[0] or {}).get("mainsnak") or {}
+                # snaktype: "value" | "novalue" | "somevalue"
+                if mainsnak.get("snaktype") == "value":
+                    dv = mainsnak.get("datavalue") or {}
+                    val = dv.get("value") or {}
+                    # val genelde {"entity-type":"item","id":"Q..."}
+                    self.country_qid = val.get("id")  # None olabilir, sorun değil
 
             # Ülke adını da çek
             country_url = f"https://www.wikidata.org/wiki/Special:EntityData/{self.country_qid}.json"

@@ -72,13 +72,12 @@ class BaseEntity:
 
         except Exception as e:
             self.log_results(
-                getattr(self, "id", "-"),
-                str(e),
-                f"❌ error in {self.TABLE_NAME} table ",
+                f"❌ error dfsfsd in {self.TABLE_NAME} table: {str(e)}",
             )
 
         if conn:
             conn.close()
+
 
     def set_data(self, data):
         conn = None
@@ -104,21 +103,13 @@ class BaseEntity:
             field_updates = ", ".join([f"{col}={repr(data[col])}" for col in columns])
 
             self.log_results(
-                    self.id,
-                    field_updates,
-                    f"✅ ADDED in {self.TABLE_NAME} table ",
-                )
-            
-            
+                    f"✅ ADDED in {self.TABLE_NAME} table: {field_updates}",
+                )   
         
         except Exception as e:
             self.log_results(
-                e,
-                getattr(self, "id", ""),
-                f"❌ error in {self.TABLE_NAME} table",
+                f"❌ Error in {self.TABLE_NAME} table: {e}",
             )
-
-        
 
         if conn:
             conn.commit()
@@ -158,22 +149,48 @@ class BaseEntity:
             field_updates = ", ".join([f"{col}={repr(data[col])}" for col in columns])
 
             self.log_results(
-                    self.id,
-                    field_updates,
-                    f"✅ UPDATED in {self.TABLE_NAME} table:",
+                    f"✅ UPDATED in {self.TABLE_NAME} table: {field_updates}",
                 )
         
         except Exception as e:
             
             self.log_results(
-                e,
-                getattr(self, "id", ""),
-                f"❌ error in {self.TABLE_NAME} table",
+                f"❌ error in {self.TABLE_NAME} table: {e}",
             )
 
         if conn:
             conn.commit()
             conn.close()
+
+
+    def delete(self):
+        if not getattr(self, "id", None):
+            raise ValueError("Delete requires 'id' to be applied.")
+
+        conn = None
+        if self.cursor is None:
+            conn = sqlite3.connect(DB_PATH)
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA foreign_keys = ON;")
+            self.cursor = conn.cursor()
+
+        try:
+            query = f"DELETE FROM {self.TABLE_NAME} WHERE id = ?"
+            self.cursor.execute(query, (self.id,))  # ✅ kritik düzeltme
+
+            self.log_results(f"✅ DELETED from {self.TABLE_NAME}")
+
+            for field in self.FIELDS:
+                setattr(self, field, None)
+
+        except Exception as e:
+            self.log_results(f"❌ error deleting from {self.TABLE_NAME}: {str(e)}")
+
+        if conn:
+            conn.commit()
+            conn.close()
+
+    
 
     def get_wikidata_qid(self):
 
@@ -187,7 +204,7 @@ class BaseEntity:
         
         try:
             data = response.json()
-            print(f"Response JSON: {data}")  # Debugging line
+            # print(f"Response JSON: {data}")  # Debugging line
         except Exception as e:
             print("❌ JSON decode failed:", e)
             print("Response content:", response.text)
@@ -201,13 +218,13 @@ class BaseEntity:
         
         return None
 
-    def log_results(self, id, context, message):
+    def log_results(self, message):
         print("-------------------------------------------------")
         if hasattr(self, "w") and self.w:
-            self.w.writerow([message, id, context])
-        print(f" {message} {id}")
-        print(f" {context}")
-        print("-------------------------------------------------")
+            self.w.writerow([self.id, "" , message])
+        # print(f" {message} {id}")
+        print(f"{message}")
+        
 
     def __repr__(self):
         if hasattr(self, "name"):
