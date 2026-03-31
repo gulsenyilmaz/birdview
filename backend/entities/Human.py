@@ -648,23 +648,25 @@ class Human(BaseEntity):
                 detail=f"Wikidata fetch failed: {str(e)}"
             )
 
-        self.update({
-            "qid": human_wiki_entity.qid,
-            "name": human_wiki_entity.name,
-            "birth_date": human_wiki_entity.birth_date,
-            "death_date": human_wiki_entity.death_date,
-            "description": human_wiki_entity.description,
-            "img_url": human_wiki_entity.image_url,
-            "signature_url": human_wiki_entity.signature_url,
-            "num_of_identifiers": human_wiki_entity.num_of_identifiers
-        })
-        self.update_nationality(human_wiki_entity.nationality)
-        self.update_gender(human_wiki_entity.gender)        
-        self.update_citizenships(human_wiki_entity.citizenships)
+        self.update(
+            {
+                "qid": human_wiki_entity.qid,
+                "name": human_wiki_entity.name,
+                "birth_date": human_wiki_entity.birth_date,
+                "death_date": human_wiki_entity.death_date,
+                "description": human_wiki_entity.description,
+                "img_url": human_wiki_entity.image_url,
+                "signature_url": human_wiki_entity.signature_url,
+                "num_of_identifiers": human_wiki_entity.num_of_identifiers
+            }
+        )
+        # self.update_nationality(human_wiki_entity.nationality)
+        # self.update_gender(human_wiki_entity.gender)        
+        # self.update_citizenships(human_wiki_entity.citizenships)
         self.update_locations(human_wiki_entity.locations)
-        self.update_movements(human_wiki_entity.movements)
-        self.update_occupations(human_wiki_entity.occupations, human_wiki_entity.description)
-        self.check_primary_occupations(human_wiki_entity.description)
+        # self.update_movements(human_wiki_entity.movements)
+        # self.update_occupations(human_wiki_entity.occupations, human_wiki_entity.description)
+        # self.check_primary_occupations(human_wiki_entity.description)
         self.update_uniqueplace(4, human_wiki_entity.birth_place, human_wiki_entity.birth_date)
         self.update_uniqueplace(5, human_wiki_entity.death_place, human_wiki_entity.death_date) 
         self.update_relatives(human_wiki_entity.relatives)

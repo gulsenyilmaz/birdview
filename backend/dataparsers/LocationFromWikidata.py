@@ -1,5 +1,6 @@
 import requests
 from urllib.parse import quote
+from utils.date_utils import year_from_time
 
 HEADERS = {"User-Agent": "AliveThen-HumanFetcher/1.0 (gulsenyilmaz9@gmail.com)"}
 
@@ -64,8 +65,16 @@ class LocationFromWikidata:
 
         # Inception (P571)
         if "P571" in claims:
-            inception_val = claims["P571"][0]["mainsnak"]["datavalue"]["value"]
-            self.inception = inception_val.get("time")  # ISO formatta string olabilir
+            p571 = claims.get("P571") or []
+            if p571:
+                mainsnak = (p571[0] or {}).get("mainsnak") or {}
+                if mainsnak.get("snaktype") == "value":
+                    dv = mainsnak.get("datavalue") or {}
+                    val = dv.get("value") or {}
+                    # val genelde {"entity-type":"item","id":"Q..."}
+                    self.inception= year_from_time(val.get("time"))  # None olabilir, sorun değil
+            
+            
 
         # Country (P17)
         if "P17" in claims:

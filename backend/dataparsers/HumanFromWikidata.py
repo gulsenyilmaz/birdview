@@ -252,7 +252,17 @@ class HumanFromWikidata:
             claims.get("P737", []), "influenced by"
         )
 
-        
+        self.relatives += self._parse_location_claims(
+            claims.get("P451", []), "madigudisi"
+        )
+
+        self.relatives += self._parse_location_claims(
+            claims.get("P1066", []), "student of"
+        )
+
+        self.relatives += self._parse_location_claims(
+            claims.get("P802", []), "student"
+        )
         
 
       
@@ -323,6 +333,7 @@ class HumanFromWikidata:
                         "relation_type": "has_works_in",
                         "start_date": None,
                         "end_date": None,
+                        "source_url":f"https://www.wikidata.org/wiki/{self.qid}"
                     }
                 )
 

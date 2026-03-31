@@ -263,6 +263,14 @@ def get_person_details(human_id: int):
     )
 
     relatives = [dict(row) for row in cur.fetchall()]
+    index = 0
+    for h in relatives:
+        h["entity_type"] = "human"
+        index += 1
+        h["index"] = index
+            
+            
+    
 
     cur.execute(
         """
