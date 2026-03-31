@@ -4,7 +4,7 @@ import './LocationBox.css';
 
 interface LocationBoxProps {
   location:Location;
-  setSelectedObjectThumbnail: (str:string) => void;
+  // setSelectedObjectThumbnail: (str:string) => void;
 }
 
 interface LocationDetails {
@@ -16,7 +16,7 @@ interface LocationDetails {
  
 }
 
-const LocationBox: React.FC<LocationBoxProps> = ({location, setSelectedObjectThumbnail}) => {
+const LocationBox: React.FC<LocationBoxProps> = ({location}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [locationDetails, setLocationDetails] = useState<LocationDetails | null>(null);
@@ -29,7 +29,7 @@ const LocationBox: React.FC<LocationBoxProps> = ({location, setSelectedObjectThu
               .then(res => res.json())
               .then(data => {
                 setLocationDetails(data.details)
-                setSelectedObjectThumbnail(data.img_url)
+                // setSelectedObjectThumbnail(data.img_url)
               })
               .catch(err => console.error("Location details fetch error:", err));
          }
@@ -68,33 +68,46 @@ const LocationBox: React.FC<LocationBoxProps> = ({location, setSelectedObjectThu
       <>
         {locationDetails && (
           
-            <div className="location-details-container ">
-              <h2>{location.name}-({location.id})</h2>
+            <div className="detail-box-container">
+              <div className="detail-title">
+                    <h2>{location.name}</h2>
+                    <p>
+                    {locationDetails.description} ({location.id}) (
+                    <a
+                        href={`https://www.wikidata.org/wiki/${location.qid}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="timeline-item-title"
+                    >
+                        {location.qid}
+                    </a>
+                    )
 
-                {locationDetails.img_url && (
-                  <img src={locationDetails.img_url} alt="portrait" className="portrait" />
-                )}
-                <div className="location-details">
+                     <button
+                        onClick={handleUpdateLocationDetails}
+                        disabled={isUpdating}
+                        className="update-button"
+                    >
+                        {isUpdating ? "UPDATING..." : "UPDATE"}
+                    </button>
+
+                    {updateError && <p className="update-error">{updateError}</p>}
+                    </p>
+                </div>
+              
+
+                
+                <div className="content-details">
+
+                  {locationDetails.img_url && (
+                    <img src={locationDetails.img_url} alt="portrait" className="portrait" />
+                  )}
+
                   {locationDetails.logo_url && (
                     <img src={locationDetails.logo_url} alt="logo" className="logo" />
                   )}
                   
                   <div style={{height: 'auto'}}>
-                    <a href={`https://www.wikidata.org/wiki/${location.qid}`} target="_blank" rel="noreferrer" className="timeline-item-title">{location.qid}</a>
-                    <button
-                        onClick={handleUpdateLocationDetails}
-                        disabled={isUpdating}
-                        style={{ marginLeft:"0.4rem", marginTop: "0.4rem" }}
-                      >
-                        {isUpdating ? "UPDATING..." : "UPDATE"}
-                    </button>
-
-                    {updateError && (
-                    <p style={{ color: "red", marginTop: "0.3rem" }}>
-                        {updateError}
-                    </p>
-                    )}
-                    <p>{locationDetails.description}</p>
                     {locationDetails.country_label && (<p><strong>IN COUNTRY:</strong> {locationDetails.country_label}</p>)}
                     {locationDetails.inception && (<p><strong>INCEPTION:</strong> {locationDetails.inception}</p>)}
                   </div>

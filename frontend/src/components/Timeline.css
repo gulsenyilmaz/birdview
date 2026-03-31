@@ -1,39 +1,48 @@
-
-
 .timeline-strip-container {
   position: relative;
+
   display: flex;
   flex-direction: row;
   box-sizing: border-box;
   
   
   width: 100%;
-  /* height: 100%; */
-  /* background-color: #5773e16c; */
+  height: 100%;   
+  left: 0;
+  background-color: #5773e100;
   /* padding: 0.5rem; */
   transition: height 0.2s ease-in-out;
-  padding: 0rem 2.9rem; 
+  padding: 0rem; 
 }
+
 
 
 
 .timeline-strip {
   display: flex;
-  /* flex-wrap: wrap; */
-  /* justify-content:center; */
-  align-items:flex-start;
+  box-sizing: border-box;
+  
+  
+  align-items:flex-end;
   gap: 1rem;
   height: 100%;
-  width: 100%;
+  /* width: 100%; */
+  padding: 0.2rem;
+  
   background-color: #e157a700;
   overflow-x: hidden; 
+  overflow-y: hidden;
   scroll-behavior: smooth;
-  box-sizing: border-box;
+  width: max-content;
+
+  border-bottom: 2px solid #383838;
   /* padding: 1rem 0rem;  */
   /* max-height: 30vh; */
 
   cursor: grab;
   user-select: none;
+
+  transition: transform 0.3s ease;
 }
 
 
@@ -59,12 +68,12 @@
 }
 
 .scroll-button.left {
-  left: 0.2rem;
+  left: 0;
   
 }
 
 .scroll-button.right {
-  right: 0.2rem;
+  right: 0;
 }
 
 
@@ -79,9 +88,12 @@
 .timeline-item {
   min-width: 3vw;
   max-width: 7vw;
+  
+  max-height: 18vh;
   flex-shrink: 0;
   color: white;
-  padding: 1rem 0rem; 
+  padding: 0rem; 
+  background-color: #c8e15700;
 }
 
 .timeline-item-img {
@@ -90,14 +102,17 @@
 }
 
 .timeline-item-title {
-  font-size: 0.8em;
+  font-size: 0.6em;
   color: #818181;
   text-decoration: none;
 }
 
 .timeline-item-meta {
+  
+  bottom: 0;
   font-size: 0.7em;
   color: #7e7d7d;
+  background-color: #6057e100;
 }
 
 .no-works {
@@ -108,12 +123,9 @@
 
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0, 0, 0, 0.8);
-  z-index: 999;
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,13 +133,14 @@
 
 .modal-content {
   position: relative;
-  max-width: 90%;
-  max-height: 90%;
+  max-width: 90vw;
+  max-height: 90vh;
 }
 
 .modal-image {
-  max-width: 100%;
-  max-height: 100%;
+  display: block;
+  max-width: 90vw;
+  max-height: 90vh;
   border-radius: 4px;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }

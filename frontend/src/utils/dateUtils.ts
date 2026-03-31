@@ -158,5 +158,16 @@ export function clampRange(
   return [a, b];
 }
 
+export function existsThatYear(
+  s_date:number|null,
+  e_date:number|null,
+  c_date:number
+): boolean {
+  if (!s_date) return true;
+  if (!e_date) return true;
 
+  return s_date <= c_date &&
+        (!e_date || e_date >= c_date || (s_date == e_date && s_date == c_date )) &&
+        (c_date-s_date)<100
+}
 

@@ -1,25 +1,45 @@
 
 import type { Work } from "../entities/Work";
-import {  useState } from "react";
+import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import Modal from "../components/Modal";
 // import { extractSortedDates } from "../utils/dateUtils";
 // import './WorkList.css';
 
 
 interface WorkListProps {
-  filteredWorks:Work[];
+  filteredWorks: Work[];
 }
 
-const WorkList: React.FC<WorkListProps> = ({filteredWorks}) => {
-    const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
-    
+const WorkList: React.FC<WorkListProps> = ({ filteredWorks }) => {
 
-    const openImageModal = (url: string) => {
-        setModalImageUrl(url);
-      };
-    
-    const closeImageModal = () => {
-        setModalImageUrl(null);
-      };
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const worksWithImages = useMemo(
+    () => filteredWorks.filter((w) => w.title),
+    [filteredWorks]
+  );
+
+  const openModal = (index: number) => {
+    setSelectedIndex(index);
+  };
+
+  const closeModal = () => {
+    setSelectedIndex(null);
+  };
+
+  const goPrev = () => {
+    setSelectedIndex((prev) => {
+      if (prev === null) return prev;
+      return prev === 0 ? worksWithImages.length - 1 : prev - 1;
+    });
+  };
+
+  const goNext = () => {
+    setSelectedIndex((prev) => {
+      if (prev === null) return prev;
+      return prev === worksWithImages.length - 1 ? 0 : prev + 1;
+    });
+  };
 
     // const handleUpdateWorkDetails = async (w_id: number) => {
      
@@ -52,35 +72,53 @@ const WorkList: React.FC<WorkListProps> = ({filteredWorks}) => {
     
   return (
     <>
-        { filteredWorks.map((a) =>
-              a.title ? (
-                <div key={a.id} className="timeline-item">
-                  <div className="timeline-item-meta">
-                     · From <strong>{a.collection_name}</strong>
-                  </div>
-                  {a.image_url ? ( 
-                    <img
-                      src={a.image_url}
-                      alt={a.title}
-                      className="timeline-item-img"
-                      onClick={() => openImageModal(a.image_url)}
-                      style={{ cursor: "pointer" }}
-                      />
-                      ) : <p>Image not available</p>}
-                  <a href={a.url} target="_blank" rel="noreferrer" className="timeline-item-title">
-                    <strong>{a.title}</strong>
-                  </a>
-                  {a.qid ? (
+
+         {worksWithImages.map((a, index) => (
+        <div key={a.id} className="timeline-item" data-year={a.created_date}>
+          {a.image_url ? (
+            <img
+              src={a.image_url}
+              alt={a.title}
+              className="timeline-item-img"
+              onClick={() => openModal(index)}
+              style={{ cursor: "pointer" }}
+            />
+          ) : (
+            <a
+              href={a.url}
+              target="_blank"
+              rel="noreferrer"
+              className="timeline-item-title"
+            >
+              <strong>{a.title}</strong>
+            </a>
+          )}
+        </div>
+      ))}
+
+        {selectedIndex !== null &&
+        createPortal(
+          <Modal
+            works={worksWithImages}
+            selectedIndex={selectedIndex}
+            onClose={closeModal}
+            onPrev={goPrev}
+            onNext={goNext}
+          />,
+          document.body
+        )}
+
+           {/* {a.qid ? (
                     
                     <a href={`https://www.wikidata.org/wiki/${a.qid}`} target="_blank" rel="noreferrer" className="timeline-item-meta">
                         <span> <strong>{a.qid}</strong></span>
                     </a>
-                  ):""}
+                  ):""} */}
                   
 
-                  <div className="timeline-item-meta">
+                  {/* <div className="timeline-item-meta">
                      · {a.created_date} · {a.description} 
-                  </div>
+                  </div> */}
                    {/* <button
                         onClick={() => handleUpdateWorkDetails(a.id)}
                         disabled={isUpdating}
@@ -94,20 +132,9 @@ const WorkList: React.FC<WorkListProps> = ({filteredWorks}) => {
                         {updateError}
                     </p>
                     )} */}
-                </div>
-              ) : null
-          )}
-        
-          {modalImageUrl && (
-            <div className="modal-overlay" onClick={closeImageModal}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <img src={modalImageUrl} alt="Artwork" className="modal-image" />
-                <button className="modal-close" onClick={closeImageModal}>
-                  ✕
-                </button>
-              </div>
-            </div>
-          )}
+     
+
+      
     </>
   );
 };

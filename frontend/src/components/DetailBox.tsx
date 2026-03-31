@@ -16,15 +16,16 @@ const DetailBox: React.FC<DetailBoxProps> = ({
 }) => {
   return (
     <div className="detail-box">
-      <div className="year-box">
+      <div className={`year-box ${detailMode ? "up" : ""}`}>
         <label><strong>{selectedYear}</strong></label>
       </div>
-      <div
-        className="detail-tab"
-        onClick={() => setDetailMode(!detailMode)}
-      >
-        {detailMode ? "⟨" : "⟩"}
-      </div>
+      
+      <button
+        className="detail-close"
+        onClick={() => setDetailMode(false)}
+      > ✕
+      </button>
+      
 
       {detailMode && (
         <div className="detail-content">

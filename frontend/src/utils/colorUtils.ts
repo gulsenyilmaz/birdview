@@ -48,8 +48,8 @@ export const getColorForLabel= (
 
 
 const genderColorMap: Record<string, [number, number, number]> = {
-  female: [255, 157, 167],             // pastel pink
-  male: [78, 121, 167],                // pastel blue
+  "female": [255, 157, 167],             // pastel pink
+  "male": [78, 121, 167],                // pastel blue
   "gender non-conforming": [50, 50, 60],
   "transgender woman": [231, 76, 60],
   default: [150, 150, 150]
@@ -100,27 +100,68 @@ export const getColorForAgeString = (
 
 
 
- export const getColorForRelationType = ( type:string
+ export const getColorForRelationType = ( 
+  type:string,
+  opacity: number = 250
 
  ): [number, number, number, number] => {
    
     
    switch (type) {
     case 'birth_place':
-      return [39, 174, 96, 180];       // ✔ Yeşil (#27AE60)
+      return [39, 174, 96, opacity];       // ✔ Yeşil (#27AE60)
     case 'death_place':
-      return [240, 57, 43, 180];       // ✔ Kırmızı (#C0392B)
+      return [240, 57, 43, opacity];       // ✔ Kırmızı (#C0392B)
     case 'educated_at':
-      return [138, 43, 226, 180];      // ✔ Mor (#9B59B6)
+      return [138, 43, 226, opacity];      // ✔ Mor (#9B59B6)
     case 'residence':
-      return [52, 152, 219, 180];      // ✔ Mavi (#3498DB)
+      return [52, 152, 219, opacity];      // ✔ Mavi (#3498DB)
     case 'work_location':
-      return [243, 156, 18, 180];       // ✔ Turuncu (#F39C12)
+      return [243, 156, 18, opacity];       // ✔ Turuncu (#F39C12)
     case 'has_works_in':
-      return [64, 150, 150, 180];      // ✔ Turkuaz → [ (#40E0D0)
+      return [64, 150, 150, opacity];      // ✔ Turkuaz → [ (#40E0D0)
+    case 'buried_at':
+      return [50, 50, 50, opacity];      // ✔ gray → [ (#40E0D0)
+    case 'father':
+    return [70, 130, 180, opacity];   // 👨 Baba → mavi (steelblue)
+
+    case 'mother':
+      return [231, 76, 60, opacity];    // 👩 Anne → kırmızı/pembe
+
+    case 'spouse':
+      return [155, 89, 182, opacity];   // 💍 Eş → mor
+
+    case 'child':
+      return [46, 204, 113, opacity];   // 👶 Çocuk → yeşil
+
+    case 'sibling':
+      return [241, 196, 15, opacity];   // 👥 Kardeş → sarı
+
+    case 'significant person':
+      return [230, 126, 34, opacity];   // ⭐ önemli kişi → turuncu
+
+    case 'influenced':
+      return [52, 152, 219, opacity];   // ➡ etkiledi → mavi
+
+    case 'influenced by':
+      return [41, 128, 185, opacity];   // ⬅ etkilendi → koyu mavi
+
+    case 'student':
+      return [26, 188, 156, opacity];   // 🎓 öğrenci → turkuaz
+
+    case 'student of':
+      return [22, 160, 133, opacity];   // 🎓 hocası → koyu turkuaz
+
+    case 'collaborator':
+      return [127, 140, 141, opacity];  // 🤝 işbirliği → gri
+
+    case 'unmarried partner':
+    case 'madigudisi':
+      return [255, 105, 180, opacity];
+
     default:
-      return [75, 75, 75, 180];     // Gri (bilinmeyen)
-  }
+      return [75, 75, 75, opacity];     // fallback
+    }
     
 
   }

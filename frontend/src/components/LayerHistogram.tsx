@@ -35,7 +35,7 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
   const binSize = useMemo(() => {
     const span = maxYear - minYear;
     // return Math.round(span/250);
-    if (span <= 50) return 1;
+    if (span <= 100) return 1;
     if (span <= 150) return 2;
     if (span <= 500) return 5;
     if (span <= 1500) return 10;

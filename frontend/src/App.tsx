@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 
 import type { Human } from "./entities/Human";
+import type { HumanRelative } from "./entities/HumanRelative";
 import type { Location } from "./entities/Location";
 import type { Movement } from "./entities/Movement";
 import type { Nationality } from "./entities/Nationality";
@@ -10,6 +11,7 @@ import type { Gender } from "./entities/Gender";
 import type { Occupation } from "./entities/Occupation";
 import type { MilitaryEvent } from "./entities/MilitaryEvent";
 import type { Collection } from "./entities/Collection";
+import Timeline from './components/Timeline';
 
 import { isHuman, isLocation, isMilitaryEvent,isMovement } from "./utils/typeGuards";
 
@@ -48,7 +50,7 @@ function App() {
   
   
   
-  const [selectedYear, setSelectedYear] = useState<number>(-600);
+  const [selectedYear, setSelectedYear] = useState<number>(1600);
   const [detailMode, setDetailMode] = useState<boolean>(false);
   const [manuelMode, setManuelMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -58,7 +60,7 @@ function App() {
   const [windowRange, setWindowRange] = useState<[number, number]>([-800, 1950]);
 
   const [selectedObject, setSelectedObject] = useState<any>(null);
-  const [selectedObjectThumbnail, setSelectedObjectThumbnail]= useState<string | null>(null);
+  // const [selectedObjectThumbnail, setSelectedObjectThumbnail]= useState<string | null>(null);
 
   const [selectedHuman, setSelectedHuman] = useState<Human | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
@@ -72,10 +74,12 @@ function App() {
   
 
   const [movements, setMovements] = useState<Movement[]>([]); 
-  const [locations, setLocations] = useState<Location[]>([]);
+  const [humanLocations, setHumanLocations] = useState<Location[]>([]);
+  const [humanRelatives, setHumanRelatives] = useState<HumanRelative[]>([]);
 
   const [showEvents, setShowEvents] = useState(false);
   const [showHumans, setShowHumans] = useState(true);
+  const [showWorks, setShowWorks] = useState(true);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -117,12 +121,11 @@ function App() {
   const activeFullRange = unionRanges([
     humanLayer.fullRange,
     showEvents?militaryLayer.fullRange:null,
-    //workLayer.fullRange
+    workLayer.fullRange,
     // eventsLayer.fullRange,
   ]);
 
    useEffect(() => {
-
     
     setLoadingText(`Loading Data of  ${humanLayer.loadingHumans?"Human Layer...":""}  ${militaryLayer.loadingEvents?" Military Layer...":""}`)
     setIsLoading(humanLayer.loadingHumans || militaryLayer.loadingEvents);
@@ -149,6 +152,7 @@ function App() {
       setWindowRange(humanLayer.fullRange)
 
       setSelectedHuman(selectedObject);
+      setShowHumans(false)
 
       setSelectedLocation(null);
       setSelectedMilitaryEvent(null);
@@ -160,7 +164,7 @@ function App() {
       setWindowRange(humanLayer.fullRange)
 
       setSelectedLocation(selectedObject);
-      setLocations([selectedObject]);
+      setHumanLocations([selectedObject]);
 
       setSelectedHuman(null);
       setSelectedMilitaryEvent(null);
@@ -174,7 +178,7 @@ function App() {
       setSelectedLocation(null);
       setSelectedHuman(null);
       setSelectedMovement(null);
-      setLocations([]);
+      setHumanLocations([]);
       setSelectedMilitaryEvent(selectedObject);
 
     }
@@ -186,7 +190,7 @@ function App() {
 
       setSelectedLocation(null);
       setSelectedHuman(null);
-      setLocations([]);
+      setHumanLocations([]);
       setSelectedMilitaryEvent(null);
       setSelectedMovement(selectedObject);
     }
@@ -211,11 +215,12 @@ function App() {
 
     if(!detailMode){
 
+      setShowHumans(true)
       setSelectedHuman(null);
       setSelectedLocation(null);
       setSelectedObject(null);
-      setLocations([]);
-      setSelectedObjectThumbnail(null);
+      setHumanLocations([]);
+      // setSelectedObjectThumbnail(null);
       setSelectedMilitaryEvent(null);
       setSelectedMovement(null);
       // setDistinctDates([]);
@@ -237,8 +242,9 @@ function App() {
             {selectedHuman && (
               <PersonBox
                 person={selectedHuman}
-                setLocations={setLocations}
-                setSelectedObjectThumbnail ={setSelectedObjectThumbnail}
+                setHumanLocations={setHumanLocations}
+                setHumanRelatives = {setHumanRelatives}
+                // setSelectedObjectThumbnail ={setSelectedObjectThumbnail}
                 setManuelMode={setManuelMode}
               />
             )}
@@ -246,7 +252,7 @@ function App() {
             {selectedLocation && (
               <LocationBox 
                 location={selectedLocation}
-                setSelectedObjectThumbnail = {setSelectedObjectThumbnail} 
+                // setSelectedObjectThumbnail = {setSelectedObjectThumbnail} 
               />
             )}
 
@@ -265,34 +271,28 @@ function App() {
           </DetailBox>
         </div>
 
-        <div className={`top-panel ${selectedObject && !selectedMovement ? "open" : ""}`}>
+        <div className={`top-panel ${selectedObject && selectedMilitaryEvent ? "open" : ""}`}>
           {selectedObject && !selectedMovement && (
-          <ContentStrip 
-            selectedYear = {selectedYear}
-            selectedObject = {selectedObject}>
+            <ContentStrip 
+              selectedYear = {selectedYear}
+              selectedObject = {selectedObject}>
 
-            {selectedHuman && (
-              <WorkList
-                filteredWorks = {workLayer.filteredWorks}
-              />
-            )}
+              {selectedLocation && (
+                <HumanList
+                  humans={humanLayer.filteredHumans}
+                  setSelectedObject = {setSelectedObject}
+                />
+              )}
 
-            {selectedLocation && (
-              <HumanList
-                humans={humanLayer.filteredHumans}
-                setSelectedObject = {setSelectedObject}
-              />
-            )}
+              {selectedMilitaryEvent && (
+                <MilitaryEventDetail
+                  selectedYear={selectedYear}
+                  militaryEvents={militaryLayer.filteredMilitaryEvents}
+                  setSelectedObject = {setSelectedObject}
+                />
+              )}
 
-            {selectedMilitaryEvent && (
-              <MilitaryEventDetail
-                selectedYear={selectedYear}
-                militaryEvents={militaryLayer.filteredMilitaryEvents}
-                setSelectedObject = {setSelectedObject}
-              />
-            )}
-
-          </ContentStrip>
+            </ContentStrip>
           )}
         </div>
         {/* <div className={`left-panel-dashborad ${selectedObject ? "close" : ""}`}>
@@ -333,16 +333,18 @@ function App() {
 
         <div className="scene">
           <MapScene
-            locations={locations}
+            humanLocations={humanLocations}
             humans={humanLayer.filteredHumans}
             militaryEvents={militaryLayer.filteredMilitaryEvents}
-            // works={workLayer.filteredWorks}
+            works={workLayer.filteredWorks}
+            humanRelatives={humanRelatives}
             selectedYear={selectedYear}
             setSelectedObject={setSelectedObject}
+            selectedObject={selectedObject}
             detailMode={detailMode}
-            selectedObjectThumbnail ={selectedObjectThumbnail}
             showEvents={showEvents}
             showHumans={showHumans}
+            showWorks={showWorks}
             manuelMode={manuelMode}
             setManuelMode={setManuelMode}
           />
@@ -367,8 +369,24 @@ function App() {
             movements={movements}
           />
         </div>
+        <div className={`bottom-worklist-panel ${selectedHuman && showWorks ? "open" : ""}`}>
+          {selectedHuman && (
+                <Timeline 
+                  selectedYear = {selectedYear}
+                  windowRange = {windowRange} 
+                >
+                  
+                  <WorkList
+                    filteredWorks = {workLayer.filteredWorks}
+                  />
 
-        <div className={`bottom-panel ${selectedObject ? "squeezed" : ""}`}>
+                </Timeline>
+           
+          )}
+        </div>
+        {/* <div className={`bottom-panel ${selectedObject ? "squeezed" : ""}`}> */}
+        <div className={`bottom-panel`}>
+          
           {/* {!selectedObject && (  */}
           <TimeWindowSlider
             fullRange={activeFullRange}
@@ -379,7 +397,6 @@ function App() {
             detailMode={detailMode}
           />
           {/* )} */}
-          
 
           <TimeSlider
             selectedYear={selectedYear}
@@ -393,35 +410,15 @@ function App() {
             detailMode={detailMode}    
             setManuelMode={setManuelMode} 
           >
-
-          <LayerHistogram
-            setSelectedYear={setSelectedYear}
-            windowRange={windowRange}
-            aliveCounts={militaryLayer.eventCounts}
-            binAggregation="sum"   
-            layerTypeName ="WARS" 
-            showLayer={showEvents}
-            setShowLayer={setShowEvents}  
-          />
-        {selectedHuman && workLayer.workCounts.length > 0  &&(
-          <LayerHistogram
-            setSelectedYear={setSelectedYear}
-            windowRange={windowRange}
-            aliveCounts={militaryLayer.eventCounts}
-            binAggregation="sum"   
-            layerTypeName ="DISASTERS" 
-            showLayer={showEvents}
-            setShowLayer={setShowEvents}  
-          />
-          )}
-
-          {selectedHuman && workLayer.workCounts.length > 0  &&(
+          {workLayer.workCounts.length > 0  &&(
             <LayerHistogram
               setSelectedYear={setSelectedYear}
               windowRange={windowRange}
               aliveCounts={workLayer.workCounts}
               binAggregation="sum"   
-              layerTypeName ="WORKS"   
+              layerTypeName ="WORKS"
+              showLayer={showWorks}
+              setShowLayer={setShowWorks}  
             />
           )}
 
@@ -436,6 +433,29 @@ function App() {
               setShowLayer={setShowHumans}                      
             />
           )}
+
+          <LayerHistogram
+            setSelectedYear={setSelectedYear}
+            windowRange={windowRange}
+            aliveCounts={militaryLayer.eventCounts}
+            binAggregation="sum"   
+            layerTypeName ="WARS" 
+            showLayer={showEvents}
+            setShowLayer={setShowEvents}  
+          />
+          {selectedHuman && workLayer.workCounts.length > 0  &&(
+            <LayerHistogram
+              setSelectedYear={setSelectedYear}
+              windowRange={windowRange}
+              aliveCounts={militaryLayer.eventCounts}
+              binAggregation="sum"   
+              layerTypeName ="DISASTERS" 
+              showLayer={showEvents}
+              setShowLayer={setShowEvents}  
+            />
+          )}
+
+          
           </TimeSlider>
           
         </div>

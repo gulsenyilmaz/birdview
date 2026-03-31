@@ -107,19 +107,16 @@ html, body, #root {
 }
 
 
-
-
-
 .left-panel {
   position: absolute;
   top: 0;
-  left:-24vw;
+  left:-20vw;
 
   display: flex;
   flex-direction: row;
 
-  width: 24vw;
-  height: 100vh;
+  width: 20vw;
+  height: 42vh;
 
   background-color: transparent;
   box-shadow: 7px 7px 15px rgba(49, 49, 49, 0.51);
@@ -146,6 +143,7 @@ html, body, #root {
 
   display: flex;
   flex-direction: row;
+
   width: 7vw;
   height: auto;
   background-color: transparent;
@@ -167,11 +165,11 @@ html, body, #root {
 .top-panel {
   position: absolute;
   top: 0;
-  left: 24vw;
+  left: 20vw;
 
   display: flex;
   flex-direction: row;
-  width: 76vw;
+  width: 80vw;
   /* height: 16vh; */
   background-color: #d8d8d8cf;
   box-shadow: 0 3px 5px rgba(93, 93, 93, 0.538);
@@ -209,7 +207,6 @@ html, body, #root {
   justify-items: center;
   
   
-  
   background-color: transparent;
   
   border: none;
@@ -227,8 +224,8 @@ html, body, #root {
   transform: translateY(-100%);
 }
 .top-panel-dashboard.squeezed {
-  left: 24vw;
-  width: 76vw;
+  left: 20vw;
+  width: 80vw;
 }
 
 
@@ -262,7 +259,7 @@ html, body, #root {
   left: 0;
   right: 0;
 
-  height: 16vh;
+  height: 18vh;
   width: 100vw;
 
   display: flex;
@@ -282,6 +279,34 @@ html, body, #root {
 .bottom-panel.squeezed {
   left: 24vw;
   width: 76vw;
+}
+
+.bottom-worklist-panel {
+  position: absolute;
+
+  bottom: -16vh;
+  left: 0vw;
+  
+
+  height: 19vh;
+  width: 93vw;
+
+  display: flex;
+  flex-direction: column;
+  /* align-items: flex-end;   */
+  
+
+  background-color: rgba(184, 124, 40, 0);
+  box-sizing: border-box;
+  z-index: 10;
+
+  transition:
+   
+    bottom 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-worklist-panel.open {
+  bottom: 19vh;
 }
 
 

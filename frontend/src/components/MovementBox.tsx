@@ -19,8 +19,8 @@ const MovementBox: React.FC<MovementBoxProps> = ({movement}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [movementDetails, setMovementDetails] = useState<MovementDetails | null>(null);
-    // const [isUpdating, setIsUpdating] = useState(false);
-    // const [updateError, setUpdateError] = useState<string | null>(null);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [updateError, setUpdateError] = useState<string | null>(null);
 
     useEffect(() => {
         if (movement) {
@@ -33,49 +33,73 @@ const MovementBox: React.FC<MovementBoxProps> = ({movement}) => {
          }
     }, [movement]);
 
-    // const handleUpdateMovementDetails = async () => {
-    //   if (!movement) return;
-    //   setIsUpdating(true);
-    //   setUpdateError(null);
+    const handleUpdateMovementDetails = async () => {
+      if (!movement) return;
+      setIsUpdating(true);
+      setUpdateError(null);
 
-    //   try {
-    //     // 🔧 endpoint’i backend’ine göre değiştir
-    //     const res = await fetch(
-    //       `${backendUrl}/movements/${movement.id}/update`,
-    //       {
-    //             method: "PUT",          
-    //             headers: {
-    //             "Content-Type": "application/json",
-    //             },
-    //         }
-    //     );
+      try {
+        // 🔧 endpoint’i backend’ine göre değiştir
+        const res = await fetch(
+          `${backendUrl}/movements/${movement.id}/update`,
+          {
+                method: "PUT",          
+                headers: {
+                "Content-Type": "application/json",
+                },
+            }
+        );
 
-    //     if (!res.ok) {
-    //       throw new Error(`HTTP ${res.status}`);
-    //     }
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
 
-    //   } catch (err: any) {
-    //     console.error(" update error:", err);
-    //     setUpdateError("kaydedilirken bir hata oldu.");
-    //   } finally {
-    //     setIsUpdating(false);
-    //   }
-    // };
+      } catch (err: any) {
+        console.error(" update error:", err);
+        setUpdateError("kaydedilirken bir hata oldu.");
+      } finally {
+        setIsUpdating(false);
+      }
+    };
 
     return (
       <>
         {movementDetails && (
           
-            <div className="movement-details-container ">
+            <div className="detail-box-container">
+              <div className="detail-title">
               <h2>{movement.name}-({movement.id})</h2>
+               <p>
+                    {movementDetails.description} ({movement.id}) (
+                    <a
+                        href={`https://www.wikidata.org/wiki/${movement.qid}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="timeline-item-title"
+                    >
+                        {movement.qid}
+                    </a>
+                    )
 
-                {movementDetails.img_url && (
+                     <button
+                        onClick={handleUpdateMovementDetails}
+                        disabled={isUpdating}
+                        className="update-button"
+                    >
+                        {isUpdating ? "UPDATING..." : "UPDATE"}
+                    </button>
+
+                    {updateError && <p className="update-error">{updateError}</p>}
+                    </p>
+                </div>
+
+                
+                <div className="content-details">
+
+                  {movementDetails.img_url && (
                   <img src={movementDetails.img_url} alt="portrait" className="portrait" />
                 )}
-                <div className="movement-details">
                   
-                  <div style={{height: 'auto'}}>
-                    <a href={`https://www.wikidata.org/wiki/${movementDetails.qid}`} target="_blank" rel="noreferrer" className="timeline-item-title">{movementDetails.qid}</a>
                     {/* <button
                         onClick={handleUpdateMovementDetails}
                         disabled={isUpdating}
@@ -89,10 +113,9 @@ const MovementBox: React.FC<MovementBoxProps> = ({movement}) => {
                         {updateError}
                     </p>
                     )} */}
-                    <p>{movementDetails.description}</p>
                     {movementDetails.instance_label && (<p><strong>INSTANCE:</strong> {movementDetails.instance_label}</p>)}
                     {movementDetails.inception && (<p><strong>INCEPTION:</strong> {movementDetails.inception}</p>)}
-                  </div>
+                  
                   
                 </div>
                 

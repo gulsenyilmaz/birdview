@@ -1,14 +1,16 @@
 import React, { useState, useEffect} from 'react';
 import type { Human } from "../entities/Human";
+import type { HumanRelative } from "../entities/HumanRelative";
 import type { Location } from "../entities/Location";
-import { getColorForRelationTypeString } from "../utils/colorUtils";
+// import { getColorForRelationTypeString } from "../utils/colorUtils";
 import './PersonBox.css';
 import { resolveCommonsThumb } from "../utils/commons"
 
 interface PersonBoxProps {
   person:Human;
-  setLocations: (arr: Location[]) => void;
-  setSelectedObjectThumbnail: (str:string | null) => void;
+  setHumanLocations: (arr: Location[]) => void;
+  setHumanRelatives:(arr: HumanRelative[]) => void;
+//   setSelectedObjectThumbnail: (str:string | null) => void;
   setManuelMode:(obj: boolean) => void
   
 }
@@ -22,42 +24,45 @@ interface PersonDetails {
   collections: string[];
   citizenships: string[];
   locations: Location[];
+  relatives:HumanRelative[];
   nationality: string;
   gender: string;
 }
 
-const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedObjectThumbnail, setManuelMode}) => {
+const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHumanRelatives, setManuelMode}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [personDetails, setPersonDetails] = useState<PersonDetails | null>(null);
     const [cv_locations, setCvLocations] = useState<Location[]>([]);
     const [museums, setMuseums] = useState<Location[]>([]);
-    const [selectedTab, setSelectedTab] = useState<"cv" | "museums">("cv");
+    const [relatives, setRelatives] = useState<HumanRelative[]>([]);
+   
+    const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "profession"| "museums">("cv");
     const [fallbackImage, setFallbackImage] = useState<string | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateError, setUpdateError] = useState<string | null>(null);
 
 
-    const renderLocationList = (
-        locations: Location[] | undefined,
+    // const renderLocationList = (
+    //     locations: any[] | undefined,
         
-        action: string
-        ) => {
-        if (!locations || locations.length === 0) return null;
+    //     action: string
+    //     ) => {
+    //     if (!locations || locations.length === 0) return null;
 
-        return (
-            <ul>
-                {locations.map((loc, idx) => (
-                    <li key={idx}>
-                    {loc.start_date} 
-                    {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} {loc.qid}— <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
-                        {action}
-                        </em>
-                    </li>
-                ))}
-            </ul>
-        );
-    };
+    //     return (
+    //         <ul>
+    //             {locations.map((loc, idx) => (
+    //                 <li key={idx}>
+    //                 {loc.start_date} 
+    //                 {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} {loc.qid}— <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
+    //                     {action}
+    //                     </em>
+    //                 </li>
+    //             ))}
+    //         </ul>
+    //     );
+    // };
 
     useEffect(() => {
         if(!isUpdating) {
@@ -76,7 +81,8 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
 
                             setMuseums(museum_locs);
                             setCvLocations(cv_locs);                                                       
-                            setLocations(cv_locs);
+                            setHumanLocations(cv_locs);
+                            setRelatives(data.relatives)
                         }
                         // setSelectedObjectThumbnail(data.img_url);
                         if (!data.img_url) {
@@ -90,28 +96,45 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
 
     useEffect(() => {
         (async () => {
-            if (!personDetails?.img_url) { setSelectedObjectThumbnail(null); return; }
-                console.log("selectedObjectThumbnail1: ", personDetails.img_url)
+            if (!personDetails?.img_url) { 
+                // setSelectedObjectThumbnail(null); 
+                return; 
+            }
+                
                 const url = await resolveCommonsThumb(personDetails.img_url, 256);
 
                 console.log("selectedObjectThumbnail2: ", url)
-                setSelectedObjectThumbnail(url);
+                // setSelectedObjectThumbnail(url);
         })();
     }, [personDetails]);
 
 
     useEffect(() => {
+
+
         if (selectedTab=="cv") {
             setManuelMode(false)
-            setLocations(cv_locations);
+            setHumanLocations(cv_locations);
+            setHumanRelatives([]);
            
+         }
+         else if(selectedTab=="family"){
+            setManuelMode(false)
+            setHumanRelatives((relatives as HumanRelative[]).filter(l => l.relationship_type_name !== "influenced by"))
+            setHumanLocations([]);
+         }
+         else if(selectedTab=="profession"){
+            setManuelMode(false)
+            setHumanRelatives((relatives as HumanRelative[]).filter(l => l.relationship_type_name === "influenced by"))
+            setHumanLocations([]);
          }
          else if(selectedTab=="museums"){
             setManuelMode(false)
-            setLocations(museums);
+            setHumanLocations(museums);
+            setHumanRelatives([]);
          }
          else{
-            setLocations([]);
+            setHumanLocations([]);
          }
 
     }, [selectedTab]);
@@ -160,55 +183,94 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
     return (
     <>
         {personDetails && (
-            <div className="person-details-container ">
-                <h2>{person.name} ({person.birth_date}-{person.death_date})</h2>
-                {(personDetails.img_url || fallbackImage) ? (
-                    <img
-                        src={personDetails.img_url || fallbackImage!}
-                        alt="portrait"
-                        className="portrait"
-                    />
-                ) : (<p>IMAGE NOT AVAILABLE</p>)}
-                {personDetails.signature_url && (
-                    <img
-                        src={personDetails.signature_url}
-                        alt="signature"
-                        className="signature-image"
-                        />
-                )}
-                <div className="person-details">
-                    
-                    <h3><i>{personDetails.description} ({person.id} )</i></h3>
-                    <a href={`https://www.wikidata.org/wiki/${person.qid}`} target="_blank" rel="noreferrer" className="timeline-item-title">{person.qid}</a>
-                    <button
+            <div className="detail-box-container">
+                <div className="detail-title">
+                    <h2>{person.name}</h2>
+                    <p>
+                    {personDetails.description} ({person.id}) (
+                    <a
+                        href={`https://www.wikidata.org/wiki/${person.qid}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="timeline-item-title"
+                    >
+                        {person.qid}
+                    </a>
+                    )
+
+                     <button
                         onClick={handleUpdatePersonDetails}
                         disabled={isUpdating}
-                        style={{ marginLeft:"0.4rem", marginTop: "0.4rem" }}
-                      >
+                        className="update-button"
+                    >
                         {isUpdating ? "UPDATING..." : "UPDATE"}
                     </button>
 
-                    {updateError && (
-                    <p style={{ color: "red", marginTop: "0.3rem" }}>
-                        {updateError}
+                    {updateError && <p className="update-error">{updateError}</p>}
                     </p>
+                </div>
+
+                <div className="person-id-card">
+                    <div className="person-portrait">
+                    {personDetails.img_url || fallbackImage ? (
+                        <img
+                        src={personDetails.img_url || fallbackImage!}
+                        alt={`${person.name} portrait`}
+                        className="portrait"
+                        />
+                    ) : (
+                        <p className="image-fallback">IMAGE NOT AVAILABLE</p>
                     )}
-                    {personDetails.occupations && personDetails.occupations.length > 0 && (
-                        <p><strong>Occupations:</strong> {personDetails.occupations.join(", ")}</p>
-                    )}
-                    <p><strong> {personDetails.nationality} -  {personDetails.gender}</strong></p>
+                    </div>
+
+                    <div className="person-data">
+                    <p>
+                        <strong>
+                        {personDetails.nationality} - {personDetails.gender}
+                        </strong>
+                    </p>
 
                     {personDetails.citizenships && personDetails.citizenships.length > 0 && (
-                        <p><strong>Citizenships:</strong> {personDetails.citizenships.join(", ")}</p>
+                        <p>
+                        <strong>Citizenships:</strong> {personDetails.citizenships.join(", ")}
+                        </p>
                     )}
+
+                    <p>
+                        <strong>Birth Date:</strong> {person.birth_date}
+                    </p>
+
+                    <p>
+                        <strong>Death Date:</strong> {person.death_date ?? "—"}
+                    </p>
+
+                    {personDetails.signature_url && (
+                        <img
+                        src={personDetails.signature_url}
+                        alt={`${person.name} signature`}
+                        className="signature-image"
+                        />
+                    )}
+
+                    
+                </div>
+                </div>
+                
+                <div className="content-details">
+                    {personDetails.occupations && personDetails.occupations.length > 0 && (
+                            <p><strong>Occupations:</strong> {personDetails.occupations.join(", ")}</p>
+                        )}
                     {personDetails.collections && personDetails.collections.length > 0 && (
                         <p><strong>Collections:</strong> {personDetails.collections.join(", ")}</p>
                     )}
                     {personDetails.movements && personDetails.movements.length > 0 && (
                         <p><strong>Movements:</strong> {personDetails.movements.join(", ")}</p>
                     )}
+
+                   
+                </div>
                         
-                    <div className="tab-buttons">
+                <div className="tab-buttons">
                         <button
                             className={selectedTab === "cv" ? "active" : ""}
                             onClick={() => setSelectedTab("cv")}
@@ -216,20 +278,54 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
                             Curriculum Vitae
                         </button>
                         <button
+                            className={selectedTab === "family" ? "active" : ""}
+                            onClick={() => setSelectedTab("family")}
+                        >
+                            Family
+                        </button>
+                        <button
+                            className={selectedTab === "profession" ? "active" : ""}
+                            onClick={() => setSelectedTab("profession")}
+                        >
+                            Profesional Life
+                        </button>
+                        <button
                             className={selectedTab === "museums" ? "active" : ""}
                             onClick={() => setSelectedTab("museums")}
                         >
                             Has Works In
                         </button>
-                    </div>
-
+                </div>
+{/* 
                     {selectedTab === "cv" && (
+                        
                         <div className="cv_content">
                             {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "birth_place"),  "was born here")}
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "educated_at"), "was educated here")}
                             {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "residence"), "lived here")}
+
+                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "educated_at"), "was educated here")}
                             {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "work_location"), "worked here")}
                             {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "death_place"), "passed away here")}
+                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "buried_at"), "buried at here")}
+                        </div>
+                    )}
+                    {selectedTab === "family" && (
+                        
+                        <div className="cv_content">
+                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "mother"),  "mother")}
+                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "father"), "father")}
+
+                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "sibling"), "sibling")}
+                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "child"), "child")}
+                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "spouse"), "spouse")}
+                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "madigudisi"), "madigudisi")}
+                        </div>
+                    )}
+                    {selectedTab === "profession" && (
+                        
+                        <div className="cv_content">
+                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "influenced by"),  "influenced by")}
+                          
                         </div>
                     )}
 
@@ -237,8 +333,8 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setLocations, setSelectedO
                     <div className="museum_content">
                         {renderLocationList(museums, "has works here")}
                     </div>
-                    )}
-                </div>
+                    )} 
+                </div>*/}
 
                     
 

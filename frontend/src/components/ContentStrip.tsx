@@ -28,12 +28,12 @@ const ContentStrip: React.FC<ContentStripProps> = ({
         </div>
         
         <div className="content-strip-content">
-            {isOpen && (
-              <Timeline>
+          {isOpen && (
+              <Timeline selectedYear = {selectedYear}>
                       {children}
               </Timeline>
-              
-           )} 
+            )
+          } 
           
           <div className="content-strip-header">
             <strong className="person-name">{selectedObject? selectedObject.name: ""} in {selectedYear}</strong>

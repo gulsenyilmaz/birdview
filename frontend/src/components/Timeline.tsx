@@ -3,10 +3,13 @@ import "./Timeline.css";
 
 interface TimelineProps {
   children: React.ReactNode;
+  selectedYear:Number;
+  windowRange?: [number, number];
 }
 
-const Timeline: React.FC<TimelineProps> = ({ children }) => {
-  const stripRef = useRef<HTMLDivElement | null>(null);
+const Timeline: React.FC<TimelineProps> = ({ children, selectedYear, windowRange = [1200, 2025] }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const stripRef = useRef<HTMLDivElement | null>(null); 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   
@@ -30,6 +33,41 @@ const Timeline: React.FC<TimelineProps> = ({ children }) => {
     setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
   };
 
+  const alignStripToSelectedYear = () => {
+    const container = containerRef.current;
+    const strip = stripRef.current;
+    if (!container || !strip) return;
+
+    const [minYear, maxYear] = windowRange;
+    if (maxYear <= minYear) return;
+
+    const clampedYear = Math.max(minYear, Math.min(Number(selectedYear), maxYear));
+    const ratio = (clampedYear - minYear) / (maxYear - minYear);
+
+    const containerWidth = container.clientWidth;
+    const stripWidth = strip.scrollWidth;
+
+    if (stripWidth > containerWidth) {
+      const maxScrollLeft = stripWidth - containerWidth;
+      strip.style.transform = "translateX(0px)";
+      const rawLeft = ratio * maxScrollLeft;
+      const left = Math.max(0, Math.min(rawLeft, maxScrollLeft));
+      strip.scrollTo({
+        left: left,
+        behavior: "smooth"
+      });
+      return;
+    }
+
+    const movableSpace = containerWidth - stripWidth;
+    const rawOffset = ratio * movableSpace;
+    const offset = Math.max(0, Math.min(rawOffset, movableSpace));
+
+    strip.scrollTo({ left: 0 });
+    strip.style.transform = `translateX(${offset}px)`;
+  };
+
+
   useEffect(() => {
     updateScrollButtons();
     const el = stripRef.current;
@@ -46,6 +84,13 @@ const Timeline: React.FC<TimelineProps> = ({ children }) => {
     };
   }, [children]);
 
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      alignStripToSelectedYear();
+    }, 0);
+
+    return () => window.clearTimeout(id);
+  }, [children, selectedYear, windowRange]);
  
 
   const isDragging = useRef<boolean>(false);
@@ -79,7 +124,7 @@ const Timeline: React.FC<TimelineProps> = ({ children }) => {
   return (
     <>
       {/* {works.length > 0 ? ( */}
-        <div className="timeline-strip-container">
+        <div className="timeline-strip-container" ref={containerRef} >
           {canScrollLeft && (
             <button className="scroll-button left" onClick={() => scrollWorks(-1)}>
               ⟨

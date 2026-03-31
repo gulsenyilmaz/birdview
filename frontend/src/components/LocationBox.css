@@ -1,14 +1,22 @@
 
 
 .location-details-container {
+
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
   width: 100%;
-  padding: 1rem;
-  overflow-y: auto;
+  height: 100%;
+  padding: 0.75rem;
+
+  background-color: rgb(48, 49, 48);
+  border-top: 1px solid #444;
+  
   font-family: 'Inter', sans-serif;
   color: #ffffff;
-  background-color: rgb(48, 49, 48);;
-  border-top: 1px solid #444;
-  box-sizing: border-box;
+  
+  
 }
 
 .location-details-container img.portrait {
