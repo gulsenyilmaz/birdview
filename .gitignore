@@ -32,6 +32,8 @@ design/
 # databases
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
 
 backend/*.db
 backend/*backup*.db
