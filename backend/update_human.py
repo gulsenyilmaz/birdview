@@ -4,9 +4,10 @@ import csv
 import time
 from entities.Human import Human
 from entities.HumanLocation import HumanLocation
+from dataparsers.HumanFromWikidata import HumanFromWikidata
 
 
-OUTPUT_CSV = "Not_Known_qid_02.csv"
+OUTPUT_CSV = "relatives.csv"
 DB_PATH = "birdview.db"
 
 
@@ -24,40 +25,35 @@ def update_humans():
     cursor.execute(
         """SELECT 
         id,
-        human_id
-        FROM human_location 
-        WHERE source_url IS NULL OR source_url = ''
+        qid
+        FROM humans 
+        WHERE num_of_identifiers > 100 AND id NOT IN (SELECT human_id FROM human_human)
+        ORDER BY num_of_identifiers DESC
+        LIMIT 100;
         """
     )
 
     results = cursor.fetchall()
     rows = [dict(row) for row in results]
 
+
     with open(OUTPUT_CSV, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
         writer.writerow(["id", "name", "Result"])
 
         for row in rows:
-            
-            id = row["id"]
-            human_id = row["human_id"]
-            human = Human(id=human_id, cursor=cursor, w=writer)
 
-            if human.qid is None:
+            human = Human(qid=row["qid"], cursor=cursor, w=writer)
+
+            if human.id is None:
+                log_results(writer, row["qid"],"", "There is no human")
                 continue
 
-            human_location = HumanLocation(id=id,cursor=cursor,w=writer)
-
-            human_location.update(
-                    {
-                        "source_url": f"https://www.wikidata.org/wiki/{human.qid}"
-                    }
-                )
+            log_results(writer, row["qid"],human.name, "relatives are updating...")
+            human_wiki_entity = HumanFromWikidata(row["qid"])
+            print(human_wiki_entity.relatives)
+            human.update_relatives(human_wiki_entity.relatives)  
             conn.commit()
-
-            log_results(writer, human_location.id, "", "✅ Updated successfully")
-                
-            continue    
 
         conn.close()
 
@@ -157,7 +153,28 @@ def add_human_location(human_id, file_path):
         conn.commit()
     conn.close()
 
+def add_relatives(qid):
 
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON;")
+    cursor = conn.cursor()
+
+    with open(OUTPUT_CSV, mode="w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["id", "name", "Result"])
+
+        human = Human(qid=qid, cursor=cursor, w=writer)
+
+        if human.id is None:
+            log_results(writer, qid,"", "There is no human")
+        
+        human_wiki_entity = HumanFromWikidata("Q692")
+        print(human_wiki_entity.relatives)
+        human.update_relatives(human_wiki_entity.relatives)  
+        conn.commit()
+
+    conn.close()
 
 
 def clean_double_entry_humans():
@@ -225,4 +242,4 @@ def clean_double_entry_humans():
 
 
 if __name__ == "__main__":
-    add_human_location(150600, "data/HUMAN_DETAILS/WilliamShakespeare.csv")
+    update_humans()
