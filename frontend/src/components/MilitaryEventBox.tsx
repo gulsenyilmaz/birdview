@@ -99,11 +99,12 @@ const MilitaryEventBox: React.FC<MilitaryEventBoxProps> = ({militaryEvent}) => {
       
         {militaryEventDetails && (
           
-            <div className="militaryevent-details-container">
+            <div className="detail-box-container">
+              
               {militaryEventDetails.image_url && (
                 <img src={militaryEventDetails.image_url} alt="portrait" className="portrait" />
               )}
-              <div className="militaryevent-details">
+              <div className="content-details">
                   <div>
                         <h4>
                           {militaryEventDetails.parent_name && (

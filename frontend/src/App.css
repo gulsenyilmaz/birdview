@@ -110,13 +110,13 @@ html, body, #root {
 .left-panel {
   position: absolute;
   top: 0;
-  left:-20vw;
+  right:-12vw;
 
   display: flex;
   flex-direction: row;
 
-  width: 20vw;
-  height: 42vh;
+  width: 12vw;
+  height: 70vh;
 
   background-color: transparent;
   box-shadow: 7px 7px 15px rgba(49, 49, 49, 0.51);
@@ -127,19 +127,19 @@ html, body, #root {
 
   z-index: 200;
 
-  transition: left 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: right 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 
 }
 
 .left-panel.open {
-  left: 0;
+  right: 0;
 }
 
 .right-panel {
   position: absolute;
   
   top: 11vh;
-  right: 0;
+  left: 0;
 
   display: flex;
   flex-direction: row;
@@ -159,17 +159,17 @@ html, body, #root {
 }
 
 .right-panel.hide {
-  transform: translateX(100%);
+  transform: translateX(-100%);
 }
 
 .top-panel {
   position: absolute;
   top: 0;
-  left: 20vw;
+  left: 0vw;
 
   display: flex;
   flex-direction: row;
-  width: 80vw;
+  width: 88vw;
   /* height: 16vh; */
   background-color: #d8d8d8cf;
   box-shadow: 0 3px 5px rgba(93, 93, 93, 0.538);
@@ -216,7 +216,7 @@ html, body, #root {
   transition:
     transform 0.9s ease-in-out,
     width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    left 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    right 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateY(0%);
 }
 
@@ -224,8 +224,8 @@ html, body, #root {
   transform: translateY(-100%);
 }
 .top-panel-dashboard.squeezed {
-  left: 20vw;
-  width: 80vw;
+  right: 20vw;
+  width: 88vw;
 }
 
 

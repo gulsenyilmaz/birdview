@@ -2,7 +2,8 @@ import React, { useState, useEffect} from 'react';
 import type { Human } from "../entities/Human";
 import type { HumanRelative } from "../entities/HumanRelative";
 import type { Location } from "../entities/Location";
-// import { getColorForRelationTypeString } from "../utils/colorUtils";
+import Legend from "./Legend";
+import { getColorForRelationTypeString } from "../utils/colorUtils";
 import './PersonBox.css';
 import { resolveCommonsThumb } from "../utils/commons"
 
@@ -36,6 +37,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
     const [cv_locations, setCvLocations] = useState<Location[]>([]);
     const [museums, setMuseums] = useState<Location[]>([]);
     const [relatives, setRelatives] = useState<HumanRelative[]>([]);
+    const [uniqueTypes, setUniqueTypes] = useState<string[]>([]);
    
     const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "profession"| "museums">("cv");
     const [fallbackImage, setFallbackImage] = useState<string | null>(null);
@@ -43,26 +45,28 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
     const [updateError, setUpdateError] = useState<string | null>(null);
 
 
-    // const renderLocationList = (
-    //     locations: any[] | undefined,
+   
+    
+    const renderLocationList = (
+        locations: any[] | undefined,
         
-    //     action: string
-    //     ) => {
-    //     if (!locations || locations.length === 0) return null;
+        action: string
+        ) => {
+        if (!locations || locations.length === 0) return null;
 
-    //     return (
-    //         <ul>
-    //             {locations.map((loc, idx) => (
-    //                 <li key={idx}>
-    //                 {loc.start_date} 
-    //                 {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} {loc.qid}— <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
-    //                     {action}
-    //                     </em>
-    //                 </li>
-    //             ))}
-    //         </ul>
-    //     );
-    // };
+        return (
+            <ul>
+                {locations.map((loc, idx) => (
+                    <li key={idx}>
+                    {loc.start_date} 
+                    {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} {loc.qid}— <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
+                        {action}
+                        </em>
+                    </li>
+                ))}
+            </ul>
+        );
+    };
 
     useEffect(() => {
         if(!isUpdating) {
@@ -116,12 +120,22 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             setManuelMode(false)
             setHumanLocations(cv_locations);
             setHumanRelatives([]);
+            setUniqueTypes( Array.from(
+                new Set(
+                    cv_locations.map(l => l.relationship_type_name)
+                )
+            ))
            
          }
          else if(selectedTab=="family"){
             setManuelMode(false)
             setHumanRelatives((relatives as HumanRelative[]).filter(l => l.relationship_type_name !== "influenced by"))
             setHumanLocations([]);
+            setUniqueTypes( Array.from(
+                new Set(
+                    relatives.map(l => l.relationship_type_name)
+                )
+            ))
          }
          else if(selectedTab=="profession"){
             setManuelMode(false)
@@ -186,31 +200,31 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             <div className="detail-box-container">
                 <div className="detail-title">
                     <h2>{person.name}</h2>
-                    <p>
-                    {personDetails.description} ({person.id}) (
-                    <a
+                    <p> {personDetails.description}<i>({person.id})</i></p>
+                </div>
+                 <div className="admin-tools">
+                        <a
                         href={`https://www.wikidata.org/wiki/${person.qid}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="timeline-item-title"
-                    >
+                        className="qid-link"
+                        >
                         {person.qid}
-                    </a>
-                    )
+                        </a>
 
-                     <button
+                        <button
                         onClick={handleUpdatePersonDetails}
                         disabled={isUpdating}
                         className="update-button"
-                    >
-                        {isUpdating ? "UPDATING..." : "UPDATE"}
-                    </button>
+                        >
+                        {isUpdating ? "..." : "↻"}
+                        </button>
 
-                    {updateError && <p className="update-error">{updateError}</p>}
-                    </p>
-                </div>
+                        {updateError && <span className="update-error">!</span>}
+                    </div>
 
                 <div className="person-id-card">
+                   
                     <div className="person-portrait">
                     {personDetails.img_url || fallbackImage ? (
                         <img
@@ -251,7 +265,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                         className="signature-image"
                         />
                     )}
-
+                   
                     
                 </div>
                 </div>
@@ -287,7 +301,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                             className={selectedTab === "profession" ? "active" : ""}
                             onClick={() => setSelectedTab("profession")}
                         >
-                            Profesional Life
+                            Professional Life
                         </button>
                         <button
                             className={selectedTab === "museums" ? "active" : ""}
@@ -296,7 +310,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                             Has Works In
                         </button>
                 </div>
-{/* 
+
                     {selectedTab === "cv" && (
                         
                         <div className="cv_content">
@@ -330,14 +344,13 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                     )}
 
                     {selectedTab === "museums" && (
-                    <div className="museum_content">
+                    <div className="cv_content">
                         {renderLocationList(museums, "has works here")}
                     </div>
                     )} 
-                </div>*/}
-
-                    
-
+                
+                   
+                <Legend items={uniqueTypes} />
             </div>
         )}
         

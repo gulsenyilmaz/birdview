@@ -62,7 +62,7 @@ export function createSelectedHumanLayers({
             getColor: (d: HumanRelativeEnriched) => getColorForRelationType(d.relationship_type_name, existsThatYear(d.start_date, d.end_date, selectedYear)?100:50), 
             getSourcePosition: (d: HumanRelativeEnriched) => [d.lon, d.lat],
             getTargetPosition: (d: HumanRelativeEnriched) => [d.lonOffsetSource, d.latOffsetSource],
-            getWidth: 1,
+            getWidth: 1.7,
             pickable: true
       
           }
@@ -90,7 +90,7 @@ export function createSelectedHumanLayers({
           const start = d.start_date ?? d.birth_date;
           const end = d.end_date ?? d.death_date;
           const isActive = existsThatYear(start, end, selectedYear);
-          return getColorForRelationType(d.relationship_type_name, isActive ? 255 : 150);
+          return [250, 250, 250, isActive ? 255 : 70];
         },
 
         getSize: d => Math.max(Math.log10(Math.max(d.age, 1)) / 3, 0.2),
@@ -105,7 +105,7 @@ export function createSelectedHumanLayers({
           const start = d.start_date ?? d.birth_date;
           const end = d.end_date ?? d.death_date;
           const isActive = existsThatYear(start, end, selectedYear);
-          return [250, 250, 250, isActive ? 100 : 70];
+          return getColorForRelationType(d.relationship_type_name, isActive ? 255 : 150);
         },
 
         pickable: true,
@@ -149,12 +149,12 @@ export function createSelectedHumanLayers({
 
     layers.push(
         new TextLayer<Location, CollisionFilterExtensionProps<Location>>({
-          id: 'humans-relatives-text-layer',
+          id: 'humans-locations-text-layer',
           data: filteredLocation,
           characterSet: 'auto',
           fontSettings: { buffer: 8, sdf: true },
 
-          getText: d => ".\n\n\n\n\n\n" +selectedObject.name+" \n\n" + d.relationship_type_name.toLocaleUpperCase(),
+          getText: d => ".\n\n\n\n\n\n" +d.name+" \n\n" + d.relationship_type_name.toLocaleUpperCase(),
           getPosition: d => [d.loc_lon, d.loc_lat],
           getColor: d => getColorForRelationType(d.relationship_type_name),
           getSize: () => 0.2,
@@ -163,7 +163,7 @@ export function createSelectedHumanLayers({
           sizeMaxPixels,
           maxWidth: 64 * 12,
           background: false,
-          getBackgroundColor: () => [250, 250, 250, 250],
+          getBackgroundColor: d => getColorForRelationType(d.relationship_type_name),
           pickable: true,
 
           collisionEnabled: true,

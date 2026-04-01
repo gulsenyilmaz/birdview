@@ -144,7 +144,7 @@ export const getColorForAgeString = (
       return [52, 152, 219, opacity];   // ➡ etkiledi → mavi
 
     case 'influenced by':
-      return [41, 128, 185, opacity];   // ⬅ etkilendi → koyu mavi
+      return [41, 128, 195, opacity];   // ⬅ etkilendi → koyu mavi
 
     case 'student':
       return [26, 188, 156, opacity];   // 🎓 öğrenci → turkuaz

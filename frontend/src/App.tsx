@@ -220,7 +220,7 @@ function App() {
       setSelectedLocation(null);
       setSelectedObject(null);
       setHumanLocations([]);
-      // setSelectedObjectThumbnail(null);
+      //setSelectedObjectThumbnail(null);
       setSelectedMilitaryEvent(null);
       setSelectedMovement(null);
       // setDistinctDates([]);
@@ -443,7 +443,7 @@ function App() {
             showLayer={showEvents}
             setShowLayer={setShowEvents}  
           />
-          {selectedHuman && workLayer.workCounts.length > 0  &&(
+          {selectedHuman  &&(
             <LayerHistogram
               setSelectedYear={setSelectedYear}
               windowRange={windowRange}
