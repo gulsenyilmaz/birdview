@@ -31,8 +31,11 @@ design/
 
 # databases
 *.db
+*.db-journal
+
 backend/*.db
 backend/*backup*.db
+backend/*.db-journal
 
 backend/*.csv
 *.csv
