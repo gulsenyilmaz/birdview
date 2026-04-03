@@ -90,13 +90,13 @@ const MapScene: React.FC<MapSceneProps> = ({
   const [processedHumanRelatives, setProcessedHumanRelatives] = useState<HumanRelativeEnriched[]>([]);
   
  
-  const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text'>('text');
+  const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text' | 'circle'>('text');
   const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("age");
 
 
   useEffect(() => {
     if(showHumans){
-      const enrichedHumans: HumanEnriched[] = humans.filter(h => h.birth_date<1700 || h.num_of_identifiers>40).map((h) => {
+      const enrichedHumans: HumanEnriched[] = humans.filter(h => h.birth_date<1700 || h.num_of_identifiers>10).map((h) => {
           const age = selectedYear - h.birth_date;
           
           let fillColor: [number, number, number, number];
@@ -340,6 +340,16 @@ const layers = useMemo(() => {
                   onChange={() => setSelectedLayerType('text')}
                 />
                 Text Layer
+              </label>
+
+              <label>
+                <input
+                  type="radio"
+                  value="text"
+                  checked={selectedLayerType === 'circle'}
+                  onChange={() => setSelectedLayerType('circle')}
+                />
+                Circle Layer
               </label>
             </div>
             <div className="radio-group">

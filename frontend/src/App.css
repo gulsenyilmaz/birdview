@@ -107,7 +107,7 @@ html, body, #root {
 }
 
 
-.left-panel {
+.right-panel {
   position: absolute;
   top: 0;
   right:-15vw;
@@ -131,14 +131,14 @@ html, body, #root {
 
 }
 
-.left-panel.open {
+.right-panel.open {
   right: 0;
 }
 
-.right-panel {
+.left-panel {
   position: absolute;
   
-  top: 11vh;
+  top: 14vh;
   left: 0;
 
   display: flex;
@@ -158,7 +158,7 @@ html, body, #root {
   
 }
 
-.right-panel.hide {
+.left-panel.hide {
   transform: translateX(-100%);
 }
 

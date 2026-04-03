@@ -233,7 +233,7 @@ function App() {
     <div className="app-container">
       <div className="main-content">
         {isLoading && <LoadingOverlay text={loadingText} />}
-        <div className={`left-panel ${selectedObject? "open" : ""}`}>
+        <div className={`right-panel ${selectedObject? "open" : ""}`}>
           <DetailBox
             selectedYear={selectedYear}
             detailMode={detailMode}   
@@ -295,13 +295,6 @@ function App() {
             </ContentStrip>
           )}
         </div>
-        {/* <div className={`left-panel-dashborad ${selectedObject ? "close" : ""}`}>
-          
-            <Dashboard
-              humans={humanLayer.filteredHumans}
-            />
-           
-          </div> */}
 
         <div className={`top-panel-dashboard ${selectedObject? (selectedMovement? "squeezed" : "close"): ""}`} >
           <Dashboard
@@ -352,7 +345,7 @@ function App() {
           </Suspense>
         </div>
 
-        <div className={`right-panel ${selectedObject && !selectedMovement? "hide" : ""}`}>
+        <div className={`left-panel ${selectedObject && !selectedMovement? "hide" : ""}`}>
          
           <FilterList
             selectedOccupation = {selectedOccupation}
@@ -445,7 +438,7 @@ function App() {
             showLayer={showEvents}
             setShowLayer={setShowEvents}  
           />
-          {selectedHuman  &&(
+          
             <LayerHistogram
               setSelectedYear={setSelectedYear}
               windowRange={windowRange}
@@ -455,7 +448,7 @@ function App() {
               showLayer={showEvents}
               setShowLayer={setShowEvents}  
             />
-          )}
+         
 
           
           </TimeSlider>

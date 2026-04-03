@@ -8,7 +8,7 @@ type HumanEnriched = Enriched<Human>;
 
 type HumanLayerParams = {
   processedHumans: HumanEnriched[];
-  selectedLayerType: "arc" | "text";
+  selectedLayerType: "arc" | "text" | "circle";
   zoom: number;
   fontSize: number;
   sizeMinPixels: number;
@@ -27,6 +27,7 @@ export function createHumanLayers({
   const SCATTER_FACTOR = 0.04 * 111320;
 
   if (selectedLayerType === "arc") {
+
     layers.push(
       new ArcLayer<HumanEnriched>({
         id: "humans-arc-layer",
@@ -39,9 +40,11 @@ export function createHumanLayers({
         pickable: true
       })
     );
+
   }
 
-  if (selectedLayerType === "text") {
+  if (selectedLayerType === "text" || selectedLayerType === "circle") {
+
     layers.push(
       new ScatterplotLayer<HumanEnriched>({
         id: "ScatterplotLayer-for-lines",
@@ -51,11 +54,16 @@ export function createHumanLayers({
         getRadius: d => (SCATTER_FACTOR / Math.log2(zoom)) * d.age,
         getFillColor: [0, 0, 0, 0],
         getLineColor: d => d.fillColor,
-        lineWidthMinPixels: 0.1,
+        lineWidthMinPixels: 0.5,
         pickable: true,
         radiusUnits: "meters"
       })
     );
+
+    
+  }
+
+  if (selectedLayerType === "text") {
 
     layers.push(
       new TextLayer<HumanEnriched, CollisionFilterExtensionProps<HumanEnriched>>({
@@ -71,7 +79,7 @@ export function createHumanLayers({
         sizeMaxPixels,
         maxWidth: 64 * 12,
         background: true,
-        getBackgroundColor: [190, 200, 190, 200],
+        getBackgroundColor: d => d.fillColor,
         pickable: true,
         collisionEnabled: true,
         getCollisionPriority: d => Math.log2(d.num_of_identifiers + 20),
@@ -85,6 +93,7 @@ export function createHumanLayers({
         extensions: [new CollisionFilterExtension()]
       })
     );
+    
   }
 
   return layers;
