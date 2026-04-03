@@ -110,13 +110,13 @@ html, body, #root {
 .left-panel {
   position: absolute;
   top: 0;
-  right:-12vw;
+  right:-15vw;
 
   display: flex;
   flex-direction: row;
 
-  width: 12vw;
-  height: 76vh;
+  width: 15vw;
+  height: 62vh;
 
   background-color: transparent;
   box-shadow: 7px 7px 15px rgba(49, 49, 49, 0.51);

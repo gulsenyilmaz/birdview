@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
+import path from "path";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, ".", "");
@@ -20,7 +21,7 @@ export default defineConfig(({ mode }) => {
       alias: [
         {
           find: "child_process",
-          replacement: "/src/shims/child-process.ts",
+          replacement: path.resolve(__dirname, "src/shims/child-process.ts"),
         },
       ],
     },

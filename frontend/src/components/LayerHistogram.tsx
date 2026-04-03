@@ -111,12 +111,13 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
           
         </div>
 
-        <div className="label-group">
+        <div className="label-group" style={{ color:getLayerColor(layerTypeName) }}>
           <label>
-              <span className="label-title">{layerTypeName}    </span>
+              <span className="label-title">{layerTypeName}</span>
               <input
                   type="checkbox"
                   checked={showLayer}
+                  style={{ color:getLayerColor(layerTypeName) }}
                   onChange={(e) => setShowLayer && setShowLayer(e.target.checked)}
                 />
             

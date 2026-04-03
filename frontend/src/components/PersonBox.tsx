@@ -343,11 +343,11 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                         </div>
                     )}
 
-                    {selectedTab === "museums" && (
+                    {/* {selectedTab === "museums" && (
                     <div className="cv_content">
                         {renderLocationList(museums, "has works here")}
                     </div>
-                    )} 
+                    )}  */}
                 
                    
                 <Legend items={uniqueTypes} />

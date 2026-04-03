@@ -90,8 +90,9 @@
 
 .content-details {
   width: 100%;
-  padding: 1rem;
-  overflow-y: hidden;
+  height: 70%;
+  padding: 0.3rem;
+  overflow-y: auto;
   
   color: #ffffff;
   background-color: rgba(48, 49, 48, 0.397);
