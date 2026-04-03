@@ -27,9 +27,8 @@ def update_humans():
         id,
         qid
         FROM humans 
-        WHERE num_of_identifiers > 100 AND id NOT IN (SELECT human_id FROM human_human)
-        ORDER BY num_of_identifiers DESC
-        LIMIT 100;
+        WHERE num_of_identifiers > 100 AND id NOT IN (SELECT human_id FROM human_human) AND id IN (SELECT human_id FROM human_collection)
+        ORDER BY num_of_identifiers DESC;
         """
     )
 

@@ -4,7 +4,7 @@ import { CollisionFilterExtension } from "@deck.gl/extensions";
 import type { CollisionFilterExtensionProps } from "@deck.gl/extensions";
 
 import type { HumanRelativeEnriched } from "../entities/HumanRelativeEnriched";
-import type { Human } from "../entities/Human";
+// import type { Human } from "../entities/Human";
 import type { Location } from "../entities/Location";
 import {getColorForRelationType } from "../utils/colorUtils";
 import { existsThatYear } from "../utils/dateUtils"
@@ -15,7 +15,7 @@ type SelectedHumanLayerParams = {
   processedHumanRelatives: HumanRelativeEnriched[];
   humanLocations:Location[];
   selectedYear: number;
-  selectedObject:Human;
+  // selectedObject:Human;
   fontSize: number;
   sizeMinPixels: number;
   sizeMaxPixels: number;
@@ -25,7 +25,7 @@ export function createSelectedHumanLayers({
   processedHumanRelatives,
   humanLocations,
   selectedYear,
-  selectedObject,
+  // selectedObject,
   fontSize,
   sizeMinPixels,
   sizeMaxPixels
@@ -108,7 +108,7 @@ export function createSelectedHumanLayers({
           return getColorForRelationType(d.relationship_type_name, isActive ? 255 : 150);
         },
 
-        pickable: true,
+        pickable: false,
         collisionEnabled: false,
         getCollisionPriority: d => Math.max(d.age*d.index, 0),
 

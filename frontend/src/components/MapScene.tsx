@@ -236,7 +236,7 @@ const layers = useMemo(() => {
         processedHumanRelatives,
         humanLocations,
         selectedYear,
-        selectedObject,
+        // selectedObject,
         fontSize,
         sizeMinPixels,
         sizeMaxPixels

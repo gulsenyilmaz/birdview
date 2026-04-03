@@ -1,5 +1,5 @@
 import "./App.css"; // Import your CSS file
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 
 
 import type { Human } from "./entities/Human";
@@ -20,7 +20,7 @@ import { useMilitaryEventLayer } from "./layers/useMilitaryEventLayer";
 import { useWorkLayer} from "./layers/useWorkLayer"
 
 import LoadingOverlay from './components/LoadingOverlay'
-import MapScene from './components/MapScene';
+const MapScene = lazy(() => import("./components/MapScene"));
 import TimeSlider from "./components/TimeSlider";
 import TimeWindowSlider from "./components/TimeWindowSlider";
 import LayerHistogram from "./components/LayerHistogram";
@@ -332,22 +332,24 @@ function App() {
         </div>
 
         <div className="scene">
-          <MapScene
-            humanLocations={humanLocations}
-            humans={humanLayer.filteredHumans}
-            militaryEvents={militaryLayer.filteredMilitaryEvents}
-            works={workLayer.filteredWorks}
-            humanRelatives={humanRelatives}
-            selectedYear={selectedYear}
-            setSelectedObject={setSelectedObject}
-            selectedObject={selectedObject}
-            detailMode={detailMode}
-            showEvents={showEvents}
-            showHumans={showHumans}
-            showWorks={showWorks}
-            manuelMode={manuelMode}
-            setManuelMode={setManuelMode}
-          />
+           <Suspense fallback={<LoadingOverlay text="Loading map..." />}>
+            <MapScene
+              humanLocations={humanLocations}
+              humans={humanLayer.filteredHumans}
+              militaryEvents={militaryLayer.filteredMilitaryEvents}
+              works={workLayer.filteredWorks}
+              humanRelatives={humanRelatives}
+              selectedYear={selectedYear}
+              setSelectedObject={setSelectedObject}
+              selectedObject={selectedObject}
+              detailMode={detailMode}
+              showEvents={showEvents}
+              showHumans={showHumans}
+              showWorks={showWorks}
+              manuelMode={manuelMode}
+              setManuelMode={setManuelMode}
+            />
+          </Suspense>
         </div>
 
         <div className={`right-panel ${selectedObject && !selectedMovement? "hide" : ""}`}>

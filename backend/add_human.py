@@ -126,11 +126,12 @@ def add_relatives(qid):
         writer.writerow(["id", "name", "Result"])
 
         human = Human(qid=qid, cursor=cursor, w=writer)
+        print(human.name, human.id)
 
         if human.id is None:
             log_results(writer, qid,"", "There is no human")
         
-        human_wiki_entity = HumanFromWikidata("Q692")
+        human_wiki_entity = HumanFromWikidata(qid)
         print(human_wiki_entity.relatives)
         human.update_relatives(human_wiki_entity.relatives)  
         conn.commit()
@@ -139,7 +140,7 @@ def add_relatives(qid):
 
 if __name__ == "__main__":
     
-    add_relatives("Q692")
+    add_relatives("Q83229")
 
     # add_to_collection(591,2,5490)
     # delete_human(7127)

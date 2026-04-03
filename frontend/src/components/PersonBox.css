@@ -43,14 +43,12 @@
   width: 100%;
   
   gap: 1rem;
-  padding: 1rem;
+  padding: 0.5rem;
 
   border-top: 1px solid #676767;
   background-color: rgba(104, 104, 103, 0.612);
   
 }
-
-
 
 .person-portrait {
   flex: 0 0 35%;
@@ -80,7 +78,7 @@
 
 .person-data p {
   font-size: 0.85rem;
-  line-height: 1.35;
+  line-height: 1;
   margin: 0 0 0.75rem 0;
   word-break: break-word;
 }

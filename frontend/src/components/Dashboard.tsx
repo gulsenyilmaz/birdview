@@ -1,23 +1,81 @@
 import React from "react";
-import Plot from "react-plotly.js";
 import "./Dashboard.css";
 import type { Human } from "../entities/Human";
-import { getColorForLabelString, getColorForGenderString } from "../utils/colorUtils";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  getColorForLabelString,
+  getColorForGenderString,
+} from "../utils/colorUtils";
 
 interface DashboardProps {
   humans: Human[];
-  
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
-  
- 
+interface ChartItem {
+  label: string;
+  value: number;
+  color: string;
+}
 
+const chartMargin = { top: 5, right: 5, left: 5, bottom: 5 };
+
+const commonAxisStyle = {
+  fontSize: 10,
+  fill: "white",
+  fontFamily: "'Inter', sans-serif",
+};
+
+const getYAxisWidth = (data: ChartItem[], minWidth = 65) => {
+  const longest = data.reduce((max, item) => Math.max(max, item.label.length), 0);
+  return Math.max(minWidth, longest * 7);
+};
+
+interface CustomBarShapeProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  payload?: ChartItem;
+}
+
+const CustomBarShape: React.FC<CustomBarShapeProps> = ({
+  x = 0,
+  y = 0,
+  width = 0,
+  height = 0,
+  payload,
+}) => {
+  const radius = 4;
+  const color = payload?.color || "#8884d8";
+
+  const safeWidth = Math.max(width, 0);
+  const safeHeight = Math.max(height, 0);
+
+  return (
+    <path
+      d={`
+        M${x},${y}
+        H${x + safeWidth - radius}
+        Q${x + safeWidth},${y} ${x + safeWidth},${y + radius}
+        V${y + safeHeight - radius}
+        Q${x + safeWidth},${y + safeHeight} ${x + safeWidth - radius},${y + safeHeight}
+        H${x}
+        Z
+      `}
+      fill={color}
+    />
+  );
+};
+
+const Dashboard: React.FC<DashboardProps> = ({ humans }) => {
   const nationalityCounter: Record<string, number> = {};
-  const cityCounter: Record<
-    number,
-    { name: string; count: number }
-  > = {};
+  const cityCounter: Record<number, { name: string; count: number }> = {};
   const genderCounter: Record<string, number> = {};
 
   for (const h of humans) {
@@ -25,12 +83,14 @@ const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
       nationalityCounter[h.nationality] =
         (nationalityCounter[h.nationality] || 0) + 1;
     }
+
     if (h.city_id && h.city) {
       if (!cityCounter[h.city_id]) {
         cityCounter[h.city_id] = { name: h.city, count: 0 };
       }
       cityCounter[h.city_id].count += 1;
     }
+
     if (h.gender) {
       genderCounter[h.gender] = (genderCounter[h.gender] || 0) + 1;
     }
@@ -41,16 +101,20 @@ const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
   );
   const topNationalities = nationalities.slice(0, 5);
 
-  const nationalityLabels = topNationalities.map(([label]) => label);
-  const nationalityValues = topNationalities.map(([, value]) => value);
-
+  const nationalityData: ChartItem[] = topNationalities.map(([label, value]) => ({
+    label,
+    value,
+    color: getColorForLabelString(label),
+  }));
 
   const genders = Object.entries(genderCounter).sort((a, b) => b[1] - a[1]);
 
-  const genderLabels = genders.map(([label]) => label);
-  const genderValues = genders.map(([, value]) => value);
+  const genderData: ChartItem[] = genders.map(([label, value]) => ({
+    label,
+    value,
+    color: getColorForGenderString(label),
+  }));
 
- 
   const cities = Object.entries(cityCounter)
     .map(([id, { name, count }]) => ({
       id: Number(id),
@@ -61,170 +125,58 @@ const Dashboard: React.FC<DashboardProps> = ({ humans}) => {
 
   const topCities = cities.slice(0, 5);
 
-  const citiesLabels = topCities.map((c) => c.name);
-  const citiesValues = topCities.map((c) => c.count);
-  // const citiesIds = topCities.map((c) => c.id);
+  const cityData: ChartItem[] = topCities.map((c) => ({
+    label: c.name,
+    value: c.count,
+    color: "#c7af48",
+  }));
+
+  const renderHorizontalBarChart = (data: ChartItem[]) => {
+    const yAxisWidth = getYAxisWidth(data);
+
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} layout="vertical" margin={chartMargin}>
+          <XAxis type="number" hide />
+          <YAxis
+            type="category"
+            dataKey="label"
+            width={yAxisWidth}
+            axisLine={false}
+            tickLine={false}
+            tick={commonAxisStyle}
+          />
+          <Bar
+            dataKey="value"
+            shape={<CustomBarShape />}
+            isAnimationActive={false}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  };
 
   return (
     <>
-    {humans && humans.length>0 && (
-    <div className="dashboard-container">
-      <div className="dashboard-charts">
+      {humans && humans.length > 0 && (
+        <div className="dashboard-container">
+          <div className="dashboard-charts">
+            <div className="chart-box">
+              {renderHorizontalBarChart(nationalityData)}
+            </div>
 
-      <div className="chart-box">
-        {/* <div className="chart-box-title">
-          <strong>NATIONALITIES : </strong>
-          {nationalities.length}
-        </div> */}
-        <Plot
-          data={[
-            {
-              x: nationalityValues,
-              y: nationalityLabels,
-              type: "bar",
-              orientation: "h",
-              marker: {
-                color: nationalityLabels.map(getColorForLabelString),
-              },
-            },
-          ]}
-          layout={{
-            yaxis: {
-              autorange: "reversed",
-              tickfont: {
-                color: "white",
-                family: "'Inter', sans-serif",
-              },
-              title: {
-                font: { color: "white", family: "'Inter', sans-serif" },
-              },
-            },
-            xaxis: {
-              showticklabels: false,
-              showgrid: false,
-              showline: false,
-              zeroline: false,
-            },
-            margin: { t: 5, l: 85, r: 0, b: 5 },
-            paper_bgcolor: "rgba(0, 0, 0, 0)",
-            plot_bgcolor: "rgba(0, 0, 0, 0)",
-            font: {
-              family: "'Inter', sans-serif",
-              size: 10,
-              color: "#e0e0e0",
-            },
-          }}
-          config={{ displayModeBar: false, staticPlot: false }}
-          useResizeHandler={false}
-          style={{ width: "100%", height: "100%" }}
-        />
-      </div>
+            <div className="chart-box">
+              {renderHorizontalBarChart(cityData)}
+            </div>
 
-      <div className="chart-box">
-        {/* <div className="chart-box-title">
-          <strong>LOCATIONS : </strong>
-          {cities.length}
-        </div> */}
-        <Plot
-          data={[
-            {
-              x: citiesValues,
-              y: citiesLabels,
-              type: "bar",
-              orientation: "h",
-              marker: { color: "#c7af48" },
-            },
-          ]}
-          layout={{
-            yaxis: {
-              color: "white",
-              autorange: "reversed",
-              tickfont: {
-                color: "white",
-                family: "'Inter', sans-serif",
-              },
-              title: {
-                font: { color: "white", family: "'Inter', sans-serif" },
-              },
-            },
-            xaxis: {
-              showticklabels: false,
-              showgrid: false,
-              showline: false,
-              zeroline: false,
-            },
-            margin: { t: 5, l: 85, r: 0, b: 5 },
-            paper_bgcolor: "rgba(0, 0, 0, 0)",
-            plot_bgcolor: "rgba(0, 0, 0, 0)",
-            font: {
-              color: "white",
-              size: 10,
-              family: "'Inter', sans-serif",
-            },
-          }}
-          config={{ displayModeBar: false, staticPlot: false }}
-          useResizeHandler={false}
-          style={{ width: "100%", height: "100%" }}
-        />
-      </div>
-
-      <div className="chart-box">
-        {/* <div className="chart-box-title">
-          <strong>GENDER : </strong>
-        </div> */}
-       
-
-        <Plot
-          data={[
-            {
-              x: genderValues,
-              y: genderLabels,
-              type: "bar",
-              orientation: "h",
-              marker: {
-                color: genderLabels.map(label => getColorForGenderString(label)),
-              },
-            },
-          ]}
-          layout={{
-            yaxis: {
-              autorange: "reversed",
-              tickfont: {
-                color: "white",
-                family: "'Inter', sans-serif",
-              },
-              title: {
-                font: { color: "white", family: "'Inter', sans-serif" },
-              },
-            },
-            xaxis: {
-              showticklabels: false,
-              showgrid: false,
-              showline: false,
-              zeroline: false,
-            },
-            margin: { t: 5, l: 65, r: 0, b: 5 },
-            paper_bgcolor: "rgba(0, 0, 0, 0)",
-            plot_bgcolor: "rgba(0, 0, 0, 0)",
-            font: {
-              family: "'Inter', sans-serif",
-              size: 10,
-              color: "#f0f0f0",
-            },
-          }}
-          config={{ displayModeBar: false, staticPlot: false }}
-          useResizeHandler={false}
-          style={{ width: "100%", height: "100%" }}
-        />
-      </div>
-      </div>
-     
-      
-    </div>)}
+            <div className="chart-box">
+              {renderHorizontalBarChart(genderData)}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
-  
 };
-
 
 export default Dashboard;
