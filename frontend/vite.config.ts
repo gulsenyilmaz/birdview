@@ -33,7 +33,6 @@ export default defineConfig(({ mode }) => {
             if (id.includes("@deck.gl")) return "deck";
             if (id.includes("@loaders.gl")) return "loaders";
             if (id.includes("maplibre-gl")) return "maplibre";
-            if (id.includes("react")) return "react-vendor";
             if (id.includes("d3")) return "d3";
             if (id.includes("node_modules")) return "vendor";
           },
