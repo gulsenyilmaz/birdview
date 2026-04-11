@@ -5,7 +5,7 @@ import type { Location } from "../entities/Location";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import type { Work } from "../entities/Work";
 import type { SelectedObject } from "../hooks/useAppSelection";
-import LoadingOverlay from "./LoadingOverlay";
+
 
 const MapScene = lazy(() => import("./map/MapScene"));
 
@@ -44,7 +44,7 @@ const MapSection: React.FC<MapSectionProps> = ({
 }) => {
   return (
     <div className="scene">
-      <Suspense fallback={<LoadingOverlay text="Loading map..." />}>
+      <Suspense fallback={<div>fsşlkjfsd</div>}>
         <MapScene
           humanLocations={humanLocations}
           humans={humans}

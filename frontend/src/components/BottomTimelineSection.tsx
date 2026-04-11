@@ -99,7 +99,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
         detailMode={detailMode}
         setManualMode={setManualMode}
       >
-        {workCounts.length > 0 && (
+        {selectedHuman && workCounts.length > 0 && (
           <LayerHistogram
             setSelectedYear={setSelectedYear}
             windowRange={windowRange}

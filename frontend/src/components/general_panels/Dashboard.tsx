@@ -159,7 +159,7 @@ const Dashboard: React.FC<DashboardProps> = ({ humans }) => {
   return (
     <>
       {humans && humans.length > 0 && (
-        <div className="dashboard-container">
+        <div className="dashboard-container active">
           <div className="dashboard-charts">
             <div className="chart-box">
               {renderHorizontalBarChart(nationalityData)}

@@ -25,7 +25,7 @@ import type { SelectedObject } from "../hooks/useAppSelection";
 
 interface AppPanelsProps {
   selectedYear: number;
-
+  isInitiated: boolean;
   detailMode: boolean;
   setDetailMode: (value: boolean) => void;
 
@@ -65,6 +65,7 @@ interface AppPanelsProps {
 const AppPanels: React.FC<AppPanelsProps> = ({
   selectedYear,
   detailMode,
+  isInitiated,
   setDetailMode,
   selectedObject,
   setSelectedObject,
@@ -161,18 +162,25 @@ const AppPanels: React.FC<AppPanelsProps> = ({
         )}
       </div>
 
-      <div className={`top-panel-dashboard ${selectedObject ? (selectedMovement ? "squeezed" : "close") : ""}`}>
-        <Dashboard humans={filteredHumans} />
-        <DescriptionBanner
-          humans={filteredHumans}
-          selectedMovement={selectedMovement}
-          selectedOccupation={selectedOccupation}
-          selectedGender={selectedGender}
-          selectedNationality={selectedNationality}
-          selectedCollection={selectedCollection}
-          onClearFilter={handleClearFilter}
-        />
-      </div>
+      <div className={`top-panel-dashboard ${isInitiated ? "" : "loading"} ${
+            selectedObject ? (selectedMovement ? "squeezed" : "close") : ""
+        }`}
+        >
+        {isInitiated && (
+            <>
+            <Dashboard humans={filteredHumans} />
+            <DescriptionBanner
+                humans={filteredHumans}
+                selectedMovement={selectedMovement}
+                selectedOccupation={selectedOccupation}
+                selectedGender={selectedGender}
+                selectedNationality={selectedNationality}
+                selectedCollection={selectedCollection}
+                onClearFilter={handleClearFilter}
+            />
+            </>
+        )}
+        </div>
 
       <div className={`left-panel ${selectedObject && !selectedMovement ? "hide" : ""}`}>
         <FilterList

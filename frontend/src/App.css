@@ -13,10 +13,10 @@ html, body {
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #646cff00);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em #61dafb00);
 }
 
 @keyframes logo-spin {
@@ -207,25 +207,32 @@ html, body, #root {
   justify-items: center;
   
   
-  background-color: transparent;
+  background-color: rgb(41, 41, 41);
   
   border: none;
-  z-index: 50;
+  z-index: 1550;
   
   transition: transform 0.9s ease-in-out;
   transition:
     transform 0.9s ease-in-out,
     width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    right 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(0%);
+    right 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    height  0.45s  cubic-bezier(0.4, 0, 0.2, 1);
+  
+}
+
+.top-panel-dashboard.loading {
+  height: 100vh;
+  
 }
 
 .top-panel-dashboard.close {
   transform: translateY(-100%);
 }
+
 .top-panel-dashboard.squeezed {
   right: 20vw;
-  width: 88vw;
+  width: 85vw;
 }
 
 
@@ -259,12 +266,13 @@ html, body, #root {
   left: 0;
   right: 0;
 
-  height: 18vh;
+  height: 17vh;
   width: 100vw;
 
   display: flex;
   flex-direction: column;
-  align-items: flex-end;  
+  align-items: flex-start;  
+  justify-content: center;
   
 
   background-color: rgba(255, 255, 255, 0);

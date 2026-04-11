@@ -12,7 +12,7 @@
   box-sizing: border-box;
 
   border: none;
-  background-color: rgba(123, 123, 123, 0.678);
+  background-color: rgba(123, 123, 123, 0);
  
 
   z-index: 1000;
@@ -84,7 +84,7 @@
 }
 /* Ray (arka çizgi) */
 .rc-slider-rail {
-  background-color: #eeeded;
+  background-color: #01c01e;
   height: 6px;
 }
 
@@ -99,7 +99,7 @@
   width: 14px;
   height: 14px;
   border: 2px solid #50ff59;
-  background-color: #767667;
+  background-color: #0e1f89;
   box-shadow: 0 0 0 2px #111;
   
   opacity: 1;

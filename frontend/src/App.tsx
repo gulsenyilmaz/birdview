@@ -22,8 +22,9 @@ import AppPanels from "./components/AppPanels";
 
 
 function App() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [loadingText, setLoadingText] = useState("Loading data...")
+  
+  const [isInitiated, setIsInitiated] = useState(false);
+  
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   
 
@@ -103,12 +104,7 @@ function App() {
     [humanLayer.fullRange, militaryLayer.fullRange, workLayer.fullRange, showEvents]
   );
 
-  useEffect(() => {
-    
-    setLoadingText(`Loading Data of  ${humanLayer.loadingHumans?"Human Layer...":""}  ${militaryLayer.loadingEvents?" Military Layer...":""}`)
-    setIsLoading(humanLayer.loadingHumans || militaryLayer.loadingEvents);
 
-  }, [humanLayer.loadingHumans, militaryLayer.loadingEvents]);
 
   
 
@@ -149,7 +145,15 @@ function App() {
   return (
     <div className="app-container">
       <div className="main-content">
-        {isLoading && <LoadingOverlay text={loadingText} />}
+        {!isInitiated && 
+          <LoadingOverlay 
+            humanDataLoading={humanLayer.loadingHumans}
+            eventDataLoading={militaryLayer.loadingEvents}
+            onInitialize={() => {
+              setIsInitiated(true);
+            }
+          } />
+          }
         
         <AppPanels
           selectedYear={selectedYear}
@@ -160,6 +164,7 @@ function App() {
               setSelectedObject(null);
             }
           }}
+          isInitiated={isInitiated}
           selectedObject={selectedObject}
           setSelectedObject={setSelectedObject}
           selectedHuman={selectedHuman}
