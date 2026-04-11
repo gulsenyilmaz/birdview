@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import type { Movement } from "../entities/Movement";
+import type { Movement } from "../../entities/Movement";
 import './MovementBox.css';
 
 interface MovementBoxProps {

@@ -69,9 +69,10 @@ export function createHumanLayers({
       new TextLayer<HumanEnriched, CollisionFilterExtensionProps<HumanEnriched>>({
         id: "humans-text-layer",
         data: processedHumans,
+        
         characterSet: "auto",
-        fontSettings: { buffer: 8, sdf: true },
-        getText: d => (d.awarded ? "✨" : " ") + d.name + "  (" + d.num_of_identifiers + ")",
+        fontSettings: { buffer: 2, sdf: true },
+        getText: d => (d.awarded ? "✨" : " ") + d.name,// + "  (" + d.num_of_identifiers + ")",
         getPosition: d => [d.lonOffsetSource, d.latOffsetSource],
         getSize: d => Math.pow((d.num_of_identifiers + 10) * 30 * d.age, 0.25) / 40,
         sizeScale: fontSize,

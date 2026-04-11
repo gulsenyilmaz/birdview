@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import "./TimeSlider.css";
-import { getLayerColor } from "../utils/colorUtils";
+import { getLayerColor } from "../../utils/colorUtils";
 
 
 type YearCount = { year: number; count: number };

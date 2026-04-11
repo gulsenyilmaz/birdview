@@ -1,4 +1,4 @@
-import type { Work } from "../entities/Work";
+import type { Work } from "../../entities/Work";
 import "./Modal.css";
 
 interface ModalProps {

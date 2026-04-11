@@ -1,6 +1,6 @@
 import React from "react";
 import "./Dashboard.css";
-import type { Human } from "../entities/Human";
+import type { Human } from "../../entities/Human";
 import {
   BarChart,
   Bar,
@@ -11,7 +11,7 @@ import {
 import {
   getColorForLabelString,
   getColorForGenderString,
-} from "../utils/colorUtils";
+} from "../../utils/colorUtils";
 
 interface DashboardProps {
   humans: Human[];

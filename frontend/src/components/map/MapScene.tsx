@@ -7,26 +7,26 @@ import maplibregl from 'maplibre-gl';
 import { Map } from 'react-map-gl/maplibre'; 
 import {MapView} from '@deck.gl/core';
 
-import type { Location } from "../entities/Location";
-import type { Human } from "../entities/Human";
-import type { HumanRelative } from "../entities/HumanRelative";
-import type { HumanEnriched } from "../entities/HumanEnriched";
-import type { HumanRelativeEnriched } from "../entities/HumanRelativeEnriched";
+import type { Location } from "../../entities/Location";
+import type { Human } from "../../entities/Human";
+import type { HumanRelative } from "../../entities/HumanRelative";
+import type { HumanEnriched } from "../../entities/HumanEnriched";
+import type { HumanRelativeEnriched } from "../../entities/HumanRelativeEnriched";
 
-import type { Work } from "../entities/Work";
-import type { MilitaryEvent } from "../entities/MilitaryEvent";
+import type { Work } from "../../entities/Work";
+import type { MilitaryEvent } from "../../entities/MilitaryEvent";
 
-import { isHuman } from "../utils/typeGuards";
+import { isHuman } from "../../utils/typeGuards";
 
-import { createMilitaryEventLayers } from "../layers/militaryEventLayers";
-import { createHumanLayers } from "../layers/humanLayers";
-import { createWorkLayers } from "../layers/workLayers";
-import { createSelectedHumanLayers } from "../layers/selectedHumanLayers"
+import { createMilitaryEventLayers } from "../../layers/militaryEventLayers";
+import { createHumanLayers } from "../../layers/humanLayers";
+import { createWorkLayers } from "../../layers/workLayers";
+import { createSelectedHumanLayers } from "../../layers/selectedHumanLayers"
 
 
 
-import { getColorForGender, getColorForAge, getColorForLabel } from "../utils/colorUtils";
-import { computeBounds, offsetFibonacciPosition } from "../utils/locationUtils"
+import { getColorForGender, getColorForAge, getColorForLabel } from "../../utils/colorUtils";
+import { computeBounds, offsetFibonacciPosition } from "../../utils/locationUtils"
 
 
 
@@ -47,7 +47,7 @@ const INITIAL_VIEW_STATE: ViewStateType = {
   bearing: 0,
 };
 
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
 interface MapSceneProps {
 
@@ -64,8 +64,8 @@ interface MapSceneProps {
   showEvents: boolean;
   showHumans: boolean;
   showWorks:boolean;
-  manuelMode:boolean;
-  setManuelMode:(obj: boolean) => void
+  manualMode:boolean;
+  setManualMode:(obj: boolean) => void
 }
 
 const MapScene: React.FC<MapSceneProps> = ({
@@ -81,8 +81,8 @@ const MapScene: React.FC<MapSceneProps> = ({
                                               showEvents,
                                               showHumans,
                                               showWorks,
-                                              manuelMode,
-                                              setManuelMode
+                                              manualMode,
+                                              setManualMode
                                             }) => {
 
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE); 
@@ -159,7 +159,7 @@ const MapScene: React.FC<MapSceneProps> = ({
   }, [selectedObject, humanRelatives, selectedYear, viewState.zoom]);
 
   useEffect(() => {
-    if (manuelMode) return;
+    if (manualMode) return;
     
     const combinedLocations:any[] = [];
     
@@ -188,7 +188,7 @@ const MapScene: React.FC<MapSceneProps> = ({
       transitionDuration: 'auto',
     }));
 
-  }, [humans, humanLocations, militaryEvents, detailMode, showHumans, showEvents, manuelMode]);
+  }, [humans, humanLocations, militaryEvents, detailMode, showHumans, showEvents, manualMode]);
 
 
 const layers = useMemo(() => {
@@ -216,18 +216,7 @@ const layers = useMemo(() => {
     layersArray.push(...createWorkLayers(works));
   }
 
-  if (showHumans) {
-    layersArray.push(
-      ...createHumanLayers({
-        processedHumans,
-        selectedLayerType,
-        zoom: viewState.zoom,
-        fontSize,
-        sizeMinPixels,
-        sizeMaxPixels
-      })
-    );
-  }
+  
 
   if(isHuman(selectedObject)){
 
@@ -237,6 +226,19 @@ const layers = useMemo(() => {
         humanLocations,
         selectedYear,
         // selectedObject,
+        fontSize,
+        sizeMinPixels,
+        sizeMaxPixels
+      })
+    );
+  }
+
+  if (showHumans) {
+    layersArray.push(
+      ...createHumanLayers({
+        processedHumans,
+        selectedLayerType,
+        zoom: viewState.zoom,
         fontSize,
         sizeMinPixels,
         sizeMaxPixels
@@ -276,14 +278,14 @@ const layers = useMemo(() => {
           onClick={({ object }) => {
                 if (object) {
                  
-                  // setManuelMode(true);
+                  // setManualMode(true);
                   setSelectedObject(object);
                 }
             }}
           onDragStart={({ object }) => {
                 
                   console.log("onDragStart object:",object);
-                  setManuelMode(true);
+                  setManualMode(true);
                 
             }}
           
@@ -304,8 +306,8 @@ const layers = useMemo(() => {
               <span className="label-title">Manuel Mode    </span>
               <input
                   type="checkbox"
-                  checked={manuelMode}
-                  onChange={(e) => setManuelMode(e.target.checked)}
+                  checked={manualMode}
+                  onChange={(e) => setManualMode(e.target.checked)}
                 />
             
             </label>
@@ -316,8 +318,8 @@ const layers = useMemo(() => {
               <span className="label-title">Manuel Mode    </span>
               <input
                   type="checkbox"
-                  checked={manuelMode}
-                  onChange={(e) => setManuelMode(e.target.checked)}
+                  checked={manualMode}
+                  onChange={(e) => setManualMode(e.target.checked)}
                 />
             
             </label> */}

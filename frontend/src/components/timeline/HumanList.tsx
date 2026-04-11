@@ -1,5 +1,5 @@
 
-import type { Human } from "../entities/Human";
+import type { Human } from "../../entities/Human";
 // import './HumanList.css';
 
 

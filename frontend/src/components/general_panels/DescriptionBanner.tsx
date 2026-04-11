@@ -2,12 +2,12 @@
 
 import './DescriptionBanner.css';
 // import "react-widgets/styles.css";
-import type { Movement } from '../entities/Movement';
-import type { Nationality } from "../entities/Nationality";
-import type { Gender } from "../entities/Gender";
-import type { Occupation } from "../entities/Occupation";
-import type { Human } from "../entities/Human";
-import type { Collection } from '../entities/Collection';
+import type { Movement } from '../../entities/Movement';
+import type { Nationality } from "../../entities/Nationality";
+import type { Gender } from "../../entities/Gender";
+import type { Occupation } from "../../entities/Occupation";
+import type { Human } from "../../entities/Human";
+import type { Collection } from '../../entities/Collection';
 
 
 interface DescriptionBannerProps{

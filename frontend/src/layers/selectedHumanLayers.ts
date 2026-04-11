@@ -93,7 +93,7 @@ export function createSelectedHumanLayers({
           return [250, 250, 250, isActive ? 255 : 70];
         },
 
-        getSize: d => Math.max(Math.log10(Math.max(d.age, 1)) / 3, 0.2),
+        getSize: d => Math.max(Math.log10(Math.max(d.age, 1)) / 3, 0.5),
 
         sizeScale: fontSize,
         sizeMinPixels,
@@ -110,12 +110,12 @@ export function createSelectedHumanLayers({
 
         pickable: false,
         collisionEnabled: false,
-        getCollisionPriority: d => Math.max(d.age*d.index, 0),
+        getCollisionPriority: d => Math.max(d.age, 1),
 
         collisionTestProps: {
-          sizeScale: fontSize * 2,
-          sizeMaxPixels: sizeMaxPixels * 2,
-          sizeMinPixels: sizeMinPixels * 2
+          sizeScale: fontSize,
+          sizeMaxPixels: sizeMaxPixels*2,
+          sizeMinPixels: sizeMinPixels 
         },
 
         getTextAnchor: 'start',

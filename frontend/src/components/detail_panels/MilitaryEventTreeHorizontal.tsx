@@ -1,6 +1,6 @@
-import type { MilitaryEvent } from "../entities/MilitaryEvent";
+import type { MilitaryEvent } from "../../entities/MilitaryEvent";
 import React, { useRef, useEffect, useState } from "react";
-import { getStatusColorForMilitaryEvents } from "../utils/colorUtils";
+import { getStatusColorForMilitaryEvents } from "../../utils/colorUtils";
 
 import * as d3 from "d3";
 

@@ -1,8 +1,8 @@
 
-import type { Work } from "../entities/Work";
+import type { Work } from "../../entities/Work";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import Modal from "../components/Modal";
+import Modal from "./Modal";
 // import { extractSortedDates } from "../utils/dateUtils";
 // import './WorkList.css';
 

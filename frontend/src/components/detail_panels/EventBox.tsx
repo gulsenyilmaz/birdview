@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import type { Event } from "../entities/Event";
+import type { Event } from "../../entities/Event";
 import './LocationBox.css';
 
 interface EventBoxProps {

@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef} from 'react';
 import './FilterList.css';
 // import "react-widgets/styles.css";
 import NavBar from './NavBar';
-import type { Movement } from "../entities/Movement";
-import type { Nationality } from "../entities/Nationality";
-import type { Gender } from "../entities/Gender";
-import type { Occupation } from "../entities/Occupation";
-import type { Human } from "../entities/Human";
-import type { Location } from "../entities/Location";
-import type { Collection } from "../entities/Collection";
+import type { Movement } from "../../entities/Movement";
+import type { Nationality } from "../../entities/Nationality";
+import type { Gender } from "../../entities/Gender";
+import type { Occupation } from "../../entities/Occupation";
+import type { Human } from "../../entities/Human";
+import type { Location } from "../../entities/Location";
+import type { Collection } from "../../entities/Collection";
 
 interface Results{
 

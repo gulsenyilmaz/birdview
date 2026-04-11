@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import type { MilitaryEvent } from "../entities/MilitaryEvent";
+import type { MilitaryEvent } from "../../entities/MilitaryEvent";
 import './MilitaryEventBox.css';
 
 interface MilitaryEventBoxProps {

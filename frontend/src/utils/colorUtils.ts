@@ -77,14 +77,14 @@ export const getColorForAge = (
   age: number,
   opacity: number = 180
 ): [number, number, number, number] => {
-  const clampedAge = Math.min(Math.max(age, 0), 100);
-  const t = clampedAge / 100;
+  const clampedAge = Math.min(Math.max(age, 0), 90);
+  const t = clampedAge / 90;
 
   // Başlangıç: rgb(100, 200, 100)
-  // Bitiş: rgb(240, 220, 130)
-  const r = Math.round(100 + t * (200 - 100)); // 100 → 240
-  const g = Math.round(190 + t * (220 - 200)); // 200 → 220
-  const b = Math.round(100 + t * (180 - 110)); // 110 → 180
+  // Bitiş: rgba(240, 227, 103, 0.94)
+  const r = Math.round(100 + t * (240 - 100)); // 100 → 240
+  const g = Math.round(190 + t * (227 - 200)); // 200 → 220
+  const b = Math.round(100 + t * (103 - 100)); // 100 → 130
 
   return [r, g, b, opacity];
 };

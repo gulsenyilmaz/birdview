@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState,useRef  } from "react";
 import "./TimeSlider.css";
-import type { Movement } from "../entities/Movement";
+import type { Movement } from "../../entities/Movement";
 
 // ⬇️ yeni: dışarıdan verilecek "yıl -> hayatta olan sayısı"
 // type YearCount = { year: number; count: number };
@@ -16,7 +16,7 @@ interface TimeSliderProps {
   movements: Movement[];
   children: React.ReactNode;
   detailMode?: boolean; 
-  setManuelMode:(obj: boolean) => void
+  setManualMode:(obj: boolean) => void
 }
 
 const TimeSlider: React.FC<TimeSliderProps> = ({
@@ -30,7 +30,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   movements,
   children,
   detailMode = false,
-  setManuelMode
+  setManualMode
         
 }) => {
 
@@ -131,7 +131,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
 
   const handlePlayAction = () => {
     setIsPlaying((p) => !p);
-    setManuelMode(false);
+    setManualMode(false);
     
   };
 

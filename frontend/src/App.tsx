@@ -1,87 +1,62 @@
 import "./App.css"; // Import your CSS file
-import { useEffect, useState, lazy, Suspense } from "react";
+import LoadingOverlay from './components/LoadingOverlay'
+import { useEffect, useState, useMemo } from "react";
 
-
-import type { Human } from "./entities/Human";
 import type { HumanRelative } from "./entities/HumanRelative";
-import type { Location } from "./entities/Location";
 import type { Movement } from "./entities/Movement";
 import type { Nationality } from "./entities/Nationality";
 import type { Gender } from "./entities/Gender";
 import type { Occupation } from "./entities/Occupation";
-import type { MilitaryEvent } from "./entities/MilitaryEvent";
 import type { Collection } from "./entities/Collection";
-import Timeline from './components/Timeline';
-
-import { isHuman, isLocation, isMilitaryEvent,isMovement } from "./utils/typeGuards";
 
 import { useHumanLayer } from "./layers/useHumanLayer";
 import { useMilitaryEventLayer } from "./layers/useMilitaryEventLayer";
 import { useWorkLayer} from "./layers/useWorkLayer"
 
-import LoadingOverlay from './components/LoadingOverlay'
-const MapScene = lazy(() => import("./components/MapScene"));
-import TimeSlider from "./components/TimeSlider";
-import TimeWindowSlider from "./components/TimeWindowSlider";
-import LayerHistogram from "./components/LayerHistogram";
-import Dashboard from "./components/Dashboard";
-// import DashboardAdvanced from "./components/DashboardAdvanced";
-
-import FilterList from "./components/FilterList";
-import DescriptionBanner from "./components/DescriptionBanner"
-
-import DetailBox from "./components/DetailBox";
-import PersonBox from './components/PersonBox';
-import LocationBox from './components/LocationBox';
-import MilitaryEventBox from './components/MilitaryEventBox';
-import MovementBox from './components/MovementBox';
-
-import ContentStrip from "./components/ContentStrip";
-import WorkList from './components/WorkList';
-import HumanList from './components/HumanList';
-import MilitaryEventDetail from './components/MilitaryEventDetail';
-
 import { unionRanges } from "./utils/dateUtils";
+import { useAppSelection, type SelectedObject } from "./hooks/useAppSelection";
+
+import BottomTimelineSection from "./components/BottomTimelineSection";
+import MapSection from "./components/MapSection";
+import AppPanels from "./components/AppPanels";
 
 
 function App() {
-
- 
-  
-  
-  
-  const [selectedYear, setSelectedYear] = useState<number>(1600);
-  const [detailMode, setDetailMode] = useState<boolean>(false);
-  const [manuelMode, setManuelMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingText, setLoadingText] = useState("Loading data...")
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   
-  // const [distinctDates, setDistinctDates] = useState<number[]>([]);
-  const [windowRange, setWindowRange] = useState<[number, number]>([-800, 1950]);
 
-  const [selectedObject, setSelectedObject] = useState<any>(null);
-  // const [selectedObjectThumbnail, setSelectedObjectThumbnail]= useState<string | null>(null);
-
-  const [selectedHuman, setSelectedHuman] = useState<Human | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const [selectedMilitaryEvent, setSelectedMilitaryEvent] = useState<MilitaryEvent | null>(null);
-
+  const [selectedYear, setSelectedYear] = useState<number>(1600);
+  const [selectedObject, setSelectedObject] = useState<SelectedObject>(null);
+  const detailMode = !!selectedObject;
+  
   const [selectedOccupation, setSelectedOccupation] = useState<Occupation| null>(null);
   const [selectedGender, setSelectedGender] = useState<Gender| null>(null);
   const [selectedNationality, setSelectedNationality] = useState<Nationality| null>(null);
-  const [selectedMovement, setSelectedMovement] = useState<Movement| null>(null);
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
   
-
+  const [windowRange, setWindowRange] = useState<[number, number]>([-800, 1950]);
   const [movements, setMovements] = useState<Movement[]>([]); 
-  const [humanLocations, setHumanLocations] = useState<Location[]>([]);
   const [humanRelatives, setHumanRelatives] = useState<HumanRelative[]>([]);
 
-  const [showEvents, setShowEvents] = useState(false);
   const [showHumans, setShowHumans] = useState(true);
-  const [showWorks, setShowWorks] = useState(true);
+  const [showEvents, setShowEvents] = useState(false);
+  const [showWorks, setShowWorks] = useState(false);
+  const [showDisasters, setShowDisasters] = useState(false);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const {
+    manualMode,
+    setManualMode,
+    selectedHuman,
+    selectedLocation,
+    selectedMilitaryEvent,
+    selectedMovement,
+    humanLocations,
+    setHumanLocations
+  } = useAppSelection(
+    selectedObject
+  );
 
   const humanLayer = useHumanLayer({
     active: true, // şimdilik hep açık
@@ -118,342 +93,140 @@ function App() {
     selectedYear,
   });
 
-  const activeFullRange = unionRanges([
-    humanLayer.fullRange,
-    showEvents?militaryLayer.fullRange:null,
-    workLayer.fullRange,
-    // eventsLayer.fullRange,
-  ]);
+  const activeFullRange = useMemo(
+    () =>
+      unionRanges([
+        humanLayer.fullRange,
+        showEvents ? militaryLayer.fullRange : null,
+        workLayer.fullRange,
+      ]),
+    [humanLayer.fullRange, militaryLayer.fullRange, workLayer.fullRange, showEvents]
+  );
 
-   useEffect(() => {
+  useEffect(() => {
     
     setLoadingText(`Loading Data of  ${humanLayer.loadingHumans?"Human Layer...":""}  ${militaryLayer.loadingEvents?" Military Layer...":""}`)
     setIsLoading(humanLayer.loadingHumans || militaryLayer.loadingEvents);
 
   }, [humanLayer.loadingHumans, militaryLayer.loadingEvents]);
 
-
-  useEffect(() => {
-
-    setManuelMode(false)
-
-    if(!selectedObject){
-
-      setWindowRange(activeFullRange);
-      setDetailMode(false);
-      return ;
-
-    }  
-
-    setDetailMode(true);
-
-    if(isHuman(selectedObject)){
-
-      setWindowRange(humanLayer.fullRange)
-
-      setSelectedHuman(selectedObject);
-      setShowHumans(false)
-
-      setSelectedLocation(null);
-      setSelectedMilitaryEvent(null);
-      setSelectedMovement(null);
-
-    }
-    else if(isLocation(selectedObject)){
-
-      setWindowRange(humanLayer.fullRange)
-
-      setSelectedLocation(selectedObject);
-      setHumanLocations([selectedObject]);
-
-      setSelectedHuman(null);
-      setSelectedMilitaryEvent(null);
-      setSelectedMovement(null);
-
-    }
-    else if(isMilitaryEvent(selectedObject)){
-
-      setWindowRange(militaryLayer.fullRange)
-      
-      setSelectedLocation(null);
-      setSelectedHuman(null);
-      setSelectedMovement(null);
-      setHumanLocations([]);
-      setSelectedMilitaryEvent(selectedObject);
-
-    }
-
-    else if(isMovement(selectedObject)){
-
-      setWindowRange([selectedObject.start_date?selectedObject.start_date:humanLayer.fullRange[0], 
-                      selectedObject.end_date?selectedObject.end_date:humanLayer.fullRange[1]]);
-
-      setSelectedLocation(null);
-      setSelectedHuman(null);
-      setHumanLocations([]);
-      setSelectedMilitaryEvent(null);
-      setSelectedMovement(selectedObject);
-    }
-    
-    else{
-
-      setSelectedHuman(null);
-      setSelectedLocation(null);
-      setSelectedMilitaryEvent(null);
-      setSelectedMovement(null);
-      setSelectedObject(null);
-      setDetailMode(false);
-
-    }
-    
-
-  }, [selectedObject, humanLayer.fullRange, militaryLayer.fullRange]);
-
-
   
+
   useEffect(() => {
+    let nextRange: [number, number] | null = null;
 
-    if(!detailMode){
-
-      setShowHumans(true)
-      setSelectedHuman(null);
-      setSelectedLocation(null);
-      setSelectedObject(null);
-      setHumanLocations([]);
-      //setSelectedObjectThumbnail(null);
-      setSelectedMilitaryEvent(null);
-      setSelectedMovement(null);
-      // setDistinctDates([]);
-
+    if (!selectedObject) {
+      nextRange = activeFullRange;
+    } else if (selectedHuman || selectedLocation) {
+      nextRange = humanLayer.fullRange;
+    } else if (selectedMilitaryEvent) {
+      nextRange = militaryLayer.fullRange;
+    } else if (selectedMovement) {
+      nextRange = [
+        selectedMovement.start_date ?? humanLayer.fullRange[0],
+        selectedMovement.end_date ?? humanLayer.fullRange[1],
+      ];
     }
 
-  }, [detailMode]);
+    if (
+      nextRange &&
+      (windowRange[0] !== nextRange[0] || windowRange[1] !== nextRange[1])
+    ) {
+      setWindowRange(nextRange);
+    }
+  }, [
+    selectedObject,
+    selectedHuman,
+    selectedLocation,
+    selectedMilitaryEvent,
+    selectedMovement,
+    activeFullRange,
+    humanLayer.fullRange,
+    militaryLayer.fullRange,
+    
+  ]);
 
   return (
     <div className="app-container">
       <div className="main-content">
         {isLoading && <LoadingOverlay text={loadingText} />}
-        <div className={`right-panel ${selectedObject? "open" : ""}`}>
-          <DetailBox
-            selectedYear={selectedYear}
-            detailMode={detailMode}   
-            setDetailMode={setDetailMode}>
+        
+        <AppPanels
+          selectedYear={selectedYear}
+          detailMode={detailMode}
+          setDetailMode={(value) => {
+            if (!value) {
+              setShowHumans(true);
+              setSelectedObject(null);
+            }
+          }}
+          selectedObject={selectedObject}
+          setSelectedObject={setSelectedObject}
+          selectedHuman={selectedHuman}
+          selectedLocation={selectedLocation}
+          selectedMilitaryEvent={selectedMilitaryEvent}
+          selectedMovement={selectedMovement}
+          setHumanLocations={setHumanLocations}
+          setHumanRelatives={setHumanRelatives}
+          selectedOccupation={selectedOccupation}
+          selectedGender={selectedGender}
+          selectedNationality={selectedNationality}
+          selectedCollection={selectedCollection}
+          setSelectedOccupation={setSelectedOccupation}
+          setSelectedGender={setSelectedGender}
+          setSelectedNationality={setSelectedNationality}
+          setSelectedCollection={setSelectedCollection}
+          backendUrl={backendUrl}
+          movements={movements}
+          setMovements={setMovements}
+          filteredHumans={humanLayer.filteredHumans}
+          filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
+          setManualMode={setManualMode}
+        />
+       
+        <MapSection
+          humanLocations={humanLocations}
+          humans={humanLayer.filteredHumans}
+          militaryEvents={militaryLayer.filteredMilitaryEvents}
+          works={workLayer.filteredWorks}
+          humanRelatives={humanRelatives}
+          selectedYear={selectedYear}
+          setSelectedObject={setSelectedObject}
+          selectedObject={selectedObject}
+          detailMode={detailMode}
+          showEvents={showEvents}
+          showHumans={showHumans}
+          showWorks={showWorks}
+          manualMode={manualMode}
+          setManualMode={setManualMode}
+        />
 
-            {selectedHuman && (
-              <PersonBox
-                person={selectedHuman}
-                setHumanLocations={setHumanLocations}
-                setHumanRelatives = {setHumanRelatives}
-                // setSelectedObjectThumbnail ={setSelectedObjectThumbnail}
-                setManuelMode={setManuelMode}
-              />
-            )}
-
-            {selectedLocation && (
-              <LocationBox 
-                location={selectedLocation}
-                // setSelectedObjectThumbnail = {setSelectedObjectThumbnail} 
-              />
-            )}
-
-            {selectedMilitaryEvent && (
-              <MilitaryEventBox 
-                militaryEvent={selectedMilitaryEvent} 
-              />
-            )}
-
-            {selectedMovement && (
-              <MovementBox 
-                movement={selectedMovement} 
-              />
-            )}
-
-          </DetailBox>
-        </div>
-
-        <div className={`top-panel ${selectedObject && selectedMilitaryEvent ? "open" : ""}`}>
-          {selectedObject && !selectedMovement && (
-            <ContentStrip 
-              selectedYear = {selectedYear}
-              selectedObject = {selectedObject}>
-
-              {selectedLocation && (
-                <HumanList
-                  humans={humanLayer.filteredHumans}
-                  setSelectedObject = {setSelectedObject}
-                />
-              )}
-
-              {selectedMilitaryEvent && (
-                <MilitaryEventDetail
-                  selectedYear={selectedYear}
-                  militaryEvents={militaryLayer.filteredMilitaryEvents}
-                  setSelectedObject = {setSelectedObject}
-                />
-              )}
-
-            </ContentStrip>
-          )}
-        </div>
-
-        <div className={`top-panel-dashboard ${selectedObject? (selectedMovement? "squeezed" : "close"): ""}`} >
-          <Dashboard
-              humans={humanLayer.filteredHumans}
-            />
-          <DescriptionBanner
-              humans={humanLayer.filteredHumans}
-              selectedMovement ={selectedMovement}
-              selectedOccupation= {selectedOccupation}
-              selectedGender={selectedGender}
-              selectedNationality={selectedNationality}
-              selectedCollection={selectedCollection}
-              onClearFilter={(key) => {
-                console.log("Clearing filter for key:", key);
-                switch (key) {
-                  case "nationality": setSelectedNationality(null); break;
-                  case "gender": setSelectedGender(null); break;
-                  case "occupation": setSelectedOccupation(null); break;
-                  case "movement": setSelectedObject(null); break;
-                  case "collection": setSelectedCollection(null); break;
-                  default: break;
-                  }
-                }
-              }
-            />
+        <BottomTimelineSection
+          selectedYear={selectedYear}
+          setSelectedYear={setSelectedYear}
+          activeFullRange={activeFullRange}
+          windowRange={windowRange}
+          setWindowRange={setWindowRange}
+          detailMode={detailMode}
           
-
-        </div>
-
-        <div className="scene">
-           <Suspense fallback={<LoadingOverlay text="Loading map..." />}>
-            <MapScene
-              humanLocations={humanLocations}
-              humans={humanLayer.filteredHumans}
-              militaryEvents={militaryLayer.filteredMilitaryEvents}
-              works={workLayer.filteredWorks}
-              humanRelatives={humanRelatives}
-              selectedYear={selectedYear}
-              setSelectedObject={setSelectedObject}
-              selectedObject={selectedObject}
-              detailMode={detailMode}
-              showEvents={showEvents}
-              showHumans={showHumans}
-              showWorks={showWorks}
-              manuelMode={manuelMode}
-              setManuelMode={setManuelMode}
-            />
-          </Suspense>
-        </div>
-
-        <div className={`left-panel ${selectedObject && !selectedMovement? "hide" : ""}`}>
-         
-          <FilterList
-            selectedOccupation = {selectedOccupation}
-            selectedGender  = {selectedGender}
-            selectedNationality = {selectedNationality}
-            selectedMovement = {selectedMovement}
-            selectedCollection = {selectedCollection}
-            setSelectedOccupation= {setSelectedOccupation}
-            setSelectedGender = {setSelectedGender}
-            setSelectedNationality= {setSelectedNationality}
-            setSelectedMovement = {setSelectedObject}
-            setSelectedCollection = {setSelectedCollection}
-            setSelectedObject={setSelectedObject}
-            backendUrl={backendUrl}
-            setMovements={setMovements}
-            movements={movements}
-          />
-        </div>
-        <div className={`bottom-worklist-panel ${selectedHuman && showWorks ? "open" : ""}`}>
-          {selectedHuman && (
-                <Timeline 
-                  selectedYear = {selectedYear}
-                  windowRange = {windowRange} 
-                >
-                  
-                  <WorkList
-                    filteredWorks = {workLayer.filteredWorks}
-                  />
-
-                </Timeline>
-           
-          )}
-        </div>
-        {/* <div className={`bottom-panel ${selectedObject ? "squeezed" : ""}`}> */}
-        <div className={`bottom-panel`}>
-          
-          {/* {!selectedObject && (  */}
-          <TimeWindowSlider
-            fullRange={activeFullRange}
-            windowRange={windowRange}
-            setWindowRange={setWindowRange}
-            setSelectedYear={setSelectedYear}
-            selectedYear={selectedYear}
-            detailMode={detailMode}
-          />
-          {/* )} */}
-
-          <TimeSlider
-            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-            fullRange={activeFullRange}
-            windowRange={windowRange}
-            setWindowRange={setWindowRange}
-            // distinctDates= {distinctDates}   
-            setSelectedMovement= {setSelectedObject}
-            movements={movements}    
-            detailMode={detailMode}    
-            setManuelMode={setManuelMode} 
-          >
-          {workLayer.workCounts.length > 0  &&(
-            <LayerHistogram
-              setSelectedYear={setSelectedYear}
-              windowRange={windowRange}
-              aliveCounts={workLayer.workCounts}
-              binAggregation="sum"   
-              layerTypeName ="WORKS"
-              showLayer={showWorks}
-              setShowLayer={setShowWorks}  
-            />
-          )}
-
-          {!selectedHuman && (
-            <LayerHistogram
-              setSelectedYear={setSelectedYear}
-              windowRange={windowRange}
-              aliveCounts={humanLayer.aliveCounts}
-              binAggregation="sum" 
-              layerTypeName ="HUMANS"  
-              showLayer={showHumans}
-              setShowLayer={setShowHumans}                      
-            />
-          )}
-
-          <LayerHistogram
-            setSelectedYear={setSelectedYear}
-            windowRange={windowRange}
-            aliveCounts={militaryLayer.eventCounts}
-            binAggregation="sum"   
-            layerTypeName ="WARS" 
-            showLayer={showEvents}
-            setShowLayer={setShowEvents}  
-          />
-          
-            <LayerHistogram
-              setSelectedYear={setSelectedYear}
-              windowRange={windowRange}
-              aliveCounts={militaryLayer.eventCounts}
-              binAggregation="sum"   
-              layerTypeName ="DISASTERS" 
-              showLayer={showEvents}
-              setShowLayer={setShowEvents}  
-            />
-         
-
-          
-          </TimeSlider>
-          
-        </div>
+          movements={movements}
+          setSelectedObject={setSelectedObject}
+          setManualMode={setManualMode}
+          selectedHuman={selectedHuman}
+          showWorks={showWorks}
+          setShowWorks={setShowWorks}
+          showHumans={showHumans}
+          setShowHumans={setShowHumans}
+          showEvents={showEvents}
+          setShowEvents={setShowEvents}
+          showDisasters={showDisasters}
+          setShowDisasters={setShowDisasters}
+          filteredWorks={workLayer.filteredWorks}
+          workCounts={workLayer.workCounts}
+          humanAliveCounts={humanLayer.aliveCounts}
+          militaryEventCounts={militaryLayer.eventCounts}
+        />
+       
       </div>
     </div>
   );

@@ -270,7 +270,6 @@ def get_person_details(human_id: int):
         h["index"] = index
             
             
-    
 
     cur.execute(
         """
@@ -334,6 +333,7 @@ def get_person_details(human_id: int):
         "movements": movs,
         "collections": colls,
         "citizenships": citizs,
+        "relatives":relatives,
         "relatives":relatives,
     }
 

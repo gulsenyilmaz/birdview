@@ -1,6 +1,6 @@
-import type { MilitaryEvent } from "../entities/MilitaryEvent";
+import type { MilitaryEvent } from "../../entities/MilitaryEvent";
 // import MilitaryEventBox from '../components/MilitaryEventBox';
-import MilitaryEventTreeHorizontal from '../components/MilitaryEventTreeHorizontal';
+import MilitaryEventTreeHorizontal from './MilitaryEventTreeHorizontal';
 import './MilitaryEventDetail.css';
 
 

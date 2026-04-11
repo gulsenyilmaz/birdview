@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import type { Location } from "../entities/Location";
+import type { Location } from "../../entities/Location";
 import './LocationBox.css';
 
 interface LocationBoxProps {

@@ -1,18 +1,18 @@
 import React, { useState, useEffect} from 'react';
-import type { Human } from "../entities/Human";
-import type { HumanRelative } from "../entities/HumanRelative";
-import type { Location } from "../entities/Location";
-import Legend from "./Legend";
-import { getColorForRelationTypeString } from "../utils/colorUtils";
+import type { Human } from "../../entities/Human";
+import type { HumanRelative } from "../../entities/HumanRelative";
+import type { Location } from "../../entities/Location";
+import Legend from "../Legend";
+import { getColorForRelationTypeString } from "../../utils/colorUtils";
 import './PersonBox.css';
-import { resolveCommonsThumb } from "../utils/commons"
+import { resolveCommonsThumb } from "../../utils/commons"
 
 interface PersonBoxProps {
   person:Human;
   setHumanLocations: (arr: Location[]) => void;
   setHumanRelatives:(arr: HumanRelative[]) => void;
 //   setSelectedObjectThumbnail: (str:string | null) => void;
-  setManuelMode:(obj: boolean) => void
+  setManualMode:(obj: boolean) => void
   
 }
 
@@ -30,7 +30,7 @@ interface PersonDetails {
   gender: string;
 }
 
-const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHumanRelatives, setManuelMode}) => {
+const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHumanRelatives, setManualMode}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [personDetails, setPersonDetails] = useState<PersonDetails | null>(null);
@@ -117,7 +117,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
 
 
         if (selectedTab=="cv") {
-            setManuelMode(false)
+            setManualMode(false)
             setHumanLocations(cv_locations);
             setHumanRelatives([]);
             setUniqueTypes( Array.from(
@@ -128,7 +128,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
            
          }
          else if(selectedTab=="family"){
-            setManuelMode(false)
+            setManualMode(false)
             setHumanRelatives((relatives as HumanRelative[]).filter(l => l.relationship_type_name !== "influenced by"))
             setHumanLocations([]);
             setUniqueTypes( Array.from(
@@ -138,12 +138,12 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             ))
          }
          else if(selectedTab=="profession"){
-            setManuelMode(false)
+            setManualMode(false)
             setHumanRelatives((relatives as HumanRelative[]).filter(l => l.relationship_type_name === "influenced by"))
             setHumanLocations([]);
          }
          else if(selectedTab=="museums"){
-            setManuelMode(false)
+            setManualMode(false)
             setHumanLocations(museums);
             setHumanRelatives([]);
          }

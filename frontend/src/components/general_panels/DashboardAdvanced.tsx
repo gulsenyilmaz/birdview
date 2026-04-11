@@ -1,8 +1,8 @@
 import React from "react";
 import Plot from "react-plotly.js";
 import "./Dashboard.css";
-import type { Human } from "../entities/Human";
-import { getColorForLabelString } from "../utils/colorUtils";
+import type { Human } from "../../entities/Human";
+import { getColorForLabelString } from "../../utils/colorUtils";
 
 interface DashboardAdvancedProps {
   humans: Human[];
