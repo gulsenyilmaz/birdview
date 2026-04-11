@@ -28,6 +28,15 @@ html, body {
   }
 }
 
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus,
+button:active {
+  outline: none;
+  box-shadow: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
@@ -207,7 +216,7 @@ html, body, #root {
   justify-items: center;
   
   
-  background-color: rgb(41, 41, 41);
+  background-color:#20262d58;
   
   border: none;
   z-index: 1550;
@@ -217,13 +226,14 @@ html, body, #root {
     transform 0.9s ease-in-out,
     width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
     right 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    height  0.45s  cubic-bezier(0.4, 0, 0.2, 1);
+    height  0.45s  cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 3s cubic-bezier(0.4, 0, 0.2, 1);
   
 }
 
 .top-panel-dashboard.loading {
   height: 100vh;
-  
+  background-color: rgba(0, 0, 0,1);
 }
 
 .top-panel-dashboard.close {

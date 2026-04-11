@@ -72,9 +72,10 @@ export function createHumanLayers({
         
         characterSet: "auto",
         fontSettings: { buffer: 2, sdf: true },
-        getText: d => (d.awarded ? "✨" : " ") + d.name,// + "  (" + d.num_of_identifiers + ")",
+        getText: d => (d.awarded ? "✨" : " ") + d.name + " ",// + "  (" + d.num_of_identifiers + ")",
         getPosition: d => [d.lonOffsetSource, d.latOffsetSource],
         getSize: d => Math.pow((d.num_of_identifiers + 10) * 30 * d.age, 0.25) / 40,
+        getColor: [255, 255, 255, 190],
         sizeScale: fontSize,
         sizeMinPixels,
         sizeMaxPixels,

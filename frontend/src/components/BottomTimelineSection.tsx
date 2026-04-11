@@ -79,14 +79,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
         )}
     </div>
     <div className="bottom-panel">
-      <TimeWindowSlider
-        fullRange={activeFullRange}
-        windowRange={windowRange}
-        setWindowRange={setWindowRange}
-        setSelectedYear={setSelectedYear}
-        selectedYear={selectedYear}
-        detailMode={detailMode}
-      />
+      
 
       <TimeSlider
         selectedYear={selectedYear}
@@ -143,6 +136,15 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           setShowLayer={setShowDisasters}
         />
       </TimeSlider>
+
+      <TimeWindowSlider
+        fullRange={activeFullRange}
+        windowRange={windowRange}
+        setWindowRange={setWindowRange}
+        setSelectedYear={setSelectedYear}
+        selectedYear={selectedYear}
+        detailMode={detailMode}
+      />
     </div>
     </>
   );

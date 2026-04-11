@@ -8,7 +8,7 @@
   flex-direction: row;
   box-sizing: border-box;
   align-self: flex-start;
-  background-color: rgba(28, 158, 126, 0.947);
+  background-color: #656566;
   box-shadow: 0 5px 5px rgba(64, 64, 64, 0.306);
   z-index: 1100;
   

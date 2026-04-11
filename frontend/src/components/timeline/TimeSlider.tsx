@@ -177,36 +177,36 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
        
       <div className={`zoom-container ${detailMode ? "hide" : ""}`}>
         {movements && movements.length>0 && (
-                <div className="movements-wrapper">
-                    
-                  {movements
-                  .filter((item) =>
-                    item.start_date !== null && item.end_date !== null && item.start_date <= maxYear && item.start_date >= minYear && item.count>10
-                  )
-                  .map((item) => {
-                      const left = getLeftPercent(item.start_date!);
+            <div className="movements-wrapper">
+                
+              {movements
+              .filter((item) =>
+                item.start_date !== null && item.end_date !== null && item.start_date <= maxYear && item.start_date >= minYear && item.count>10
+              )
+              .map((item) => {
+                  const left = getLeftPercent(item.start_date!);
+                  
+                  return (
+                    <div 
+                        className="milestone"
+                        key={item.id}
+                        style={{
+                        left: `${left}%`,
+                        // right: `${(1 - (item.end_date! - minYear) / (maxYear - minYear)) * 100}%`
                       
-                      return (
-                        <div 
-                            className="milestone"
-                            key={item.id}
-                            style={{
-                            left: `${left}%`,
-                            // right: `${(1 - (item.end_date! - minYear) / (maxYear - minYear)) * 100}%`
-                          
-                            }}
-                            title={`Jump to ${item.name} `}
-                            onClick={() => setSelectedMovement(item)}
-                            onMouseOver={() => console.log(`${item.name} (${item.start_date})`)}    
-                            
-                          /> 
-                          
-                      );
-                    }
-                  )}
+                        }}
+                        title={`Jump to ${item.name} `}
+                        onClick={() => setSelectedMovement(item)}
+                        onMouseOver={() => console.log(`${item.name} (${item.start_date})`)}    
+                        
+                      /> 
+                      
+                  );
+                }
+              )}
 
-                </div>
-            )}
+            </div>
+        )}
         <div className="zoom-slider-wrapper">
           <span className="zoom-label"> - </span>
             <input

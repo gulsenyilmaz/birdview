@@ -82,9 +82,9 @@ export const getColorForAge = (
 
   // Başlangıç: rgb(100, 200, 100)
   // Bitiş: rgba(240, 227, 103, 0.94)
-  const r = Math.round(100 + t * (240 - 100)); // 100 → 240
-  const g = Math.round(190 + t * (227 - 200)); // 200 → 220
-  const b = Math.round(100 + t * (103 - 100)); // 100 → 130
+  const r = Math.round(80 + t * (170 - 80));   // 80 → 160
+  const g = Math.round(170 + t * (170 - 170)); // 170 → 190
+  const b = Math.round(140 + t * (170 - 140)); // 140 → 170
 
   return [r, g, b, opacity];
 };

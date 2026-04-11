@@ -68,7 +68,7 @@
   width: 2%;
   height: auto;
 
-  margin-top: -30px;
+  margin-top: -20px;
   text-align: center;
   
   padding: 0rem;
@@ -99,8 +99,8 @@
   width: 14px;
   height: 14px;
   border: 2px solid #50ff59;
-  background-color: #0e1f89;
-  box-shadow: 0 0 0 2px #111;
+  background-color: #0e1e8900;
+  box-shadow: 0 0 0 2px #11111100;
   
   opacity: 1;
   border-radius:0px;
