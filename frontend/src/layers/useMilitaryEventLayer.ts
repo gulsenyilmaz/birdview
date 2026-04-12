@@ -38,7 +38,7 @@ export function useMilitaryEventLayer(args: {
 
     (async () => {
       const res = await fetch(
-        `${backendUrl}/allmilitaryevents?${qp.toString()}`,
+        `${backendUrl}/militaryevents?${qp.toString()}`,
         { signal: controller.signal }
       );
 

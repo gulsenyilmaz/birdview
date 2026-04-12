@@ -62,10 +62,10 @@ export default function TimeWindowSlider({
                 pushable={maxYear-minYear<100?maxYear-minYear:100}
 
                 railStyle={{ backgroundColor: "#4a4a4a74",  borderRadius:0, height: 10 }}
-                trackStyle={[{ backgroundColor: "#ae1414", borderRadius:0, height: 10 }]}
+                trackStyle={[{ backgroundColor: "#4e4e4e", borderRadius:0, height: 10 }]}
                 handleStyle={[
-                    { borderColor: "#ae1414", borderRadius:0, backgroundColor: "#ff5050", width: 5, height: 20 },
-                    { borderColor: "#ae1414", borderRadius:0, backgroundColor: "#ff5050", width: 5, height: 20 }
+                    { borderColor: "#4a4a4a74", borderRadius:0, backgroundColor: "#4a4a4a74", width: 5, height: 20 },
+                    { borderColor: "#4a4a4a74", borderRadius:0, backgroundColor: "#4a4a4a74", width: 5, height: 20 }
                 ]}
                 />
             <div className="tw-year-label"

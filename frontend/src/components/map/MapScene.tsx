@@ -91,7 +91,7 @@ const MapScene: React.FC<MapSceneProps> = ({
   
  
   const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text' | 'circle'>('text');
-  const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("age");
+  const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("nationality");
 
 
   useEffect(() => {

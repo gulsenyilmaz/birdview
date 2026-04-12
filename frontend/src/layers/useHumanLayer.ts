@@ -51,7 +51,7 @@ export function useHumanLayer(args: {
     setLoadingHumans(true);
 
     (async () => {
-      const res = await fetch(`${backendUrl}/allhumans?${qp.toString()}`, {
+      const res = await fetch(`${backendUrl}/humans?${qp.toString()}`, {
         signal: controller.signal,
       });
 

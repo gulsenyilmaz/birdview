@@ -161,13 +161,13 @@ const AppPanels: React.FC<AppPanelsProps> = ({
           </ContentStrip>
         )}
       </div>
-
-      <div className={`top-panel-dashboard ${isInitiated ? "" : "loading"} ${
+{isInitiated && ( <>
+      <div className={`top-panel-dashboard ${
             selectedObject ? (selectedMovement ? "squeezed" : "close") : ""
         }`}
         >
-        {isInitiated && (
-            <>
+        
+            
             <Dashboard humans={filteredHumans} />
             <DescriptionBanner
                 humans={filteredHumans}
@@ -178,28 +178,31 @@ const AppPanels: React.FC<AppPanelsProps> = ({
                 selectedCollection={selectedCollection}
                 onClearFilter={handleClearFilter}
             />
-            </>
-        )}
+            
+        
         </div>
 
       <div className={`left-panel ${selectedObject && !selectedMovement ? "hide" : ""}`}>
-        <FilterList
-          selectedOccupation={selectedOccupation}
-          selectedGender={selectedGender}
-          selectedNationality={selectedNationality}
-          selectedMovement={selectedMovement}
-          selectedCollection={selectedCollection}
-          setSelectedOccupation={setSelectedOccupation}
-          setSelectedGender={setSelectedGender}
-          setSelectedNationality={setSelectedNationality}
-          setSelectedMovement={setSelectedObject}
-          setSelectedCollection={setSelectedCollection}
-          setSelectedObject={setSelectedObject}
-          backendUrl={backendUrl}
-          setMovements={setMovements}
-          movements={movements}
-        />
-      </div>
+        
+            <FilterList
+            selectedOccupation={selectedOccupation}
+            selectedGender={selectedGender}
+            selectedNationality={selectedNationality}
+            selectedMovement={selectedMovement}
+            selectedCollection={selectedCollection}
+            setSelectedOccupation={setSelectedOccupation}
+            setSelectedGender={setSelectedGender}
+            setSelectedNationality={setSelectedNationality}
+            setSelectedMovement={setSelectedObject}
+            setSelectedCollection={setSelectedCollection}
+            setSelectedObject={setSelectedObject}
+            backendUrl={backendUrl}
+            setMovements={setMovements}
+            movements={movements}
+            /> 
+        
+      </div></>
+  )}
 
       {/* <div className={`bottom-worklist-panel ${selectedHuman && showWorks ? "open" : ""}`}>
         {selectedHuman && (

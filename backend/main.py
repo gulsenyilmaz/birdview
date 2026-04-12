@@ -36,7 +36,7 @@ app.add_middleware(
 DB_PATH = os.getenv("DB_PATH", "birdview.db")
 
 
-@app.get("/allhumans")
+@app.get("/humans")
 def get_humans(request: Request):
     qp = request.query_params
 
@@ -849,7 +849,7 @@ def extract_year(val):
 
     
 
-@app.get("/allmilitaryevents")
+@app.get("/militaryevents")
 def get_military_events(request: Request):
     qp = request.query_params
 

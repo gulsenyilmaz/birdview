@@ -80,8 +80,8 @@ export const getColorForAge = (
   const clampedAge = Math.min(Math.max(age, 0), 90);
   const t = clampedAge / 90;
 
-  // Başlangıç: rgb(100, 200, 100)
-  // Bitiş: rgba(240, 227, 103, 0.94)
+  // Başlangıç: rgb(80, 170, 140)
+  // Bitiş: rgba(170, 170, 170, 0.94)
   const r = Math.round(80 + t * (170 - 80));   // 80 → 160
   const g = Math.round(170 + t * (170 - 170)); // 170 → 190
   const b = Math.round(140 + t * (170 - 140)); // 140 → 170
@@ -109,7 +109,7 @@ export const getColorForAgeString = (
     
    switch (type) {
     case 'birth_place':
-      return [39, 174, 96, opacity];       // ✔ Yeşil (#27AE60)
+      return [39, 174, 96, opacity];       // ✔ Yeşil rgb(39, 174, 96)
     case 'death_place':
       return [240, 57, 43, opacity];       // ✔ Kırmızı (#C0392B)
     case 'educated_at':

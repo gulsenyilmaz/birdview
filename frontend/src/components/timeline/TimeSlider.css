@@ -169,7 +169,7 @@
   width: 93%;
   height: 100%;
 
-  padding: 0rem;
+  padding-top: 0.2rem;
 
   display: flex;
   flex-direction: column;
@@ -257,7 +257,7 @@
   display: flex;
   box-sizing: border-box;
 
-  background-color: #ae1414;
+  background-color: #4b4b4b;
   border-bottom: #ababa7d6 solid 1px;
   
   font-size: 0.8rem;

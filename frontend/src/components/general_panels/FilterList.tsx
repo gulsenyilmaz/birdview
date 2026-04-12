@@ -17,6 +17,8 @@ interface Results{
     events: any[];
 }
 interface FilterListProps {
+    backendUrl:string;
+
     selectedOccupation:Occupation| null;
     selectedGender:Gender| null;
     selectedNationality:Nationality| null;
@@ -28,12 +30,13 @@ interface FilterListProps {
     setSelectedMovement: (obj: Movement) => void;
     setSelectedCollection: (obj: Collection) => void;
     setSelectedObject: (obj: any) => void;
-    backendUrl:string;
+    
     setMovements: (movements: Movement[]) => void;
     movements: Movement[];
 }
 
 const FilterList: React.FC<FilterListProps> = ({
+    backendUrl,
     selectedOccupation,
     selectedGender,
     selectedNationality,
@@ -46,7 +49,7 @@ const FilterList: React.FC<FilterListProps> = ({
     setSelectedCollection,
 
     setSelectedObject,
-    backendUrl,
+    
     setMovements,
     movements
 
@@ -82,87 +85,130 @@ const FilterList: React.FC<FilterListProps> = ({
                 setSearchResults(data); // backend tarafında hem humans hem locations döndür
                 });
         }
-    }, [searchTerm]);
+    }, [searchTerm, backendUrl]);
 
     useEffect(() => {
+        const fetchFilters = async () => {
+            const commonParams = new URLSearchParams();
 
-        const queryParams = new URLSearchParams();
+            if (selectedOccupation) commonParams.append("occupation_id", String(selectedOccupation.id));
+            if (selectedGender) commonParams.append("gender_id", String(selectedGender.id));
+            if (selectedNationality) commonParams.append("nationality_id", String(selectedNationality.id));
+            if (selectedMovement) commonParams.append("movement_id", String(selectedMovement.id));
+            if (selectedCollection) commonParams.append("collection_id", String(selectedCollection.id));
 
-        if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
-        if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
-        if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
-        if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
+            const [movRes, occRes, genRes, natRes, colRes] = await Promise.all([
+            fetch(`${backendUrl}/movements?${commonParams.toString()}`),
+            fetch(`${backendUrl}/occupations?${commonParams.toString()}`),
+            fetch(`${backendUrl}/genders?${commonParams.toString()}`),
+            fetch(`${backendUrl}/nationalities?${commonParams.toString()}`),
+            fetch(`${backendUrl}/collections?${commonParams.toString()}`)
+            ]);
 
-        fetch(`${backendUrl}/movements/?${queryParams.toString()}`)
-        .then(res => res.json())
-        .then(data => {
-            setMovements(data.movements);  // 👈 dikkat!
-        });
-    }, [selectedGender,selectedOccupation,selectedNationality,selectedCollection]);
+            const [movData, occData, genData, natData, colData] = await Promise.all([
+            movRes.json(),
+            occRes.json(),
+            genRes.json(),
+            natRes.json(),
+            colRes.json()
+            ]);
 
-    useEffect(() => {
+            setMovements(movData.movements ?? []);
+            setOccupations(occData.occupations ?? []);
+            setGenders(genData.genders ?? []);
+            setNationalities(natData.nationalities ?? []);
+            setCollections(colData.collections ?? []);
+        };
 
-        const queryParams = new URLSearchParams();
+        fetchFilters();
+        }, [
+        backendUrl,
+        selectedOccupation,
+        selectedGender,
+        selectedNationality,
+        selectedMovement,
+        selectedCollection
+        ]);
 
-        if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
-        if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
-        if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
-        if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
+    // useEffect(() => {
 
-        fetch(`${backendUrl}/occupations/?${queryParams.toString()}`)
-        .then(res => res.json())
-        .then(data => {
-            setOccupations(data.occupations);  // 👈 dikkat!
-        });
-    }, [selectedGender,selectedNationality,selectedMovement,selectedCollection]);
+    //     const queryParams = new URLSearchParams();
 
-    useEffect(() => {
+    //     if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
+    //     if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
+    //     if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+    //     if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
 
-        const queryParams = new URLSearchParams();
+    //     fetch(`${backendUrl}/movements?${queryParams.toString()}`)
+    //     .then(res => res.json())
+    //     .then(data => {
+    //         setMovements(data.movements);  // 👈 dikkat!
+    //     });
+    // }, [selectedGender,selectedOccupation,selectedNationality,selectedCollection]);
 
-        if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
-        if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
-        if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
-        if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
+    // useEffect(() => {
 
-        fetch(`${backendUrl}/genders/?${queryParams.toString()}`)
-        .then(res => res.json())
-        .then(data => {
-            setGenders(data.genders);  // 👈 dikkat!
-        });
-    }, [selectedMovement,selectedOccupation,selectedNationality,selectedCollection]);
+    //     const queryParams = new URLSearchParams();
 
-    useEffect(() => {
+    //     if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
+    //     if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
+    //     if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+    //     if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
 
-        const queryParams = new URLSearchParams();
+    //     fetch(`${backendUrl}/occupations?${queryParams.toString()}`)
+    //     .then(res => res.json())
+    //     .then(data => {
+    //         setOccupations(data.occupations);  // 👈 dikkat!
+    //     });
+    // }, [selectedGender,selectedNationality,selectedMovement,selectedCollection]);
 
-        if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
-        if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
-        if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
-        if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
+    // useEffect(() => {
 
-        fetch(`${backendUrl}/nationalities/?${queryParams.toString()}`)
-        .then(res => res.json())
-        .then(data => {
-            setNationalities(data.nationalities);  // 👈 dikkat!
-        });
-    }, [selectedGender, selectedMovement, selectedOccupation, selectedCollection]);
+    //     const queryParams = new URLSearchParams();
 
-    useEffect(() => {
+    //     if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
+    //     if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
+    //     if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+    //     if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
 
-        const queryParams = new URLSearchParams();
+    //     fetch(`${backendUrl}/genders?${queryParams.toString()}`)
+    //     .then(res => res.json())
+    //     .then(data => {
+    //         setGenders(data.genders);  // 👈 dikkat!
+    //     });
+    // }, [selectedMovement,selectedOccupation,selectedNationality,selectedCollection]);
 
-        if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
-        if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
-        if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
-        if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+    // useEffect(() => {
 
-        fetch(`${backendUrl}/collections/?${queryParams.toString()}`)
-        .then(res => res.json())
-        .then(data => {
-            setCollections(data.collections);  // 👈 dikkat!
-        });
-    }, [selectedGender, selectedMovement, selectedOccupation, selectedNationality]);
+    //     const queryParams = new URLSearchParams();
+
+    //     if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
+    //     if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
+    //     if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
+    //     if (selectedCollection) queryParams.append("collection_id", String(selectedCollection.id));
+
+    //     fetch(`${backendUrl}/nationalities?${queryParams.toString()}`)
+    //     .then(res => res.json())
+    //     .then(data => {
+    //         setNationalities(data.nationalities);  // 👈 dikkat!
+    //     });
+    // }, [selectedGender, selectedMovement, selectedOccupation, selectedCollection]);
+
+    // useEffect(() => {
+
+    //     const queryParams = new URLSearchParams();
+
+    //     if (selectedOccupation) queryParams.append("occupation_id", String(selectedOccupation.id));
+    //     if (selectedGender) queryParams.append("gender_id", String(selectedGender.id));
+    //     if (selectedMovement) queryParams.append("movement_id", String(selectedMovement.id));
+    //     if (selectedNationality) queryParams.append("nationality_id", String(selectedNationality.id));
+
+    //     fetch(`${backendUrl}/collections?${queryParams.toString()}`)
+    //     .then(res => res.json())
+    //     .then(data => {
+    //         setCollections(data.collections);  // 👈 dikkat!
+    //     });
+    // }, [selectedGender, selectedMovement, selectedOccupation, selectedNationality]);
 
     useEffect(() => {
 
