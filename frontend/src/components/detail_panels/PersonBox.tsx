@@ -56,9 +56,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
    
     
     const renderList = (
-        locations: any[] | undefined,
-        
-        action: string
+        locations: any[] | undefined
         ) => {
         if (!locations || locations.length === 0) return null;
 
@@ -343,31 +341,31 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                     {selectedTab === "cv" && (
                         
                         <div className="cv_content">
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "birth_place"),  "was born here")}
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "residence"), "lived here")}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "birth_place"))}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "residence"))}
 
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "educated_at"), "was educated here")}
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "work_location"), "worked here")}
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "death_place"), "passed away here")}
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "buried_at"), "buried at here")}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "educated_at"))}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "work_location"))}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "death_place"))}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "buried_at"))}
                         </div>
                     )}
                     {selectedTab === "family" && (
                         
                         <div className="cv_content">
-                            {renderList(family.filter(l => l.relationship_type_name == "mother"),  "mother")}
-                            {renderList(family.filter(l => l.relationship_type_name == "father"), "father")}
+                            {renderList(family.filter(l => l.relationship_type_name == "mother"))}
+                            {renderList(family.filter(l => l.relationship_type_name == "father"))}
 
-                            {renderList(family.filter(l => l.relationship_type_name == "sibling"), "sibling")}
-                            {renderList(family.filter(l => l.relationship_type_name == "child"), "child")}
-                            {renderList(family.filter(l => l.relationship_type_name == "spouse"), "spouse")}
-                            {renderList(family.filter(l => l.relationship_type_name == "madigudisi"), "madigudisi")}
+                            {renderList(family.filter(l => l.relationship_type_name == "sibling"))}
+                            {renderList(family.filter(l => l.relationship_type_name == "child"))}
+                            {renderList(family.filter(l => l.relationship_type_name == "spouse"))}
+                            {renderList(family.filter(l => l.relationship_type_name == "madigudisi"))}
                         </div>
                     )}
                     {selectedTab === "professional" && (
                         
                         <div className="cv_content">
-                            {renderList(professional, "worked here")}
+                            {renderList(professional)}
                         </div>
                     )}
 
