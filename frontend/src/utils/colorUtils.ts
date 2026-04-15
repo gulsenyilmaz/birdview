@@ -150,7 +150,7 @@ export const getColorForAgeString = (
       return [26, 188, 156, opacity];   // 🎓 öğrenci → turkuaz
 
     case 'student of':
-      return [22, 160, 133, opacity];   // 🎓 hocası → koyu turkuaz
+      return [22, 50, 133, opacity];   // 🎓 hocası → koyu turkuaz
 
     case 'collaborator':
       return [127, 140, 141, opacity];  // 🤝 işbirliği → gri

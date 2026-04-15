@@ -13,7 +13,7 @@ interface LayerHistogramProps {
   binAggregation?: "avg" | "sum";
   layerTypeName:string;
   showLayer?: boolean;
-  setShowLayer?: (ch: boolean) => void;
+  setShowLayer: (ch: boolean) => void;
 }
 
 const LayerHistogram: React.FC<LayerHistogramProps> = ({
@@ -41,6 +41,8 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
     if (span <= 1500) return 10;
     return 20;
   }, [minYear, maxYear]);
+
+  
 
   const { bins, maxVal } = useMemo(() => {
     if (!aliveCounts.length) return { bins: [] as Array<{start:number; end:number; value:number}>, maxVal: 0 };
@@ -83,6 +85,14 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
   const getWidthPercentForBin = (size: number): number =>
     (size / totalRange) * 100;
 
+   const handleShowAction = () => {
+    
+      setShowLayer(showLayer ? false : true);
+    
+   
+    
+  };
+
   return (
     // <div className="component-container">
       <div className="time-container" >
@@ -99,10 +109,11 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
                 return (
                   <div
                     key={`${b.start}-${i}`}
-                    className={`hist-bar ${b.value > 0 ? "active" : ""}`}
+                    className={`hist-bar ${showLayer? (b.value > 0 ? "active" : "") : "disabled"}`}
                     style={{ left: `${left}%`, width: `${width}%`, height: `${height}%`, color:getLayerColor(layerTypeName) }}
                     title={`${b.start}–${b.end}: ${binAggregation === "avg" ? "avg" : "sum"}=${b.value.toFixed(0)}`}
-                    onClick={() => b.value > 0 && setSelectedYear(b.start)}
+                    
+                    onClick={showLayer ? () => b.value > 0 && setSelectedYear(b.start) : undefined}
                   />
                 );
               })}
@@ -112,16 +123,9 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
         </div>
 
         <div className="label-group" style={{ color:getLayerColor(layerTypeName) }}>
-          <label>
-              <span className="label-title">{layerTypeName}</span>
-              <input
-                  type="checkbox"
-                  checked={showLayer}
-                  style={{ color:getLayerColor(layerTypeName) }}
-                  onChange={(e) => setShowLayer && setShowLayer(e.target.checked)}
-                />
-            
-          </label>
+         <button className={`label-button ${showLayer ? "active" : ""}`} style={{backgroundColor:getLayerColor(layerTypeName) }} onClick={handleShowAction}>
+            {layerTypeName}
+          </button>
         </div>
       
       </div>

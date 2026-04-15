@@ -140,11 +140,11 @@ export function buildWorkCountsByCreatedDate(
 
   // yıl -> o yıl üretilen eser sayısı
   const counts = new Map<number, number>();
-  console.log("buildWorkCountsByCreatedDate", works)
+  // console.log("buildWorkCountsByCreatedDate", works)
   for (const w of works) {
     const y = coerceYear(w.created_date);
 
-    console.log("coerceYear", y)
+    // console.log("coerceYear", y)
     if (y == null) continue;
     if (y < minY || y > maxY) continue;
 

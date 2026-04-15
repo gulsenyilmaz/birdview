@@ -37,11 +37,10 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   const stripRef = useRef<HTMLDivElement | null>(null);
 
   const [alltime_minYear, alltime_maxYear] = fullRange;
-  const alltime_totalRange = alltime_maxYear - alltime_minYear;
   const [minYear, maxYear] = windowRange;
   const totalRange = maxYear - minYear;
 
-  const [zoom, setZoom] = useState(totalRange);
+ 
 
   const step = useMemo(() => {
     const span = maxYear - minYear;
@@ -56,35 +55,6 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
     return 1000;
   }, [minYear, maxYear]);
 
-  useEffect(() => {
-    setZoom(maxYear - minYear);
-  }, [minYear, maxYear]);
-
-  const recalculateWindowRange = (n_totalRange:number) => {
-    const centerYear = (minYear + maxYear) / 2;
-    const halfRange = n_totalRange / 2;
-    let newMin = Math.max(alltime_minYear, Math.floor(centerYear - halfRange));
-    let newMax = Math.min(alltime_maxYear, Math.ceil(centerYear + halfRange));
-
-    // Sınır kontrolleri
-    if (newMin === alltime_minYear) {
-      newMax = newMin + n_totalRange;
-    } else if (newMax === alltime_maxYear) {
-      newMin = newMax - n_totalRange;
-    }
-
-    // Eğer seçili yıl yeni aralığın dışındaysa, onu da ortala
-    if (selectedYear < newMin || selectedYear > newMax) {
-      const adjustedCenter = Math.min(
-        Math.max(selectedYear, alltime_minYear + halfRange),
-        alltime_maxYear - halfRange
-      );
-      newMin = Math.floor(adjustedCenter - halfRange);
-      newMax = Math.ceil(adjustedCenter + halfRange);
-    }
-
-    setWindowRange([newMin, newMax]);
-  }
 
   const getLeftPercent = (year: number): number =>
     ((year - minYear) / totalRange) * 100;
@@ -175,7 +145,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   return (
     <div className="component-container">
        
-      <div className={`zoom-container ${detailMode ? "hide" : ""}`}>
+      <div className={`movements-container ${detailMode ? "hide" : ""}`}>
         {movements && movements.length>0 && (
             <div className="movements-wrapper">
                 
@@ -207,22 +177,10 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
 
             </div>
         )}
-        <div className="zoom-slider-wrapper">
-          <span className="zoom-label"> - </span>
-            <input
-                // className="zoom-slider"
-                type="range"
-                min= {100}
-                max={alltime_totalRange}
-                step={1}
-                value={zoom}
-                onChange={(e) => {
-                  const v = Number(e.target.value);
-                  // setZoom(v);
-                  recalculateWindowRange(v);
-                }}
-              />
-          <span className="zoom-label"> + </span>
+        <div className="label-group">
+          <button className="label-button" style={{backgroundColor:'#ebbe09' }} onClick={() => setManualMode(true)}>
+            Movements
+            </button>
         </div>
       </div>
       <div className="time-container">

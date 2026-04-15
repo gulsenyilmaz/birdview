@@ -39,7 +39,7 @@ interface AppPanelsProps {
 
  
   setHumanLocations: React.Dispatch<React.SetStateAction<Location[]>>;
-  setHumanRelatives: React.Dispatch<React.SetStateAction<HumanRelative[]>>;
+  setHumanRelations: React.Dispatch<React.SetStateAction<HumanRelative[]>>;
 
   selectedOccupation: Occupation | null;
   selectedGender: Gender | null;
@@ -75,7 +75,7 @@ const AppPanels: React.FC<AppPanelsProps> = ({
   selectedMilitaryEvent,
   selectedMovement,
   setHumanLocations,
-  setHumanRelatives,
+  setHumanRelations,
   selectedOccupation,
   selectedGender,
   selectedNationality,
@@ -126,7 +126,7 @@ const AppPanels: React.FC<AppPanelsProps> = ({
             <PersonBox
               person={selectedHuman}
               setHumanLocations={setHumanLocations}
-              setHumanRelatives={setHumanRelatives}
+              setHumanRelations={setHumanRelations}
               setManualMode={setManualMode}
             />
           )}

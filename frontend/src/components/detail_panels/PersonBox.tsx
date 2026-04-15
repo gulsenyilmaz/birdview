@@ -5,12 +5,12 @@ import type { Location } from "../../entities/Location";
 import Legend from "../Legend";
 import { getColorForRelationTypeString } from "../../utils/colorUtils";
 import './PersonBox.css';
-import { resolveCommonsThumb } from "../../utils/commons"
+// import { resolveCommonsThumb } from "../../utils/commons"
 
 interface PersonBoxProps {
   person:Human;
   setHumanLocations: (arr: Location[]) => void;
-  setHumanRelatives:(arr: HumanRelative[]) => void;
+  setHumanRelations:(arr: HumanRelative[]) => void;
 //   setSelectedObjectThumbnail: (str:string | null) => void;
   setManualMode:(obj: boolean) => void
   
@@ -25,21 +25,29 @@ interface PersonDetails {
   collections: string[];
   citizenships: string[];
   locations: Location[];
-  relatives:HumanRelative[];
+  family: HumanRelative[];
+  professional: HumanRelative[];
+  intellectual: HumanRelative[];
+  social: HumanRelative[];
+  political: HumanRelative[];
   nationality: string;
   gender: string;
 }
 
-const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHumanRelatives, setManualMode}) => {
+const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHumanRelations, setManualMode}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [personDetails, setPersonDetails] = useState<PersonDetails | null>(null);
     const [cv_locations, setCvLocations] = useState<Location[]>([]);
     const [museums, setMuseums] = useState<Location[]>([]);
-    const [relatives, setRelatives] = useState<HumanRelative[]>([]);
+    const [family, setFamily] = useState<HumanRelative[]>([]);
+    const [professional, setProfessional] = useState<HumanRelative[]>([]);
+    const [intellectual, setIntellectual] = useState<HumanRelative[]>([]);
+    const [social, setSocial] = useState<HumanRelative[]>([]);
+    const [political, setPolitical] = useState<HumanRelative[]>([]);    
     const [uniqueTypes, setUniqueTypes] = useState<string[]>([]);
    
-    const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "profession"| "museums">("cv");
+    const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "professional"| "museums">("cv");
     const [fallbackImage, setFallbackImage] = useState<string | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateError, setUpdateError] = useState<string | null>(null);
@@ -47,7 +55,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
 
    
     
-    const renderLocationList = (
+    const renderList = (
         locations: any[] | undefined,
         
         action: string
@@ -60,7 +68,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                     <li key={idx}>
                     {loc.start_date} 
                     {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} {loc.qid}— <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
-                        {action}
+                        {loc.relationship_type_name}
                         </em>
                     </li>
                 ))}
@@ -86,7 +94,17 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                             setMuseums(museum_locs);
                             setCvLocations(cv_locs);                                                       
                             setHumanLocations(cv_locs);
-                            setRelatives(data.relatives)
+                            setFamily(data.family);
+                            setProfessional(data.professional);
+                            setIntellectual(data.intellectual);
+                            setSocial(data.social);
+                            setPolitical(data.political);
+
+                            setUniqueTypes( Array.from(
+                                new Set(
+                                    cv_locs.map(l => l.relationship_type_name)
+                                )
+                            ))
                         }
                         // setSelectedObjectThumbnail(data.img_url);
                         if (!data.img_url) {
@@ -98,19 +116,19 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
     }, [person, isUpdating]);
 
 
-    useEffect(() => {
-        (async () => {
-            if (!personDetails?.img_url) { 
-                // setSelectedObjectThumbnail(null); 
-                return; 
-            }
+    // useEffect(() => {
+    //     (async () => {
+    //         if (!personDetails?.img_url) { 
+    //             // setSelectedObjectThumbnail(null); 
+    //             return; 
+    //         }
                 
-                const url = await resolveCommonsThumb(personDetails.img_url, 256);
+    //             const url = await resolveCommonsThumb(personDetails.img_url, 256);
 
-                console.log("selectedObjectThumbnail2: ", url)
-                // setSelectedObjectThumbnail(url);
-        })();
-    }, [personDetails]);
+                
+    //             // setSelectedObjectThumbnail(url);
+    //     })();
+    // }, [personDetails]);
 
 
     useEffect(() => {
@@ -119,7 +137,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
         if (selectedTab=="cv") {
             setManualMode(false)
             setHumanLocations(cv_locations);
-            setHumanRelatives([]);
+            setHumanRelations([]);
             setUniqueTypes( Array.from(
                 new Set(
                     cv_locations.map(l => l.relationship_type_name)
@@ -129,23 +147,34 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
          }
          else if(selectedTab=="family"){
             setManualMode(false)
-            setHumanRelatives((relatives as HumanRelative[]).filter(l => l.relationship_type_name !== "influenced by"))
+            setHumanRelations(family)
             setHumanLocations([]);
             setUniqueTypes( Array.from(
                 new Set(
-                    relatives.map(l => l.relationship_type_name)
+                    family.map(l => l.relationship_type_name)
                 )
             ))
          }
-         else if(selectedTab=="profession"){
+         else if(selectedTab=="professional"){
+            
             setManualMode(false)
-            setHumanRelatives((relatives as HumanRelative[]).filter(l => l.relationship_type_name === "influenced by"))
+            setHumanRelations(intellectual.concat(professional).concat(social).concat(political))
             setHumanLocations([]);
+            setUniqueTypes( Array.from(
+                new Set(
+                    professional.map(l => l.relationship_type_name)
+                )
+            ))
          }
          else if(selectedTab=="museums"){
             setManualMode(false)
             setHumanLocations(museums);
-            setHumanRelatives([]);
+            setHumanRelations([]);
+            setUniqueTypes( Array.from(
+                new Set(
+                    museums.map(l => l.relationship_type_name)
+                )
+            ))
          }
          else{
             setHumanLocations([]);
@@ -298,8 +327,8 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                             Family
                         </button>
                         <button
-                            className={selectedTab === "profession" ? "active" : ""}
-                            onClick={() => setSelectedTab("profession")}
+                            className={selectedTab === "professional" ? "active" : ""}
+                            onClick={() => setSelectedTab("professional")}
                         >
                             Professional Life
                         </button>
@@ -314,38 +343,37 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                     {selectedTab === "cv" && (
                         
                         <div className="cv_content">
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "birth_place"),  "was born here")}
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "residence"), "lived here")}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "birth_place"),  "was born here")}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "residence"), "lived here")}
 
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "educated_at"), "was educated here")}
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "work_location"), "worked here")}
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "death_place"), "passed away here")}
-                            {renderLocationList(cv_locations.filter(l => l.relationship_type_name == "buried_at"), "buried at here")}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "educated_at"), "was educated here")}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "work_location"), "worked here")}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "death_place"), "passed away here")}
+                            {renderList(cv_locations.filter(l => l.relationship_type_name == "buried_at"), "buried at here")}
                         </div>
                     )}
                     {selectedTab === "family" && (
                         
                         <div className="cv_content">
-                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "mother"),  "mother")}
-                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "father"), "father")}
+                            {renderList(family.filter(l => l.relationship_type_name == "mother"),  "mother")}
+                            {renderList(family.filter(l => l.relationship_type_name == "father"), "father")}
 
-                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "sibling"), "sibling")}
-                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "child"), "child")}
-                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "spouse"), "spouse")}
-                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "madigudisi"), "madigudisi")}
+                            {renderList(family.filter(l => l.relationship_type_name == "sibling"), "sibling")}
+                            {renderList(family.filter(l => l.relationship_type_name == "child"), "child")}
+                            {renderList(family.filter(l => l.relationship_type_name == "spouse"), "spouse")}
+                            {renderList(family.filter(l => l.relationship_type_name == "madigudisi"), "madigudisi")}
                         </div>
                     )}
-                    {selectedTab === "profession" && (
+                    {selectedTab === "professional" && (
                         
                         <div className="cv_content">
-                            {renderLocationList(relatives.filter(l => l.relationship_type_name == "influenced by"),  "influenced by")}
-                          
+                            {renderList(professional, "worked here")}
                         </div>
                     )}
 
                     {/* {selectedTab === "museums" && (
                     <div className="cv_content">
-                        {renderLocationList(museums, "has works here")}
+                        {renderList(museums, "has works here")}
                     </div>
                     )}  */}
                 

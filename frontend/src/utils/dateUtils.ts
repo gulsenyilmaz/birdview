@@ -59,7 +59,7 @@ export function getFullRange<T extends Record<string, any>>(
     someoneAlive = items.some((item) => {
       const birth = item[start];
       const death = item[end];
-      console.log(`getFullRange [${mode}] -> typeof death: ${typeof death}, death: ${death}`);
+      // console.log(`getFullRange [${mode}] -> typeof death: ${typeof death}, death: ${death}`);
       return (
         typeof birth === "number" &&
         (
@@ -85,7 +85,7 @@ export function getFullRange<T extends Record<string, any>>(
     ? Math.max(...endYears)
     : currentYear;
 
-  console.log(`getFullRange [${mode}] -> min: ${min}, max: ${max}, someoneAlive: ${someoneAlive}`);
+  // console.log(`getFullRange [${mode}] -> min: ${min}, max: ${max}, someoneAlive: ${someoneAlive}`);
 
   return [min, max];
 }
@@ -103,13 +103,13 @@ export function getFullRangeByYearField<T extends Record<string, any>>(
     .map((item) => item[yearField] as unknown)
     .filter((y): y is number => typeof y === "number");
   
-  console.log(`getFullRangeByYearField fallback: ${fallback}`);
+  // console.log(`getFullRangeByYearField fallback: ${fallback}`);
   if (years.length === 0) return fallback;
 
   const rawMin = Math.min(...years);
   const rawMax = Math.max(...years);
 
-  console.log(`getFullRangeByYearField min: ${rawMin}, max: ${rawMax}`);
+  // console.log(`getFullRangeByYearField min: ${rawMin}, max: ${rawMax}`);
 
   const min = rawMin < clampMin ? clampMin : rawMin;
   const max = rawMax;

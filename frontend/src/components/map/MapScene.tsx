@@ -30,14 +30,16 @@ import { computeBounds, offsetFibonacciPosition } from "../../utils/locationUtil
 
 
 
-
 type ViewStateType = {
   latitude: number;
   longitude: number;
   zoom: number;
   pitch: number;
   bearing: number;
+  transitionInterpolator?: FlyToInterpolator;
+  transitionDuration?: number | 'auto';
 };
+
 
 const INITIAL_VIEW_STATE: ViewStateType = {
   latitude: 20,
@@ -53,7 +55,7 @@ interface MapSceneProps {
 
   humanLocations:Location[];
   humans:Human[];
-  humanRelatives:HumanRelative[];
+  humanRelations:HumanRelative[];
   militaryEvents:MilitaryEvent[];
   works:Work[];
   selectedYear:number;
@@ -71,7 +73,7 @@ interface MapSceneProps {
 const MapScene: React.FC<MapSceneProps> = ({
                                               humanLocations,
                                               humans,
-                                              humanRelatives,
+                                              humanRelations,
                                               militaryEvents,
                                               works,
                                               selectedYear,
@@ -98,12 +100,12 @@ const MapScene: React.FC<MapSceneProps> = ({
     if(showHumans){
       const enrichedHumans: HumanEnriched[] = humans.filter(h => h.birth_date<1700 || h.num_of_identifiers>30).map((h) => {
           const age = selectedYear - h.birth_date;
-          
+          const seed = h.id % 10;
           let fillColor: [number, number, number, number];
           let fillTColor: [number, number, number, number];
           let [lonOffsetSource, latOffsetSource] = offsetFibonacciPosition(h.lon, h.lat, age, viewState.zoom, h.city_index || 0);
-          let lonOffsetTarget = lonOffsetSource + Math.random()*10;
-          let latOffsetTarget = latOffsetSource + Math.random()*10;
+          let lonOffsetTarget = lonOffsetSource + seed;
+          let latOffsetTarget = latOffsetSource + seed;
           
           switch (colorFilterType) {
             case "gender":
@@ -140,7 +142,7 @@ const MapScene: React.FC<MapSceneProps> = ({
 
   useEffect(() => {
     if(isHuman(selectedObject)){
-      const enrichedHumanRelatives: HumanRelativeEnriched[] = humanRelatives.filter(h => h.birth_date<selectedYear ).map((h) => {
+      const enrichedHumanRelatives: HumanRelativeEnriched[] = humanRelations.filter(h => h.birth_date<selectedYear ).map((h) => {
           const age = (h.death_date && (selectedYear>h.death_date)?h.death_date:selectedYear) - h.birth_date;
           
           let [lonOffsetSource, latOffsetSource] = offsetFibonacciPosition(h.lon, h.lat, age*2, viewState.zoom, h.index*15 || 0);
@@ -156,7 +158,7 @@ const MapScene: React.FC<MapSceneProps> = ({
         setProcessedHumanRelatives(enrichedHumanRelatives);
       }
 
-  }, [selectedObject, humanRelatives, selectedYear, viewState.zoom]);
+  }, [selectedObject, humanRelations, selectedYear, viewState.zoom]);
 
   useEffect(() => {
     if (manualMode) return;
@@ -169,7 +171,7 @@ const MapScene: React.FC<MapSceneProps> = ({
     }
 
     if(isHuman(selectedObject)){
-      combinedLocations.push(...humanRelatives.map(l => ({ lon: l.lon, lat: l.lat })));
+      combinedLocations.push(...humanRelations.map(l => ({ lon: l.lon, lat: l.lat })));
       combinedLocations.push(...humanLocations.map(l => ({ lon: l.loc_lon, lat: l.loc_lat })));
     }
 
@@ -251,9 +253,12 @@ const layers = useMemo(() => {
 }, [selectedObject, showEvents, showHumans, showWorks, humanLocations, processedHumanRelatives, processedHumans, viewState.zoom, selectedLayerType,  militaryEvents]);
 
   return (
-    <div>
-      <div>
+      <div className="map-scene-root">
+    <div className="map-canvas">
+  
         <DeckGL
+        width="100%"
+        height="100%"
           views={new MapView({repeat: false})}
           layers={layers}
           viewState={viewState}
@@ -292,7 +297,7 @@ const layers = useMemo(() => {
 
           >
           <Map
-            reuseMaps
+            
             id="map"
             mapLib={maplibregl}
             mapStyle={MAP_STYLE}

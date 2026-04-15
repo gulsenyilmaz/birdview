@@ -246,11 +246,13 @@ def get_person_details(human_id: int):
         """
         SELECT h.id, h.name, h.num_of_identifiers, h.qid AS qid, h.birth_date, h.death_date, 
         hrt.name AS relationship_type_name, 
+        rc.name AS relationship_category_name,
         hh.start_date, hh.end_date, 
         l.lat AS lat, l.lon AS lon
         FROM human_human AS hh
         JOIN humans AS h ON h.id = hh.related_human_id
         JOIN human_relationship_types AS hrt ON hrt.id = hh.relationship_type_id
+        INNER JOIN relationship_categories rc ON rc.id = hrt.category_id
         INNER JOIN human_location hl ON hl.human_id = hh.related_human_id
         INNER JOIN locations l ON hl.location_id = l.id
        
@@ -261,10 +263,42 @@ def get_person_details(human_id: int):
     """,
         (human_id,),
     )
+    results = cur.fetchall()
+    allowed_categories = {"professional", "intellectual", "social", "political"}
 
-    relatives = [dict(row) for row in cur.fetchall()]
+    
+    professional = [dict(row) for row in results if row["relationship_category_name"] in allowed_categories] 
+    intellectual = [dict(row) for row in results if row["relationship_category_name"] == "intellectual"]
+    social = [dict(row) for row in results if row["relationship_category_name"] == "social"]
+    political = [dict(row) for row in results if row["relationship_category_name"] == "political"]
+    family = [dict(row) for row in results if row["relationship_category_name"] == "family"]
+    
     index = 0
-    for h in relatives:
+    for h in family:
+        h["entity_type"] = "human"
+        index += 1
+        h["index"] = index
+    
+    index = 0
+    for h in professional:
+        h["entity_type"] = "human"
+        index += 1
+        h["index"] = index
+
+    index = 0
+    for h in intellectual:
+        h["entity_type"] = "human"
+        index += 1
+        h["index"] = index
+
+    index = 0
+    for h in political:
+        h["entity_type"] = "human"
+        index += 1
+        h["index"] = index
+
+    index = 0
+    for h in social:
         h["entity_type"] = "human"
         index += 1
         h["index"] = index
@@ -333,8 +367,14 @@ def get_person_details(human_id: int):
         "movements": movs,
         "collections": colls,
         "citizenships": citizs,
-        "relatives":relatives,
-        "relatives":relatives,
+        
+        "family": family,
+        "professional": professional,
+        "intellectual": intellectual,
+        "social": social,
+        "political": political
+
+
     }
 
 

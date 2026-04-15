@@ -135,7 +135,6 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           showLayer={showDisasters}
           setShowLayer={setShowDisasters}
         />
-      </TimeSlider>
 
       <TimeWindowSlider
         fullRange={activeFullRange}
@@ -145,6 +144,9 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
         selectedYear={selectedYear}
         detailMode={detailMode}
       />
+      </TimeSlider>
+
+      
     </div>
     </>
   );

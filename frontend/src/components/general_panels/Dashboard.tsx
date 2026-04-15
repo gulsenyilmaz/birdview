@@ -132,29 +132,29 @@ const Dashboard: React.FC<DashboardProps> = ({ humans }) => {
   }));
 
   const renderHorizontalBarChart = (data: ChartItem[]) => {
-    const yAxisWidth = getYAxisWidth(data);
+  const yAxisWidth = getYAxisWidth(data);
 
-    return (
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} layout="vertical" margin={chartMargin}>
-          <XAxis type="number" hide />
-          <YAxis
-            type="category"
-            dataKey="label"
-            width={yAxisWidth}
-            axisLine={false}
-            tickLine={false}
-            tick={commonAxisStyle}
-          />
-          <Bar
-            dataKey="value"
-            shape={<CustomBarShape />}
-            isAnimationActive={false}
-          />
-        </BarChart>
-      </ResponsiveContainer>
-    );
-  };
+  return (
+    <ResponsiveContainer width="100%" height={120}>
+      <BarChart data={data} layout="vertical" margin={chartMargin}>
+        <XAxis type="number" hide />
+        <YAxis
+          type="category"
+          dataKey="label"
+          width={yAxisWidth}
+          axisLine={false}
+          tickLine={false}
+          tick={commonAxisStyle}
+        />
+        <Bar
+          dataKey="value"
+          shape={<CustomBarShape />}
+          isAnimationActive={false}
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+};
 
   return (
     <>

@@ -1,20 +1,21 @@
-import { Suspense, lazy } from "react";
+// import { Suspense, lazy } from "react";
 import type { Human } from "../entities/Human";
 import type { HumanRelative } from "../entities/HumanRelative";
 import type { Location } from "../entities/Location";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import type { Work } from "../entities/Work";
 import type { SelectedObject } from "../hooks/useAppSelection";
+import './map/MapScene.css';
+import MapScene from "./map/MapScene";
 
-
-const MapScene = lazy(() => import("./map/MapScene"));
+// const MapScene = lazy(() => import("./map/MapScene"));
 
 interface MapSectionProps {
   humanLocations: Location[];
   humans: Human[];
   militaryEvents: MilitaryEvent[];
   works: Work[];
-  humanRelatives: HumanRelative[];
+  humanRelations: HumanRelative[];
   selectedYear: number;
   setSelectedObject: React.Dispatch<React.SetStateAction<SelectedObject>>;
   selectedObject: SelectedObject;
@@ -31,7 +32,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   humans,
   militaryEvents,
   works,
-  humanRelatives,
+  humanRelations,
   selectedYear,
   setSelectedObject,
   selectedObject,
@@ -43,26 +44,27 @@ const MapSection: React.FC<MapSectionProps> = ({
   setManualMode,
 }) => {
   return (
-    <div className="scene">
-      <Suspense fallback={<div>fsşlkjfsd</div>}>
-        <MapScene
-          humanLocations={humanLocations}
-          humans={humans}
-          militaryEvents={militaryEvents}
-          works={works}
-          humanRelatives={humanRelatives}
-          selectedYear={selectedYear}
-          setSelectedObject={setSelectedObject}
-          selectedObject={selectedObject}
-          detailMode={detailMode}
-          showEvents={showEvents}
-          showHumans={showHumans}
-          showWorks={showWorks}
-          manualMode={manualMode}
-          setManualMode={setManualMode}
-        />
-      </Suspense>
-    </div>
+   
+        <div className="map-shell">
+          <MapScene
+            humanLocations={humanLocations}
+            humans={humans}
+            militaryEvents={militaryEvents}
+            works={works}
+            humanRelations={humanRelations}
+            selectedYear={selectedYear}
+            setSelectedObject={setSelectedObject}
+            selectedObject={selectedObject}
+            detailMode={detailMode}
+            showEvents={showEvents}
+            showHumans={showHumans}
+            showWorks={showWorks}
+            manualMode={manualMode}
+            setManualMode={setManualMode}
+          />
+        </div>
+   
+  
   );
 };
 

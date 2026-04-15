@@ -39,7 +39,7 @@ function App() {
   
   const [windowRange, setWindowRange] = useState<[number, number]>([-800, 1950]);
   const [movements, setMovements] = useState<Movement[]>([]); 
-  const [humanRelatives, setHumanRelatives] = useState<HumanRelative[]>([]);
+  const [humanRelations, setHumanRelations] = useState<HumanRelative[]>([]);
 
   const [showHumans, setShowHumans] = useState(true);
   const [showEvents, setShowEvents] = useState(false);
@@ -154,7 +154,25 @@ function App() {
             }
           } />
           }
-        
+          <div className="scene">
+         <MapSection
+          humanLocations={humanLocations}
+          humans={humanLayer.filteredHumans}
+          militaryEvents={militaryLayer.filteredMilitaryEvents}
+          works={workLayer.filteredWorks}
+          humanRelations={humanRelations}
+          selectedYear={selectedYear}
+          setSelectedObject={setSelectedObject}
+          selectedObject={selectedObject}
+          detailMode={detailMode}
+          showEvents={showEvents}
+          showHumans={showHumans}
+          showWorks={showWorks}
+          manualMode={manualMode}
+          setManualMode={setManualMode}
+        />
+        </div>
+        <div className="overlay-layer">
         <AppPanels
           selectedYear={selectedYear}
           detailMode={detailMode}
@@ -172,7 +190,7 @@ function App() {
           selectedMilitaryEvent={selectedMilitaryEvent}
           selectedMovement={selectedMovement}
           setHumanLocations={setHumanLocations}
-          setHumanRelatives={setHumanRelatives}
+          setHumanRelations={setHumanRelations}
           selectedOccupation={selectedOccupation}
           selectedGender={selectedGender}
           selectedNationality={selectedNationality}
@@ -186,23 +204,6 @@ function App() {
           setMovements={setMovements}
           filteredHumans={humanLayer.filteredHumans}
           filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
-          setManualMode={setManualMode}
-        />
-       
-        <MapSection
-          humanLocations={humanLocations}
-          humans={humanLayer.filteredHumans}
-          militaryEvents={militaryLayer.filteredMilitaryEvents}
-          works={workLayer.filteredWorks}
-          humanRelatives={humanRelatives}
-          selectedYear={selectedYear}
-          setSelectedObject={setSelectedObject}
-          selectedObject={selectedObject}
-          detailMode={detailMode}
-          showEvents={showEvents}
-          showHumans={showHumans}
-          showWorks={showWorks}
-          manualMode={manualMode}
           setManualMode={setManualMode}
         />
 
@@ -231,6 +232,10 @@ function App() {
           humanAliveCounts={humanLayer.aliveCounts}
           militaryEventCounts={militaryLayer.eventCounts}
         />
+       </div>
+       
+
+        
        
       </div>
     </div>
