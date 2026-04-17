@@ -27,17 +27,13 @@
   box-sizing: border-box;
 
   align-items: center;
-  align-content: justify;
-  justify-content: space-between;
+  align-content: center;
+  justify-content: center;
 
   border: none;
   background-color: transparent;
 
 }
-
-
-
-
 
 .tw-year-label {
   position: absolute;
@@ -50,8 +46,9 @@
   
   padding: 0rem;
   font-size:1dvb;
-  font-family: 'Inter', sans-serif;
-  color: #4d4c4c;
+  
+  color: #373737;
+  
   
   font-weight: bold;
   user-select: none;
@@ -104,7 +101,7 @@
   width: 5%;
   height: 100%;
 
-  /* padding: 0.3rem; */
+  padding: 0.2dvw;
   
   display: flex;
   flex-direction: row;
@@ -151,6 +148,8 @@
 
   width: 0.5dvw;
   height: 1.5dvh;
+
+   
 
   background: #282727e0;
   border-radius: 0px;

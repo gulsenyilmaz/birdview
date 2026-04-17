@@ -3,7 +3,7 @@ import { TextLayer } from '@deck.gl/layers';
 import { CollisionFilterExtension } from "@deck.gl/extensions";
 import type { CollisionFilterExtensionProps } from "@deck.gl/extensions";
 
-import type { HumanRelativeEnriched } from "../entities/HumanRelativeEnriched";
+import type { RelatedHumanEnriched } from "../entities/RelatedHumanEnriched";
 // import type { Human } from "../entities/Human";
 import type { Location } from "../entities/Location";
 import {getColorForRelationType } from "../utils/colorUtils";
@@ -12,7 +12,7 @@ import { existsThatYear } from "../utils/dateUtils"
 
 
 type SelectedHumanLayerParams = {
-  processedHumanRelatives: HumanRelativeEnriched[];
+  processedRelatedHumans: RelatedHumanEnriched[];
   humanLocations:Location[];
   selectedYear: number;
   // selectedObject:Human;
@@ -22,7 +22,7 @@ type SelectedHumanLayerParams = {
 };
 
 export function createSelectedHumanLayers({
-  processedHumanRelatives,
+  processedRelatedHumans,
   humanLocations,
   selectedYear,
   // selectedObject,
@@ -51,17 +51,15 @@ export function createSelectedHumanLayers({
         )
     );
 
-    
-
     layers.push(
-      new LineLayer<HumanRelativeEnriched>(
+      new LineLayer<RelatedHumanEnriched>(
           {
             id: 'HumanLineLayer',
-            data: processedHumanRelatives,
+            data: processedRelatedHumans,
             
-            getColor: (d: HumanRelativeEnriched) => getColorForRelationType(d.relationship_type_name, existsThatYear(d.start_date, d.end_date, selectedYear)?100:50), 
-            getSourcePosition: (d: HumanRelativeEnriched) => [d.lon, d.lat],
-            getTargetPosition: (d: HumanRelativeEnriched) => [d.lonOffsetSource, d.latOffsetSource],
+            getColor: (d: RelatedHumanEnriched) => getColorForRelationType(d.relationship_type_name, existsThatYear(d.start_date, d.end_date, selectedYear)?100:50), 
+            getSourcePosition: (d: RelatedHumanEnriched) => [d.lon, d.lat],
+            getTargetPosition: (d: RelatedHumanEnriched) => [d.lonOffsetSource, d.latOffsetSource],
             getWidth: 1.7,
             pickable: true
       
@@ -70,9 +68,9 @@ export function createSelectedHumanLayers({
     );
 
     layers.push(
-      new TextLayer<HumanRelativeEnriched, CollisionFilterExtensionProps<HumanRelativeEnriched>>({
+      new TextLayer<RelatedHumanEnriched, CollisionFilterExtensionProps<RelatedHumanEnriched>>({
         id: 'humans-relatives-text-layer',
-        data: processedHumanRelatives,
+        data: processedRelatedHumans,
         characterSet: 'auto',
         fontSettings: { buffer: 8, sdf: true },
 

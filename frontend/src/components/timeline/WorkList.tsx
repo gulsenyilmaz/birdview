@@ -97,16 +97,16 @@ const WorkList: React.FC<WorkListProps> = ({ filteredWorks }) => {
       ))}
 
         {selectedIndex !== null &&
-        createPortal(
-          <Modal
-            works={worksWithImages}
-            selectedIndex={selectedIndex}
-            onClose={closeModal}
-            onPrev={goPrev}
-            onNext={goNext}
-          />,
-          document.body
-        )}
+          createPortal(
+            <Modal
+              works={worksWithImages}
+              selectedIndex={selectedIndex}
+              onClose={closeModal}
+              onPrev={goPrev}
+              onNext={goNext}
+            />,
+            document.body
+          )}
 
            {/* {a.qid ? (
                     

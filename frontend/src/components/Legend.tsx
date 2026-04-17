@@ -17,7 +17,7 @@ const Legend: React.FC<LegendProps> = ({ items }) => {
               className="legend-color"
               style={{ backgroundColor: color }}
             />
-            <span className="legend-label">{type}</span>
+            <span className="legend-label" style={{ color: color }}>{type}</span>
           </div>
         );
       })}

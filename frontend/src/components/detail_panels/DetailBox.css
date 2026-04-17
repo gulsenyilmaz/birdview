@@ -5,7 +5,7 @@
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: #5f5d5d1e;
+  background-color: #5f5d5dcc;
 
   z-index: 1000;
   display: flex;
@@ -22,9 +22,8 @@
   padding: 0.75rem;
   gap:0.1rem;
 
-  background-color: rgb(107, 107, 107);
+  /* background-color: rgb(107, 107, 107); */
   color: #ffffff;
-  font-family: 'Inter', sans-serif;
   
   overflow-y: auto;
 }
@@ -48,14 +47,16 @@
 }
 
 .admin-tools {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
+  
+  width: 100%;
+  height: auto;
+ 
   display: flex;
   gap: 6px;
   align-items: center;
   opacity: 0.6;
   transition: opacity 0.2s;
+  background-color: rgba(254, 254, 254, 0);
 }
 
 .admin-tools:hover {
@@ -90,7 +91,7 @@
 
 .content-details {
   width: 100%;
-  height: 70%;
+  height: auto;
   padding: 0.3rem;
   overflow-y: auto;
   
@@ -260,26 +261,25 @@
 
 .year-box{
   position: absolute;
-  top: 27vh;
-  left: -10vw;
-  height: 5vh;
-  width: 10vw; 
+  top: 27dvh;
+  left: -9dvw;
+  height: 5dvh;
+  width: 9dvw; 
   transform: translateY(-50%);
 
   background-color: rgba(48, 48, 48, 0.801);
   color: white;
-  font-size: 4rem;
-  padding: 3rem;
+  font-size: 5.2dvb;
+  padding: 2.5dvb;
   box-sizing: border-box;
   display: flex;
   
   align-items: center;
   justify-content: center; 
-  gap: 1rem;
   z-index: 500;
 
 
-  text-align: center;
+  
 
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
@@ -296,7 +296,7 @@
 }
 
 
-.legend {
+/* .legend {
   position: absolute;
   top: 1vw;
   left: -60vw;
@@ -322,4 +322,4 @@
 
 .legend-label {
   text-transform: capitalize;
-}
+} */

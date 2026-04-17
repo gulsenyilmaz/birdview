@@ -1,6 +1,7 @@
 import TimeSlider from "./timeline/TimeSlider";
 import TimeWindowSlider from "./timeline/TimeWindowSlider";
 import LayerHistogram from "./timeline/LayerHistogram";
+import RelationTimeline from "./timeline/RelationTimeline";
 
 import Timeline from "./timeline/Timeline";
 import WorkList from "./timeline/WorkList";
@@ -9,6 +10,8 @@ import type { SelectedObject } from "../hooks/useAppSelection";
 import type { Work } from "../entities/Work";
 import type { Movement } from "../entities/Movement";
 import type { Human } from "../entities/Human";
+import type { RelatedHuman } from "../entities/RelatedHuman";
+
 
 type CountItem = {
   year: number;
@@ -16,6 +19,8 @@ type CountItem = {
 };
 
 interface BottomTimelineSectionProps {
+
+  humanRelations:RelatedHuman[];
   selectedYear: number;
   setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
   activeFullRange: [number, number];
@@ -49,7 +54,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   setSelectedYear,
   activeFullRange,
   filteredWorks,
-  
+  humanRelations,
   windowRange,
   setWindowRange,
   detailMode,
@@ -70,7 +75,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   militaryEventCounts,
 }) => {
   return (
-    <>
+    <div className="bottom-panel-slot"  >
     <div className={`bottom-worklist-panel ${selectedHuman && showWorks ? "open" : ""}`}>
         {selectedHuman && (
           <Timeline selectedYear={selectedYear} windowRange={windowRange}>
@@ -78,9 +83,35 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           </Timeline>
         )}
     </div>
-    <div className="bottom-panel">
-      
 
+   
+    <div className="bottom-panel">
+      <div className="component-container">
+       
+        {selectedHuman && (
+          <>
+            {workCounts.length > 0 && (
+              <LayerHistogram
+                setSelectedYear={setSelectedYear}
+                windowRange={windowRange}
+                aliveCounts={workCounts}
+                binAggregation="sum"
+                layerTypeName="WORKS"
+                showLayer={showWorks}
+                setShowLayer={setShowWorks}
+              />
+            )}
+          
+
+            <RelationTimeline
+              windowRange={windowRange}
+              layerTypeName="RElATIONS"
+              humanRelations={humanRelations}
+              showLayer={showHumans}
+              setShowLayer={setShowHumans}
+            />
+        </>
+        )}
       <TimeSlider
         selectedYear={selectedYear}
         setSelectedYear={setSelectedYear}
@@ -92,17 +123,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
         detailMode={detailMode}
         setManualMode={setManualMode}
       >
-        {selectedHuman && workCounts.length > 0 && (
-          <LayerHistogram
-            setSelectedYear={setSelectedYear}
-            windowRange={windowRange}
-            aliveCounts={workCounts}
-            binAggregation="sum"
-            layerTypeName="WORKS"
-            showLayer={showWorks}
-            setShowLayer={setShowWorks}
-          />
-        )}
+       
 
         {!selectedHuman && (
           <LayerHistogram
@@ -136,19 +157,21 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           setShowLayer={setShowDisasters}
         />
 
-      <TimeWindowSlider
-        fullRange={activeFullRange}
-        windowRange={windowRange}
-        setWindowRange={setWindowRange}
-        setSelectedYear={setSelectedYear}
-        selectedYear={selectedYear}
-        detailMode={detailMode}
-      />
       </TimeSlider>
+      {!selectedHuman && (
+        <TimeWindowSlider
+          fullRange={activeFullRange}
+          windowRange={windowRange}
+          setWindowRange={setWindowRange}
+          setSelectedYear={setSelectedYear}
+          selectedYear={selectedYear}
+          detailMode={detailMode}
+        />
+      )}
 
-      
+      </div>
     </div>
-    </>
+  </div>
   );
 };
 

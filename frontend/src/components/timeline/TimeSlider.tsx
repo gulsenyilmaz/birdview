@@ -143,8 +143,8 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   };
 
   return (
-    <div className="component-container">
-       
+    
+       <>
       <div className={`movements-container ${detailMode ? "hide" : ""}`}>
         {movements && movements.length>0 && (
             <div className="movements-wrapper">
@@ -178,7 +178,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
             </div>
         )}
         <div className="label-group">
-          <button className="label-button" style={{backgroundColor:'#ebbe09' }} onClick={() => setManualMode(true)}>
+          <button className="label-button" style={{backgroundColor:'#705d15' }} onClick={() => setManualMode(true)}>
             Movements
             </button>
         </div>
@@ -223,14 +223,14 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
           
         </div>
         <div className="label-group">
-          <button className="play-button" onClick={handlePlayAction}>
+          <button className="label-button" style={{backgroundColor:'#171717' }} onClick={handlePlayAction}>
             {isPlaying ? "⏸" : "▶"}
           </button>
         </div>
       </div>
       {children}
 
-    </div>
+    </>
   );
 };
 

@@ -2,12 +2,10 @@
 
 .person-id-card {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
   box-sizing: border-box;
 
-  
-  
   width: 100%;
   
   gap: 1rem;
@@ -21,13 +19,14 @@
 .person-portrait {
   flex: 0 0 35%;
   max-width: 10vw;
+ 
 }
 
 .person-id-card img.portrait {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 8px;
+  border-radius: 10px;
   background-color: #ffffff;
   /* object-fit: cover; */
 }
@@ -54,7 +53,7 @@
 .person-data img.signature-image {
   display: block;
   width: 100%;
-  max-width: 150px;
+  max-width: 120px;
   height: auto;
   margin-top: 1rem;
   /* filter: brightness(0) invert(1); */
@@ -63,25 +62,31 @@
 
 
 .tab-buttons {
+
+  display: flex;
+  flex-direction: row;
+
   width: 100%;
+  height: auto;
   box-sizing: border-box;
   background-color: #6d6d6d;
 
-  font-size: 0.8rem;
+  font-size: 0.9dvb;
 }
 
 .tab-buttons button {
   margin-right: 0rem;
-  padding: 0.5rem 1rem;
+  padding: 0rem 0rem;
   font-weight: bold;
   border-radius: 1px;
-  background-color: transparent;
+  background-color: rgba(135, 136, 135, 0.869);;
+
   
   cursor: pointer;
 }
 
 .tab-buttons button.active {
-  background-color: rgba(182, 72, 72, 0.869);;
+  background-color: rgba(182, 72, 72, 0.869);
   color: white;
   border-bottom: 1px solid #ccc;
   /* border-color: #222; */

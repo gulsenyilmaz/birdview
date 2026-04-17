@@ -1,6 +1,6 @@
 // import { Suspense, lazy } from "react";
 import type { Human } from "../entities/Human";
-import type { HumanRelative } from "../entities/HumanRelative";
+import type { HumanRelative } from "../entities/RelatedHuman";
 import type { Location } from "../entities/Location";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import type { Work } from "../entities/Work";

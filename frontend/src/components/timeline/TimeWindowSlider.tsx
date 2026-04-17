@@ -76,7 +76,7 @@ export default function TimeWindowSlider({
   
 
   return (
-    <div className={`tw-container ${detailMode ? "hide" : ""}`}>
+    <div className="tw-container">
   
           <div className="tw-window">
             <div className="tw-year-label" style={{left: 0 }}>

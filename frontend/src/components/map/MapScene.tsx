@@ -9,18 +9,18 @@ import {MapView} from '@deck.gl/core';
 
 import type { Location } from "../../entities/Location";
 import type { Human } from "../../entities/Human";
-import type { HumanRelative } from "../../entities/HumanRelative";
+import type { RelatedHuman } from "../../entities/RelatedHuman";
 import type { HumanEnriched } from "../../entities/HumanEnriched";
-import type { HumanRelativeEnriched } from "../../entities/HumanRelativeEnriched";
+import type { RelatedHumanEnriched } from "../../entities/RelatedHumanEnriched";
 
-import type { Work } from "../../entities/Work";
+// import type { Work } from "../../entities/Work";
 import type { MilitaryEvent } from "../../entities/MilitaryEvent";
 
 import { isHuman } from "../../utils/typeGuards";
 
 import { createMilitaryEventLayers } from "../../layers/militaryEventLayers";
 import { createHumanLayers } from "../../layers/humanLayers";
-import { createWorkLayers } from "../../layers/workLayers";
+// import { createWorkLayers } from "../../layers/workLayers";
 import { createSelectedHumanLayers } from "../../layers/selectedHumanLayers"
 
 
@@ -55,9 +55,9 @@ interface MapSceneProps {
 
   humanLocations:Location[];
   humans:Human[];
-  humanRelations:HumanRelative[];
+  humanRelations:RelatedHuman[];
   militaryEvents:MilitaryEvent[];
-  works:Work[];
+  // works:Work[];
   selectedYear:number;
   setSelectedObject: (obj: any) => void;
   selectedObject:any;
@@ -75,7 +75,7 @@ const MapScene: React.FC<MapSceneProps> = ({
                                               humans,
                                               humanRelations,
                                               militaryEvents,
-                                              works,
+                                              // works,
                                               selectedYear,
                                               setSelectedObject,
                                               selectedObject,
@@ -89,7 +89,7 @@ const MapScene: React.FC<MapSceneProps> = ({
 
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE); 
   const [processedHumans, setProcessedHumans] = useState<HumanEnriched[]>([]);
-  const [processedHumanRelatives, setProcessedHumanRelatives] = useState<HumanRelativeEnriched[]>([]);
+  const [processedRelatedHumans, setProcessedRelatedHumans] = useState<RelatedHumanEnriched[]>([]);
   
  
   const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text' | 'circle'>('text');
@@ -142,7 +142,7 @@ const MapScene: React.FC<MapSceneProps> = ({
 
   useEffect(() => {
     if(isHuman(selectedObject)){
-      const enrichedHumanRelatives: HumanRelativeEnriched[] = humanRelations.filter(h => h.birth_date<selectedYear ).map((h) => {
+      const enrichedRelatedHumans: RelatedHumanEnriched[] = humanRelations.filter(h => h.birth_date<selectedYear ).map((h) => {
           const age = (h.death_date && (selectedYear>h.death_date)?h.death_date:selectedYear) - h.birth_date;
           
           let [lonOffsetSource, latOffsetSource] = offsetFibonacciPosition(h.lon, h.lat, age*2, viewState.zoom, h.index*15 || 0);
@@ -155,7 +155,7 @@ const MapScene: React.FC<MapSceneProps> = ({
           };
         });
 
-        setProcessedHumanRelatives(enrichedHumanRelatives);
+        setProcessedRelatedHumans(enrichedRelatedHumans);
       }
 
   }, [selectedObject, humanRelations, selectedYear, viewState.zoom]);
@@ -214,17 +214,16 @@ const layers = useMemo(() => {
     );
   }
 
-  if (showWorks) {
-    layersArray.push(...createWorkLayers(works));
-  }
+  // if (showWorks) {
+  //   layersArray.push(...createWorkLayers(works));
+  // }
 
-  
 
   if(isHuman(selectedObject)){
 
     layersArray.push(
       ...createSelectedHumanLayers({
-        processedHumanRelatives,
+        processedRelatedHumans,
         humanLocations,
         selectedYear,
         // selectedObject,
@@ -250,7 +249,7 @@ const layers = useMemo(() => {
 
   return layersArray;
 
-}, [selectedObject, showEvents, showHumans, showWorks, humanLocations, processedHumanRelatives, processedHumans, viewState.zoom, selectedLayerType,  militaryEvents]);
+}, [selectedObject, showEvents, showHumans, showWorks, humanLocations, processedRelatedHumans, processedHumans, viewState.zoom, selectedLayerType,  militaryEvents]);
 
   return (
       <div className="map-scene-root">
@@ -305,10 +304,10 @@ const layers = useMemo(() => {
          
         </DeckGL>
         
-      </div>
-       <div className="layer-selector">
+        </div>
+        <div className="layer-selector">
             <label>
-              <span className="label-title">Manuel Mode    </span>
+              <span className="label-title">Manuel Mode</span>
               <input
                   type="checkbox"
                   checked={manualMode}
@@ -316,82 +315,75 @@ const layers = useMemo(() => {
                 />
             
             </label>
-      </div>  
-      {(showHumans && !detailMode) && (
-          <div className="layer-selector">
-            {/* <label>
-              <span className="label-title">Manuel Mode    </span>
-              <input
-                  type="checkbox"
-                  checked={manualMode}
-                  onChange={(e) => setManualMode(e.target.checked)}
-                />
-            
-            </label> */}
-            <div className="radio-group">
-              <label>
-                <input
-                  type="radio"
-                  value="arc"
-                  checked={selectedLayerType === "arc"}
-                  onChange={() => setSelectedLayerType("arc")}
-                />
-                Arc
-              </label>
+      
+            {(showHumans && !detailMode) && (
+              <>
+              <div className="radio-group">
+                <label>
+                  <input
+                    type="radio"
+                    value="arc"
+                    checked={selectedLayerType === "arc"}
+                    onChange={() => setSelectedLayerType("arc")}
+                  />
+                  Arc
+                </label>
 
-              <label>
-                <input
-                  type="radio"
-                  value="text"
-                  checked={selectedLayerType === 'text'}
-                  onChange={() => setSelectedLayerType('text')}
-                />
-                Text Layer
-              </label>
+                <label>
+                  <input
+                    type="radio"
+                    value="text"
+                    checked={selectedLayerType === 'text'}
+                    onChange={() => setSelectedLayerType('text')}
+                  />
+                  Text Layer
+                </label>
 
-              <label>
-                <input
-                  type="radio"
-                  value="text"
-                  checked={selectedLayerType === 'circle'}
-                  onChange={() => setSelectedLayerType('circle')}
-                />
-                Circle Layer
-              </label>
-            </div>
-            <div className="radio-group">
-              <label>
-                <input
-                  type="radio"
-                  value="age"
-                  checked={colorFilterType === "age"}
-                  onChange={() => setColorFilterType("age")}
-                />
-                Age
-              </label>
+                <label>
+                  <input
+                    type="radio"
+                    value="text"
+                    checked={selectedLayerType === 'circle'}
+                    onChange={() => setSelectedLayerType('circle')}
+                  />
+                  Circle Layer
+                </label>
+              </div>
+              <div className="radio-group">
+                <label>
+                  <input
+                    type="radio"
+                    value="age"
+                    checked={colorFilterType === "age"}
+                    onChange={() => setColorFilterType("age")}
+                  />
+                  Age
+                </label>
 
-              <label>
-                <input
-                  type="radio"
-                  value="gender"
-                  checked={colorFilterType === "gender"}
-                  onChange={() => setColorFilterType("gender")}
-                />
-                Gender
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  value="nationality"
-                  checked={colorFilterType === "nationality"}
-                  onChange={() => setColorFilterType("nationality")}
-                />
-                Nationality
-              </label>
-              {/* <hr className="divider" /> */}
-            </div>
+                <label>
+                  <input
+                    type="radio"
+                    value="gender"
+                    checked={colorFilterType === "gender"}
+                    onChange={() => setColorFilterType("gender")}
+                  />
+                  Gender
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    value="nationality"
+                    checked={colorFilterType === "nationality"}
+                    onChange={() => setColorFilterType("nationality")}
+                  />
+                  Nationality
+                </label>
+                
+              </div>
+              </>
+          )}
         </div>
-      )}
+      
   </div>
   );
 };

@@ -19,7 +19,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 
     <div className="loading-screen">
       <div className="loading-content">
-        <h1 className="loading-title">Being, Then, There...</h1>
+        <h1 className="loading-title">Being. There. Then.</h1>
 
         <div className="loading-status">
          {humanDataLoading && <p>human data loading...</p>}

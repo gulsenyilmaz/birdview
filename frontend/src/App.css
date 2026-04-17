@@ -87,13 +87,14 @@
 .right-panel {
   position: absolute;
   top: 0;
-  right:-15dvw;
+  right:0;
 
   display: flex;
   flex-direction: row;
 
-  width: 15dvw;
-  height: 62dvh;
+  width: 16dvw;
+  height: auto;
+  max-height: 60dvh;
 
   background-color: transparent;
   box-shadow: 7px 7px 15px rgba(49, 49, 49, 0.51);
@@ -104,12 +105,13 @@
 
   z-index: 200;
 
-  transition: right 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.45s ease-in-out;
+  transform: translateX(100%);
 
 }
 
 .right-panel.open {
-  right: 0;
+  transform: translateX(0%);
 }
 
 .top-panel {
@@ -129,7 +131,7 @@
   border: 1px solid #74747400;
   z-index: 150;
 
-  transition: transform 0.9s ease-in-out, width 0.2s ease-in-out;
+  transition: transform 0.45s ease-in-out, width 0.2s ease-in-out;
   transform: translateY(-100%);
   
 }
@@ -162,20 +164,15 @@
   border: none;
   z-index: 1550;
   
-  transition: transform 0.9s ease-in-out;
+  
   transition:
-    transform 0.9s ease-in-out,
+    transform 0.45s ease-in-out,
     width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
     right 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    height  0.45s  cubic-bezier(0.4, 0, 0.2, 1),
-    background-color 3s cubic-bezier(0.4, 0, 0.2, 1);
   
 }
 
-.top-panel-dashboard.loading {
-  height: 100dvh;
-  background-color: rgba(0, 0, 0,1);
-}
+
 
 .top-panel-dashboard.close {
   transform: translateY(-100%);
@@ -183,74 +180,74 @@
 
 .top-panel-dashboard.squeezed {
   right: 20dvw;
-  width: 85dvw;
+  width: 84dvw;
 }
 
 
-.bottom-panel {
+.bottom-panel-slot {
   position: absolute;
 
-  bottom: 0;
   left: 0;
   right: 0;
+  bottom: 0;
 
+  width: 100%;
+  height: auto; /* ikisini taşıyacak kadar */
+  
+  
+  overflow: hidden;
+  z-index: 100;
+  
+}
+
+.bottom-panel {
+  bottom: 0;
+
+  width: 100%;
   height: auto;
-  width: 100dvw;
+  
 
   display: flex;
   flex-direction: column;
   align-items: flex-start;  
-  justify-content: center;
+  justify-content:last baseline;
   
 
   background-color: rgba(255, 255, 255, 0);
   box-sizing: border-box;
   z-index: 100;
   
-  transition:
-    width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    left 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.bottom-panel.squeezed {
-  left: 24dvw;
-  width: 76dvw;
-}
 
 .bottom-worklist-panel {
-  position: absolute;
-
-  bottom: -16dvh;
-  left: 0dvw;
+  width: 95dvw;
+  height: auto;
   
-
-  height: 19dvh;
-  width: 93dvw;
 
   display: flex;
   flex-direction: column;
-  /* align-items: flex-end;   */
-  
-
-  background-color: rgba(184, 124, 40, 0);
   box-sizing: border-box;
+  
+  
   z-index: 10;
 
-  transition:
-   
-    bottom 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(100%);
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bottom-worklist-panel.open {
-  bottom: 19dvh;
+  transform: translateY(0);
 }
 
 
 .left-panel,
 .right-panel,
 .top-panel,
+.top-panel-dashboard,
 .bottom-panel,
 .bottom-worklist-panel {
   pointer-events: auto;
+  background-color: transparent;
 }
 

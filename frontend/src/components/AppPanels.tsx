@@ -12,7 +12,7 @@ import MilitaryEventDetail from "./detail_panels/MilitaryEventDetail";
 import FilterList from "./general_panels/FilterList";
 
 import type { Human } from "../entities/Human";
-import type { HumanRelative } from "../entities/HumanRelative";
+import type { HumanRelative } from "../entities/RelatedHuman";
 import type { Location } from "../entities/Location";
 import type { Movement } from "../entities/Movement";
 import type { Nationality } from "../entities/Nationality";

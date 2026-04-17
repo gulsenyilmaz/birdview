@@ -1,16 +1,16 @@
 import React, { useState, useEffect} from 'react';
 import type { Human } from "../../entities/Human";
-import type { HumanRelative } from "../../entities/HumanRelative";
+import type { RelatedHuman } from "../../entities/RelatedHuman";
 import type { Location } from "../../entities/Location";
-import Legend from "../Legend";
-import { getColorForRelationTypeString } from "../../utils/colorUtils";
+// import Legend from "../Legend";
+// import { getColorForRelationTypeString } from "../../utils/colorUtils";
 import './PersonBox.css';
 // import { resolveCommonsThumb } from "../../utils/commons"
 
 interface PersonBoxProps {
   person:Human;
   setHumanLocations: (arr: Location[]) => void;
-  setHumanRelations:(arr: HumanRelative[]) => void;
+  setHumanRelations:(arr: RelatedHuman[]) => void;
 //   setSelectedObjectThumbnail: (str:string | null) => void;
   setManualMode:(obj: boolean) => void
   
@@ -25,11 +25,11 @@ interface PersonDetails {
   collections: string[];
   citizenships: string[];
   locations: Location[];
-  family: HumanRelative[];
-  professional: HumanRelative[];
-  intellectual: HumanRelative[];
-  social: HumanRelative[];
-  political: HumanRelative[];
+  family: RelatedHuman[];
+  professional: RelatedHuman[];
+  intellectual: RelatedHuman[];
+  social: RelatedHuman[];
+  political: RelatedHuman[];
   nationality: string;
   gender: string;
 }
@@ -40,12 +40,12 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
     const [personDetails, setPersonDetails] = useState<PersonDetails | null>(null);
     const [cv_locations, setCvLocations] = useState<Location[]>([]);
     const [museums, setMuseums] = useState<Location[]>([]);
-    const [family, setFamily] = useState<HumanRelative[]>([]);
-    const [professional, setProfessional] = useState<HumanRelative[]>([]);
-    const [intellectual, setIntellectual] = useState<HumanRelative[]>([]);
-    const [social, setSocial] = useState<HumanRelative[]>([]);
-    const [political, setPolitical] = useState<HumanRelative[]>([]);    
-    const [uniqueTypes, setUniqueTypes] = useState<string[]>([]);
+    const [family, setFamily] = useState<RelatedHuman[]>([]);
+    const [professional, setProfessional] = useState<RelatedHuman[]>([]);
+    const [intellectual, setIntellectual] = useState<RelatedHuman[]>([]);
+    const [social, setSocial] = useState<RelatedHuman[]>([]);
+    const [political, setPolitical] = useState<RelatedHuman[]>([]);    
+    // const [uniqueTypes, setUniqueTypes] = useState<string[]>([]);
    
     const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "professional"| "museums">("cv");
     const [fallbackImage, setFallbackImage] = useState<string | null>(null);
@@ -55,24 +55,24 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
 
    
     
-    const renderList = (
-        locations: any[] | undefined
-        ) => {
-        if (!locations || locations.length === 0) return null;
+    // const renderList = (
+    //     locations: any[] | undefined
+    //     ) => {
+    //     if (!locations || locations.length === 0) return null;
 
-        return (
-            <ul>
-                {locations.map((loc, idx) => (
-                    <li key={idx}>
-                    {loc.start_date} 
-                    {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} {loc.qid}— <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
-                        {loc.relationship_type_name}
-                        </em>
-                    </li>
-                ))}
-            </ul>
-        );
-    };
+    //     return (
+    //         <ul>
+    //             {locations.map((loc, idx) => (
+    //                 <li key={idx}>
+    //                 {loc.start_date} 
+    //                 {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} {loc.qid}— <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
+    //                     {loc.relationship_type_name}
+    //                     </em>
+    //                 </li>
+    //             ))}
+    //         </ul>
+    //     );
+    // };
 
     useEffect(() => {
         if(!isUpdating) {
@@ -98,11 +98,11 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                             setSocial(data.social);
                             setPolitical(data.political);
 
-                            setUniqueTypes( Array.from(
-                                new Set(
-                                    cv_locs.map(l => l.relationship_type_name)
-                                )
-                            ))
+                            // setUniqueTypes( Array.from(
+                            //     new Set(
+                            //         cv_locs.map(l => l.relationship_type_name)
+                            //     )
+                            // ))
                         }
                         // setSelectedObjectThumbnail(data.img_url);
                         if (!data.img_url) {
@@ -136,43 +136,43 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             setManualMode(false)
             setHumanLocations(cv_locations);
             setHumanRelations([]);
-            setUniqueTypes( Array.from(
-                new Set(
-                    cv_locations.map(l => l.relationship_type_name)
-                )
-            ))
+            // setUniqueTypes( Array.from(
+            //     new Set(
+            //         cv_locations.map(l => l.relationship_type_name)
+            //     )
+            // ))
            
          }
          else if(selectedTab=="family"){
             setManualMode(false)
             setHumanRelations(family)
             setHumanLocations([]);
-            setUniqueTypes( Array.from(
-                new Set(
-                    family.map(l => l.relationship_type_name)
-                )
-            ))
+            // setUniqueTypes( Array.from(
+            //     new Set(
+            //         family.map(l => l.relationship_type_name)
+            //     )
+            // ))
          }
          else if(selectedTab=="professional"){
             
             setManualMode(false)
             setHumanRelations(intellectual.concat(professional).concat(social).concat(political))
             setHumanLocations([]);
-            setUniqueTypes( Array.from(
-                new Set(
-                    professional.map(l => l.relationship_type_name)
-                )
-            ))
+            // setUniqueTypes( Array.from(
+            //     new Set(
+            //         professional.map(l => l.relationship_type_name)
+            //     )
+            // ))
          }
          else if(selectedTab=="museums"){
             setManualMode(false)
             setHumanLocations(museums);
             setHumanRelations([]);
-            setUniqueTypes( Array.from(
-                new Set(
-                    museums.map(l => l.relationship_type_name)
-                )
-            ))
+            // setUniqueTypes( Array.from(
+            //     new Set(
+            //         museums.map(l => l.relationship_type_name)
+            //     )
+            // ))
          }
          else{
             setHumanLocations([]);
@@ -229,26 +229,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                     <h2>{person.name}</h2>
                     <p> {personDetails.description}<i>({person.id})</i></p>
                 </div>
-                 <div className="admin-tools">
-                        <a
-                        href={`https://www.wikidata.org/wiki/${person.qid}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="qid-link"
-                        >
-                        {person.qid}
-                        </a>
-
-                        <button
-                        onClick={handleUpdatePersonDetails}
-                        disabled={isUpdating}
-                        className="update-button"
-                        >
-                        {isUpdating ? "..." : "↻"}
-                        </button>
-
-                        {updateError && <span className="update-error">!</span>}
-                    </div>
+                 
 
                 <div className="person-id-card">
                    
@@ -337,46 +318,27 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                             Has Works In
                         </button>
                 </div>
+                <div className="admin-tools">
+                        <a
+                        href={`https://www.wikidata.org/wiki/${person.qid}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="qid-link"
+                        >
+                        {person.qid}
+                        </a>
 
-                    {selectedTab === "cv" && (
-                        
-                        <div className="cv_content">
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "birth_place"))}
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "residence"))}
+                        <button
+                        onClick={handleUpdatePersonDetails}
+                        disabled={isUpdating}
+                        className="update-button"
+                        >
+                        {isUpdating ? "..." : "↻"}
+                        </button>
 
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "educated_at"))}
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "work_location"))}
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "death_place"))}
-                            {renderList(cv_locations.filter(l => l.relationship_type_name == "buried_at"))}
-                        </div>
-                    )}
-                    {selectedTab === "family" && (
-                        
-                        <div className="cv_content">
-                            {renderList(family.filter(l => l.relationship_type_name == "mother"))}
-                            {renderList(family.filter(l => l.relationship_type_name == "father"))}
-
-                            {renderList(family.filter(l => l.relationship_type_name == "sibling"))}
-                            {renderList(family.filter(l => l.relationship_type_name == "child"))}
-                            {renderList(family.filter(l => l.relationship_type_name == "spouse"))}
-                            {renderList(family.filter(l => l.relationship_type_name == "madigudisi"))}
-                        </div>
-                    )}
-                    {selectedTab === "professional" && (
-                        
-                        <div className="cv_content">
-                            {renderList(professional)}
-                        </div>
-                    )}
-
-                    {/* {selectedTab === "museums" && (
-                    <div className="cv_content">
-                        {renderList(museums, "has works here")}
+                        {updateError && <span className="update-error">!</span>}
                     </div>
-                    )}  */}
-                
-                   
-                <Legend items={uniqueTypes} />
+
             </div>
         )}
         

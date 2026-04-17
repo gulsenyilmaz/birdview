@@ -35,22 +35,22 @@
 .layer-selector {
   position: absolute;
 
-  bottom: 20vh;
+  top: 8vh;
   left: 0;
 
-  width: 7vw;
+  width: auto;
   height: 3vh;
 
   padding: 0rem;
   gap: 0.3rem;
 
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   box-sizing: border-box;
   justify-content: left;
   align-items: left;
 
-  background-color: #f00d0d94;
+ 
   /* box-shadow: 0 2px 2px rgba(0, 0, 0, 0.261); */
   border: 1px solid #c1c1c1;  
   
@@ -106,7 +106,7 @@
   flex-direction: row;
   /* flex: 1; */
 
-  background-color: #ffffffd3;
+  background-color: #ffffff00;
 
   font-family: Arial, sans-serif;
   

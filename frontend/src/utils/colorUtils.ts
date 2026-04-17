@@ -191,8 +191,12 @@ export const getColorForAgeString = (
 
   export const getLayerColor = (layerName?: string) => {
           switch (layerName?.toLowerCase()) {
+            case "relations":
+              return "#44608e"; // soft coral
+            case "professional":
+              return "#eec12f"; // soft coral
             case "humans":
-              return "#af7aa1"; // soft coral
+              return "#a4558f"; // soft coral
             case "wars":
               return "#59a14f"; // sky blue
             case "disasters":

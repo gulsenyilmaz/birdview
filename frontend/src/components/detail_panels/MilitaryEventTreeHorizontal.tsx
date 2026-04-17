@@ -33,7 +33,7 @@ const MilitaryEventTreeHorizontal: React.FC<MilitaryEventTreeProps> = ({
   
   const [militaryEventsTree, setMilitaryEventsTree] = useState<EventNode>({ id: 0, name: "Root", children: [] });
   const [maxNumberOfNodesAtDepth, setMaxNumberOfNodesAtDepth] = useState<number>(0);
-   const [maxNumberDepth, setMaxNumbeDepth] = useState<number>(0);
+  const [maxNumberDepth, setMaxNumbeDepth] = useState<number>(0);
 
     
   useEffect(() => {

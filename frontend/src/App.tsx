@@ -2,7 +2,7 @@ import "./App.css"; // Import your CSS file
 import LoadingOverlay from './components/LoadingOverlay'
 import { useEffect, useState, useMemo } from "react";
 
-import type { HumanRelative } from "./entities/HumanRelative";
+import type { RelatedHuman } from "./entities/RelatedHuman";
 import type { Movement } from "./entities/Movement";
 import type { Nationality } from "./entities/Nationality";
 import type { Gender } from "./entities/Gender";
@@ -17,8 +17,9 @@ import { unionRanges } from "./utils/dateUtils";
 import { useAppSelection, type SelectedObject } from "./hooks/useAppSelection";
 
 import BottomTimelineSection from "./components/BottomTimelineSection";
-import MapSection from "./components/MapSection";
+// import MapSection from "./components/MapSection";
 import AppPanels from "./components/AppPanels";
+import MapScene from "./components/map/MapScene";
 
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
   
   const [windowRange, setWindowRange] = useState<[number, number]>([-800, 1950]);
   const [movements, setMovements] = useState<Movement[]>([]); 
-  const [humanRelations, setHumanRelations] = useState<HumanRelative[]>([]);
+  const [humanRelations, setHumanRelations] = useState<RelatedHuman[]>([]);
 
   const [showHumans, setShowHumans] = useState(true);
   const [showEvents, setShowEvents] = useState(false);
@@ -60,7 +61,7 @@ function App() {
   );
 
   const humanLayer = useHumanLayer({
-    active: true, // şimdilik hep açık
+    active: showHumans, // şimdilik hep açık
     backendUrl,
     filters: {
       human_id: selectedHuman?.id,
@@ -77,7 +78,7 @@ function App() {
   });
 
   const militaryLayer = useMilitaryEventLayer({
-    active: true, // şimdilik hep açık
+    active: showEvents, // şimdilik hep açık
     backendUrl,
     filters: {
       military_event_depth_index: selectedMilitaryEvent?.depth_index,
@@ -86,7 +87,7 @@ function App() {
   });
 
   const workLayer = useWorkLayer({
-    active: true, // şimdilik hep açık
+    active: showWorks, // şimdilik hep açık
     backendUrl,
     filters: {
       human_id: selectedHuman?.id,
@@ -105,15 +106,13 @@ function App() {
   );
 
 
-
-  
-
   useEffect(() => {
     let nextRange: [number, number] | null = null;
 
     if (!selectedObject) {
       nextRange = activeFullRange;
     } else if (selectedHuman || selectedLocation) {
+      setShowWorks(true);
       nextRange = humanLayer.fullRange;
     } else if (selectedMilitaryEvent) {
       nextRange = militaryLayer.fullRange;
@@ -155,7 +154,7 @@ function App() {
           } />
           }
           <div className="scene">
-         <MapSection
+         {/* <MapSection
           humanLocations={humanLocations}
           humans={humanLayer.filteredHumans}
           militaryEvents={militaryLayer.filteredMilitaryEvents}
@@ -170,7 +169,26 @@ function App() {
           showWorks={showWorks}
           manualMode={manualMode}
           setManualMode={setManualMode}
-        />
+        /> */}
+
+        <div className="map-shell">
+          <MapScene
+            humanLocations={humanLocations}
+            humans={humanLayer.filteredHumans}
+            militaryEvents={militaryLayer.filteredMilitaryEvents}
+            // works={workLayer.filteredWorks}
+            humanRelations={humanRelations}
+            selectedYear={selectedYear}
+            setSelectedObject={setSelectedObject}
+            selectedObject={selectedObject}
+            detailMode={detailMode}
+            showEvents={showEvents}
+            showHumans={showHumans}
+            showWorks={showWorks}
+            manualMode={manualMode}
+            setManualMode={setManualMode}
+          />
+        </div>
         </div>
         <div className="overlay-layer">
         <AppPanels
@@ -179,6 +197,7 @@ function App() {
           setDetailMode={(value) => {
             if (!value) {
               setShowHumans(true);
+              setShowWorks(false);
               setSelectedObject(null);
             }
           }}
@@ -214,7 +233,7 @@ function App() {
           windowRange={windowRange}
           setWindowRange={setWindowRange}
           detailMode={detailMode}
-          
+          humanRelations={humanRelations}
           movements={movements}
           setSelectedObject={setSelectedObject}
           setManualMode={setManualMode}
