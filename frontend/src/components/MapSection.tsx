@@ -3,7 +3,7 @@ import type { Human } from "../entities/Human";
 import type { RelatedHuman } from "../entities/RelatedHuman";
 import type { Location } from "../entities/Location";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
-import type { Work } from "../entities/Work";
+// import type { Work } from "../entities/Work";
 import type { SelectedObject } from "../hooks/useAppSelection";
 import './map/MapScene.css';
 import MapScene from "./map/MapScene";
@@ -14,7 +14,7 @@ interface MapSectionProps {
   humanLocations: Location[];
   humans: Human[];
   militaryEvents: MilitaryEvent[];
-  works: Work[];
+  // works: Work[];
   humanRelations: RelatedHuman[];
   selectedYear: number;
   setSelectedObject: React.Dispatch<React.SetStateAction<SelectedObject>>;
@@ -31,7 +31,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   humanLocations,
   humans,
   militaryEvents,
-  works,
+  // works,
   humanRelations,
   selectedYear,
   setSelectedObject,

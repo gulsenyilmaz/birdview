@@ -165,7 +165,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           setWindowRange={setWindowRange}
           setSelectedYear={setSelectedYear}
           selectedYear={selectedYear}
-          detailMode={detailMode}
+          
         />
       )}
 
