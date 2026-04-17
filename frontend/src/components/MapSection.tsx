@@ -1,6 +1,6 @@
 // import { Suspense, lazy } from "react";
 import type { Human } from "../entities/Human";
-import type { HumanRelative } from "../entities/RelatedHuman";
+import type { RelatedHuman } from "../entities/RelatedHuman";
 import type { Location } from "../entities/Location";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import type { Work } from "../entities/Work";
@@ -15,7 +15,7 @@ interface MapSectionProps {
   humans: Human[];
   militaryEvents: MilitaryEvent[];
   works: Work[];
-  humanRelations: HumanRelative[];
+  humanRelations: RelatedHuman[];
   selectedYear: number;
   setSelectedObject: React.Dispatch<React.SetStateAction<SelectedObject>>;
   selectedObject: SelectedObject;
@@ -50,7 +50,7 @@ const MapSection: React.FC<MapSectionProps> = ({
             humanLocations={humanLocations}
             humans={humans}
             militaryEvents={militaryEvents}
-            works={works}
+            // works={works}
             humanRelations={humanRelations}
             selectedYear={selectedYear}
             setSelectedObject={setSelectedObject}

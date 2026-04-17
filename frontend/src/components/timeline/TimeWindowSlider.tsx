@@ -12,7 +12,7 @@ type Props = {
   setWindowRange: (r: [number, number]) => void;
   selectedYear: number;                      // seçili yıl
   setSelectedYear: (y: number) => void;
-  detailMode?: boolean; // detay modu (varsayılan false)
+  
 
 };
 
@@ -21,8 +21,8 @@ export default function TimeWindowSlider({
   windowRange, 
   setWindowRange, 
   selectedYear, 
-  setSelectedYear, 
-  detailMode
+  setSelectedYear
+ 
 }: Props) {
 
   const [alltime_minYear, alltime_maxYear] = fullRange;
