@@ -2,6 +2,7 @@ import TimeSlider from "./timeline/TimeSlider";
 import TimeWindowSlider from "./timeline/TimeWindowSlider";
 import LayerHistogram from "./timeline/LayerHistogram";
 import RelationTimeline from "./timeline/RelationTimeline";
+import MovementTimeline from "./timeline/MovementTimeline";
 
 import Timeline from "./timeline/Timeline";
 import WorkList from "./timeline/WorkList";
@@ -11,6 +12,9 @@ import type { Work } from "../entities/Work";
 import type { Movement } from "../entities/Movement";
 import type { Human } from "../entities/Human";
 import type { RelatedHuman } from "../entities/RelatedHuman";
+import type { Location } from "../entities/Location";
+import YearLine from "./timeline/YearLine";
+
 
 
 type CountItem = {
@@ -21,13 +25,14 @@ type CountItem = {
 interface BottomTimelineSectionProps {
 
   humanRelations:RelatedHuman[];
+  humanLocations:Location[];
   selectedYear: number;
   setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
   activeFullRange: [number, number];
   windowRange: [number, number];
   setWindowRange: React.Dispatch<React.SetStateAction<[number, number]>>;
   
-  detailMode: boolean;
+  // detailMode: boolean;
   filteredWorks: Work[];
   movements: Movement[];
   setSelectedObject: React.Dispatch<React.SetStateAction<SelectedObject>>;
@@ -55,9 +60,10 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   activeFullRange,
   filteredWorks,
   humanRelations,
+  humanLocations,
   windowRange,
   setWindowRange,
-  detailMode,
+  // detailMode,
   movements,
   setSelectedObject,
   setManualMode,
@@ -75,66 +81,65 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   militaryEventCounts,
 }) => {
   return (
-    <div className="bottom-panel-slot"  >
-    <div className={`bottom-worklist-panel ${selectedHuman && showWorks ? "open" : ""}`}>
-        {selectedHuman && (
-          <Timeline selectedYear={selectedYear} windowRange={windowRange}>
-            <WorkList filteredWorks={filteredWorks} />
-          </Timeline>
-        )}
-    </div>
+    <div className="bottom-panel-slot" >
+      <div className={`bottom-worklist-panel ${selectedHuman && showWorks ? "open" : "hide"}`}>
+          {selectedHuman && (
+            <Timeline selectedYear={selectedYear} windowRange={windowRange}>
+              <WorkList filteredWorks={filteredWorks} />
+            </Timeline>
+          )}
+      </div>
+      <div className="bottom-panel">
+        <div className="component-container">
 
-   
-    <div className="bottom-panel">
-      <div className="component-container">
-       
-        {selectedHuman && (
-          <>
-            {workCounts.length > 0 && (
-              <LayerHistogram
-                setSelectedYear={setSelectedYear}
+          <YearLine selectedYear={selectedYear} windowRange={windowRange} />
+        
+          {selectedHuman && (
+            <>
+              {workCounts.length > 0 && (
+                <LayerHistogram
+                  setSelectedYear={setSelectedYear}
+                  windowRange={windowRange}
+                  aliveCounts={workCounts}
+                  binAggregation="sum"
+                  layerTypeName="WORKS"
+                  showLayer={showWorks}
+                  setShowLayer={setShowWorks}
+                />
+              )}
+            
+
+              <RelationTimeline
                 windowRange={windowRange}
-                aliveCounts={workCounts}
-                binAggregation="sum"
-                layerTypeName="WORKS"
-                showLayer={showWorks}
-                setShowLayer={setShowWorks}
+                layerTypeName="RElATIONS"
+                currentRelations={humanRelations.length > 0 ? humanRelations : humanLocations}
+                // humanRelations={humanRelations}
+                // humanLocations={humanLocations}
+                showLayer={showHumans}
+                setShowLayer={setShowHumans}
               />
-            )}
-          
+          </>
+          )}
+        <TimeSlider
+          selectedYear={selectedYear}
+          setSelectedYear={setSelectedYear}
+          fullRange={activeFullRange}
+          windowRange={windowRange}
+          setWindowRange={setWindowRange}
+          setSelectedMovement={setSelectedObject}
+          setManualMode={setManualMode}
+        />
 
-            <RelationTimeline
+        {!selectedHuman && (
+            <LayerHistogram
+              setSelectedYear={setSelectedYear}
               windowRange={windowRange}
-              layerTypeName="RElATIONS"
-              humanRelations={humanRelations}
+              aliveCounts={humanAliveCounts}
+              binAggregation="sum"
+              layerTypeName="HUMANS"
               showLayer={showHumans}
               setShowLayer={setShowHumans}
             />
-        </>
-        )}
-      <TimeSlider
-        selectedYear={selectedYear}
-        setSelectedYear={setSelectedYear}
-        fullRange={activeFullRange}
-        windowRange={windowRange}
-        setWindowRange={setWindowRange}
-        setSelectedMovement={setSelectedObject}
-        movements={movements}
-        detailMode={detailMode}
-        setManualMode={setManualMode}
-      >
-       
-
-        {!selectedHuman && (
-          <LayerHistogram
-            setSelectedYear={setSelectedYear}
-            windowRange={windowRange}
-            aliveCounts={humanAliveCounts}
-            binAggregation="sum"
-            layerTypeName="HUMANS"
-            showLayer={showHumans}
-            setShowLayer={setShowHumans}
-          />
         )}
 
         <LayerHistogram
@@ -157,20 +162,30 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           setShowLayer={setShowDisasters}
         />
 
-      </TimeSlider>
-      {!selectedHuman && (
-        <TimeWindowSlider
-          fullRange={activeFullRange}
-          windowRange={windowRange}
-          setWindowRange={setWindowRange}
-          setSelectedYear={setSelectedYear}
-          selectedYear={selectedYear}
-          
-        />
-      )}
+         <MovementTimeline
+              windowRange={windowRange}
+              movements={movements}
+              setSelectedMovement={setSelectedObject}
+              layerTypeName="MOVEMENTS"
+            />
 
+        {!selectedHuman && (
+          
+           
+
+            <TimeWindowSlider
+              fullRange={activeFullRange}
+              windowRange={windowRange}
+              setWindowRange={setWindowRange}
+              setSelectedYear={setSelectedYear}
+              selectedYear={selectedYear}
+              
+            />
+          
+        )}
+
+        </div>
       </div>
-    </div>
   </div>
   );
 };

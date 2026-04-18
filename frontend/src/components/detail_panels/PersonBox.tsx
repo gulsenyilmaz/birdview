@@ -134,8 +134,9 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
 
         if (selectedTab=="cv") {
             setManualMode(false)
-            setHumanLocations(cv_locations);
             setHumanRelations([]);
+            setHumanLocations(cv_locations);
+            
             // setUniqueTypes( Array.from(
             //     new Set(
             //         cv_locations.map(l => l.relationship_type_name)
@@ -145,8 +146,8 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
          }
          else if(selectedTab=="family"){
             setManualMode(false)
-            setHumanRelations(family)
             setHumanLocations([]);
+            setHumanRelations(family)
             // setUniqueTypes( Array.from(
             //     new Set(
             //         family.map(l => l.relationship_type_name)
@@ -156,8 +157,9 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
          else if(selectedTab=="professional"){
             
             setManualMode(false)
-            setHumanRelations(intellectual.concat(professional).concat(social).concat(political))
             setHumanLocations([]);
+            setHumanRelations(intellectual.concat(professional).concat(social).concat(political))
+            
             // setUniqueTypes( Array.from(
             //     new Set(
             //         professional.map(l => l.relationship_type_name)
@@ -166,8 +168,8 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
          }
          else if(selectedTab=="museums"){
             setManualMode(false)
-            setHumanLocations(museums);
             setHumanRelations([]);
+            setHumanLocations(museums);
             // setUniqueTypes( Array.from(
             //     new Set(
             //         museums.map(l => l.relationship_type_name)
@@ -246,98 +248,98 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                     </div>
 
                     <div className="person-data">
-                    <p>
-                        <strong>
-                        {personDetails.nationality} - {personDetails.gender}
-                        </strong>
-                    </p>
-
-                    {personDetails.citizenships && personDetails.citizenships.length > 0 && (
                         <p>
-                        <strong>Citizenships:</strong> {personDetails.citizenships.join(", ")}
+                            <strong>
+                            {personDetails.nationality} - {personDetails.gender}
+                            </strong>
                         </p>
-                    )}
 
-                    <p>
-                        <strong>Birth Date:</strong> {person.birth_date}
-                    </p>
+                        {personDetails.citizenships && personDetails.citizenships.length > 0 && (
+                            <p>
+                            <strong>Citizenships:</strong> {personDetails.citizenships.join(", ")}
+                            </p>
+                        )}
 
-                    <p>
-                        <strong>Death Date:</strong> {person.death_date ?? "—"}
-                    </p>
+                        <p>
+                            <strong>Birth Date:</strong> {person.birth_date}
+                        </p>
 
-                    {personDetails.signature_url && (
-                        <img
-                        src={personDetails.signature_url}
-                        alt={`${person.name} signature`}
-                        className="signature-image"
-                        />
-                    )}
-                   
-                    
-                </div>
+                        <p>
+                            <strong>Death Date:</strong> {person.death_date ?? "—"}
+                        </p>
+
+                        {personDetails.signature_url && (
+                            <img
+                                src={personDetails.signature_url}
+                                alt={`${person.name} signature`}
+                                className="signature-image"
+                            />
+                        )}
+                    </div>
                 </div>
                 
                 <div className="content-details">
                     {personDetails.occupations && personDetails.occupations.length > 0 && (
-                            <p><strong>Occupations:</strong> {personDetails.occupations.join(", ")}</p>
-                        )}
+                        <p><strong>Occupations:</strong> {personDetails.occupations.join(", ")}</p>
+                    )}
                     {personDetails.collections && personDetails.collections.length > 0 && (
                         <p><strong>Collections:</strong> {personDetails.collections.join(", ")}</p>
                     )}
                     {personDetails.movements && personDetails.movements.length > 0 && (
                         <p><strong>Movements:</strong> {personDetails.movements.join(", ")}</p>
                     )}
-
-                   
                 </div>
                         
                 <div className="tab-buttons">
-                        <button
-                            className={selectedTab === "cv" ? "active" : ""}
-                            onClick={() => setSelectedTab("cv")}
-                        >
-                            Curriculum Vitae
-                        </button>
-                        <button
-                            className={selectedTab === "family" ? "active" : ""}
-                            onClick={() => setSelectedTab("family")}
-                        >
-                            Family
-                        </button>
-                        <button
-                            className={selectedTab === "professional" ? "active" : ""}
-                            onClick={() => setSelectedTab("professional")}
-                        >
-                            Professional Life
-                        </button>
+                    <button
+                        className={selectedTab === "cv" ? "active" : ""}
+                        onClick={() => setSelectedTab("cv")}
+                    >
+                        Curriculum Vitae
+                    </button>
+                    <button
+                        className={selectedTab === "family" ? "active" : ""}
+                        onClick={() => setSelectedTab("family")}
+                    >
+                        Family
+                    </button>
+                    <button
+                        className={selectedTab === "professional" ? "active" : ""}
+                        onClick={() => setSelectedTab("professional")}
+                    >
+                        Professional Life
+                    </button>
+                    {museums.length>0 && (
+                        <>
                         <button
                             className={selectedTab === "museums" ? "active" : ""}
                             onClick={() => setSelectedTab("museums")}
                         >
-                            Has Works In
-                        </button>
+                            Museums
+                        </button></>
+                    )}
+                        
                 </div>
                 <div className="admin-tools">
-                        <a
-                        href={`https://www.wikidata.org/wiki/${person.qid}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="qid-link"
-                        >
-                        {person.qid}
-                        </a>
+                    <a
+                    href={`https://www.wikidata.org/wiki/${person.qid}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="qid-link"
+                    >
+                    {person.qid}
+                    </a>
 
-                        <button
-                        onClick={handleUpdatePersonDetails}
-                        disabled={isUpdating}
-                        className="update-button"
-                        >
-                        {isUpdating ? "..." : "↻"}
-                        </button>
+                    <button
+                    onClick={handleUpdatePersonDetails}
+                    disabled={isUpdating}
+                    className="update-button"
+                    >
+                    {isUpdating ? "..." : "↻"}
+                    </button>
 
-                        {updateError && <span className="update-error">!</span>}
-                    </div>
+                    {updateError && <span className="update-error">!</span>}
+                </div>
 
             </div>
         )}

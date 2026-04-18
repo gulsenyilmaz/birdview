@@ -108,59 +108,66 @@ export const getColorForAgeString = (
    
     
    switch (type) {
-    case 'birth_place':
-      return [39, 174, 96, opacity];       // ✔ Yeşil rgb(39, 174, 96)
-    case 'death_place':
-      return [240, 57, 43, opacity];       // ✔ Kırmızı (#C0392B)
-    case 'educated_at':
-      return [138, 43, 226, opacity];      // ✔ Mor (#9B59B6)
-    case 'residence':
-      return [52, 152, 219, opacity];      // ✔ Mavi (#3498DB)
-    case 'work_location':
-      return [243, 156, 18, opacity];       // ✔ Turuncu (#F39C12)
-    case 'has_works_in':
-      return [64, 150, 150, opacity];      // ✔ Turkuaz → [ (#40E0D0)
-    case 'buried_at':
-      return [50, 50, 50, opacity];      // ✔ gray → [ (#40E0D0)
-    case 'father':
-    return [70, 130, 180, opacity];   // 👨 Baba → mavi (steelblue)
+     case 'birth_place':
+  return [112, 146, 120, opacity];   // muted sage green
 
-    case 'mother':
-      return [231, 76, 60, opacity];    // 👩 Anne → kırmızı/pembe
+case 'death_place':
+  return [165, 96, 90, opacity];     // muted brick red
 
-    case 'spouse':
-      return [155, 89, 182, opacity];   // 💍 Eş → mor
+case 'educated_at':
+  return [128, 112, 150, opacity];   // dusty violet
 
-    case 'child':
-      return [46, 204, 113, opacity];   // 👶 Çocuk → yeşil
+case 'residence':
+  return [100, 130, 160, opacity];   // muted steel blue
 
-    case 'sibling':
-      return [241, 196, 15, opacity];   // 👥 Kardeş → sarı
+case 'work_location':
+  return [170, 140, 95, opacity];    // ochre / parchment
 
-    case 'significant person':
-      return [230, 126, 34, opacity];   // ⭐ önemli kişi → turuncu
+case 'has_works_in':
+  return [110, 150, 145, opacity];   // desaturated teal
 
-    case 'influenced':
-      return [52, 152, 219, opacity];   // ➡ etkiledi → mavi
+case 'buried_at':
+  return [90, 90, 85, opacity];      // warm dark grey
 
-    case 'influenced by':
-      return [41, 128, 195, opacity];   // ⬅ etkilendi → koyu mavi
+case 'father':
+  return [95, 125, 155, opacity];    // muted blue
 
-    case 'student':
-      return [26, 188, 156, opacity];   // 🎓 öğrenci → turkuaz
+case 'mother':
+  return [175, 105, 110, opacity];   // dusty rose
 
-    case 'student of':
-      return [22, 50, 133, opacity];   // 🎓 hocası → koyu turkuaz
+case 'spouse':
+  return [140, 110, 150, opacity];   // muted lavender
 
-    case 'collaborator':
-      return [127, 140, 141, opacity];  // 🤝 işbirliği → gri
+case 'child':
+  return [115, 160, 125, opacity];   // soft green
 
-    case 'unmarried partner':
-    case 'madigudisi':
-      return [255, 105, 180, opacity];
+case 'sibling':
+  return [185, 165, 95, opacity];    // antique gold
 
-    default:
-      return [75, 75, 75, opacity];     // fallback
+case 'significant person':
+  return [170, 125, 85, opacity];    // burnt sienna
+
+case 'influenced':
+  return [105, 135, 165, opacity];   // academic blue
+
+case 'influenced by':
+  return [85, 110, 145, opacity];    // deeper muted blue
+
+case 'student':
+  return [95, 150, 135, opacity];    // muted turquoise
+
+case 'student of':
+  return [80, 95, 130, opacity];     // ink blue
+
+case 'collaborator':
+  return [140, 145, 140, opacity];   // stone grey
+
+case 'unmarried partner':
+case 'madigudisi':
+  return [190, 130, 150, opacity];   // faded pink
+
+default:
+  return [120, 120, 115, opacity];   // neutral academic grey
     }
     
 

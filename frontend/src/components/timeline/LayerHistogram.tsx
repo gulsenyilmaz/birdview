@@ -95,8 +95,8 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
 
   return (
     // <div className="component-container">
-      <div className="time-container" >
-        <div className="time-slider">
+      <div className="timeline-row" >
+        <div className="timeline-main">
           {/* ⬇️ Tam windowRange boyunca "o yıl olanlar" histogramı */}
           {bins.length > 0 && (
             <div className="histogram">
@@ -122,7 +122,7 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
           
         </div>
 
-        <div className="label-group" style={{ color:getLayerColor(layerTypeName) }}>
+        <div className="timeline-side" style={{ color:getLayerColor(layerTypeName) }}>
          <button className={`label-button ${showLayer ? "active" : ""}`} style={{backgroundColor:getLayerColor(layerTypeName) }} onClick={handleShowAction}>
             {layerTypeName}
           </button>

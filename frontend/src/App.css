@@ -191,6 +191,9 @@
   right: 0;
   bottom: 0;
 
+  padding: .5rem;
+  padding-right: .5rem;
+
   width: 100%;
   height: auto; /* ikisini taşıyacak kadar */
   
@@ -206,6 +209,8 @@
   width: 100%;
   height: auto;
   
+  /* padding-left: .5rem;
+  padding-right: .5rem; */
 
   display: flex;
   flex-direction: column;
@@ -227,18 +232,22 @@
 
   display: flex;
   flex-direction: column;
+  align-items: flex-start;  
+  justify-content:last baseline;
   box-sizing: border-box;
   
   
   z-index: 10;
 
-  transform: translateY(100%);
-  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(100%);
+  transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bottom-worklist-panel.open {
-  transform: translateY(0);
+  transform: translateX(0%);
+  
 }
+
 
 
 .left-panel,

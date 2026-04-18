@@ -86,7 +86,7 @@
 }
 
 .tab-buttons button.active {
-  background-color: rgba(182, 72, 72, 0.869);
+  background-color: rgba(51, 34, 202, 0.869);
   color: white;
   border-bottom: 1px solid #ccc;
   /* border-color: #222; */

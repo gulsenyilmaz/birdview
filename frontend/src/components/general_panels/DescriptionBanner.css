@@ -1,7 +1,7 @@
 .description-container {
   position: relative;
-
-  width:100%;
+  
+  width:60%;
   height: 30%;
 
   padding: 0rem;
@@ -14,7 +14,7 @@
   justify-items: center;
   
 
-  background-color: rgba(0, 150, 120, 0);
+  background-color: rgba(0, 150, 120, 0.586);
   border: none;
 
   z-index: 1;

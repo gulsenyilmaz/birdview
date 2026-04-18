@@ -498,8 +498,8 @@ def get_movements(request: Request):
                 m.start_date,
                 m.inception,
                 m.end_date
-        ORDER BY count DESC
-        LIMIT 200;
+        ORDER BY m.start_date, count DESC
+        LIMIT 1000;
     """
 
     results = cur.execute(base_query, params).fetchall()

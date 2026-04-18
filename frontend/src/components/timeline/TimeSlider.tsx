@@ -13,9 +13,7 @@ interface TimeSliderProps {
   windowRange?: [number, number];
   setWindowRange: (r: [number, number]) => void;
   setSelectedMovement: (obj: Movement) => void;
-  movements: Movement[];
-  children: React.ReactNode;
-  detailMode?: boolean; 
+ 
   setManualMode:(obj: boolean) => void
 }
 
@@ -26,10 +24,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   fullRange,
   windowRange = [1200, 2025],
   setWindowRange,
-  setSelectedMovement,
-  movements,
-  children,
-  detailMode = false,
+  
   setManualMode
         
 }) => {
@@ -142,49 +137,11 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
     isDragging.current = false;
   };
 
-  return (
-    
-       <>
-      <div className={`movements-container ${detailMode ? "hide" : ""}`}>
-        {movements && movements.length>0 && (
-            <div className="movements-wrapper">
-                
-              {movements
-              .filter((item) =>
-                item.start_date !== null && item.end_date !== null && item.start_date <= maxYear && item.start_date >= minYear && item.count>10
-              )
-              .map((item) => {
-                  const left = getLeftPercent(item.start_date!);
-                  
-                  return (
-                    <div 
-                        className="milestone"
-                        key={item.id}
-                        style={{
-                        left: `${left}%`,
-                        // right: `${(1 - (item.end_date! - minYear) / (maxYear - minYear)) * 100}%`
-                      
-                        }}
-                        title={`Jump to ${item.name} `}
-                        onClick={() => setSelectedMovement(item)}
-                        onMouseOver={() => console.log(`${item.name} (${item.start_date})`)}    
-                        
-                      /> 
-                      
-                  );
-                }
-              )}
+  
 
-            </div>
-        )}
-        <div className="label-group">
-          <button className="label-button" style={{backgroundColor:'#705d15' }} onClick={() => setManualMode(true)}>
-            Movements
-            </button>
-        </div>
-      </div>
-      <div className="time-container">
-        <div className="time-slider">
+  return (
+      <div className="timeline-row">
+        <div className="timeline-main">
           
           <div className="year-labels"
               ref={stripRef}
@@ -222,15 +179,13 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
           </div>
           
         </div>
-        <div className="label-group">
+        <div className="timeline-side">
           <button className="label-button" style={{backgroundColor:'#171717' }} onClick={handlePlayAction}>
             {isPlaying ? "⏸" : "▶"}
           </button>
         </div>
       </div>
-      {children}
-
-    </>
+      
   );
 };
 

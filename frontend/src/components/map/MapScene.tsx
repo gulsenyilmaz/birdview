@@ -280,18 +280,17 @@ const layers = useMemo(() => {
                   
           
           onClick={({ object }) => {
-                if (object) {
-                 
-                  // setManualMode(true);
-                  setSelectedObject(object);
-                }
-            }}
+              if (object) {
+                
+                // setManualMode(true);
+                setSelectedObject(object);
+              }
+          }}
           onDragStart={({ object }) => {
                 
-                  console.log("onDragStart object:",object);
-                  setManualMode(true);
-                
-            }}
+              console.log("onDragStart object:",object);
+              setManualMode(true);
+          }}
           
 
           >

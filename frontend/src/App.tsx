@@ -100,9 +100,9 @@ function App() {
       unionRanges([
         humanLayer.fullRange,
         showEvents ? militaryLayer.fullRange : null,
-        workLayer.fullRange,
+        // workLayer.fullRange,
       ]),
-    [humanLayer.fullRange, militaryLayer.fullRange, workLayer.fullRange, showEvents]
+    [humanLayer.fullRange, militaryLayer.fullRange, showEvents]
   );
 
 
@@ -232,8 +232,9 @@ function App() {
           activeFullRange={activeFullRange}
           windowRange={windowRange}
           setWindowRange={setWindowRange}
-          detailMode={detailMode}
+          // detailMode={detailMode}
           humanRelations={humanRelations}
+          humanLocations={humanLocations}
           movements={movements}
           setSelectedObject={setSelectedObject}
           setManualMode={setManualMode}

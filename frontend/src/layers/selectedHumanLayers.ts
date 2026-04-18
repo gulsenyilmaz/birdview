@@ -78,7 +78,7 @@ export function createSelectedHumanLayers({
           const diedText =
             d.death_date && d.death_date < selectedYear
               ? ` (died in ${d.death_date})`
-              : '';
+              : ' ';
           return ` ${d.name}${diedText}`;
         },
 
@@ -91,7 +91,7 @@ export function createSelectedHumanLayers({
           return [250, 250, 250, isActive ? 255 : 70];
         },
 
-        getSize: d => Math.max(Math.log10(Math.max(d.age, 1)) / 3, 0.5),
+        getSize: d => Math.max(Math.log10(Math.max(d.age, 1)) / 3, 0.2),
 
         sizeScale: fontSize,
         sizeMinPixels,
@@ -106,7 +106,7 @@ export function createSelectedHumanLayers({
           return getColorForRelationType(d.relationship_type_name, isActive ? 255 : 150);
         },
 
-        pickable: false,
+        pickable: true,
         collisionEnabled: false,
         getCollisionPriority: d => Math.max(d.age, 1),
 

@@ -70,28 +70,10 @@ const LocationBox: React.FC<LocationBoxProps> = ({location}) => {
           
             <div className="detail-box-container">
               <div className="detail-title">
-                    <h2>{location.name}</h2>
+                    <h2>{location.name}({location.id}) </h2>
                     <p>
-                    {locationDetails.description} ({location.id}) (
-                    <a
-                        href={`https://www.wikidata.org/wiki/${location.qid}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="timeline-item-title"
-                    >
-                        {location.qid}
-                    </a>
-                    )
-
-                     <button
-                        onClick={handleUpdateLocationDetails}
-                        disabled={isUpdating}
-                        className="update-button"
-                    >
-                        {isUpdating ? "UPDATING..." : "UPDATE"}
-                    </button>
-
-                    {updateError && <p className="update-error">{updateError}</p>}
+                    {locationDetails.description} 
+                    
                     </p>
                 </div>
               
@@ -108,10 +90,30 @@ const LocationBox: React.FC<LocationBoxProps> = ({location}) => {
                   )}
                   
                   <div style={{height: 'auto'}}>
-                    {locationDetails.country_label && (<p><strong>IN COUNTRY:</strong> {locationDetails.country_label}</p>)}
-                    {locationDetails.inception && (<p><strong>INCEPTION:</strong> {locationDetails.inception}</p>)}
+                    {locationDetails.country_label && (<p><strong>IN COUNTRY: </strong> {locationDetails.country_label}</p>)}
+                    {locationDetails.inception && (<p><strong>INCEPTION: </strong> {locationDetails.inception}</p>)}
                   </div>
                   
+                </div>
+                 <div className="admin-tools">
+                    <a
+                    href={`https://www.wikidata.org/wiki/${location.qid}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="qid-link"
+                    >
+                    {location.qid}
+                    </a>
+
+                    <button
+                    onClick={handleUpdateLocationDetails}
+                    disabled={isUpdating}
+                    className="update-button"
+                    >
+                    {isUpdating ? "..." : "↻"}
+                    </button>
+
+                    {updateError && <span className="update-error">!</span>}
                 </div>
                 
                 
