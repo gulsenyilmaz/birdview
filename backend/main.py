@@ -235,6 +235,7 @@ def get_person_details(human_id: int):
         JOIN locations AS l ON l.id = hl.location_id
         JOIN human_location_types AS hlt ON hlt.id = hl.relationship_type_id
         WHERE hl.human_id = ?
+        ORDER BY COALESCE(hl.start_date, hl.end_date) ASC;
     """,
         (human_id,),
     )
@@ -253,13 +254,13 @@ def get_person_details(human_id: int):
         JOIN humans AS h ON h.id = hh.related_human_id
         JOIN human_relationship_types AS hrt ON hrt.id = hh.relationship_type_id
         INNER JOIN relationship_categories rc ON rc.id = hrt.category_id
-        INNER JOIN human_location hl ON hl.human_id = hh.related_human_id
+        LEFT JOIN human_location hl ON hl.human_id = hh.related_human_id
         INNER JOIN locations l ON hl.location_id = l.id
        
         WHERE 
             hh.human_id = ?
             AND hl.relationship_type_id = 4
-        
+        ORDER BY COALESCE(hh.start_date, h.birth_date) ASC;
     """,
         (human_id,),
     )

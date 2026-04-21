@@ -79,7 +79,7 @@ export function createSelectedHumanLayers({
             d.death_date && d.death_date < selectedYear
               ? ` (died in ${d.death_date})`
               : ' ';
-          return ` ${d.name}${diedText}`;
+          return ` ${d.name}${d.id}${diedText}`;
         },
 
         getPosition: d => [d.lonOffsetSource, d.latOffsetSource],

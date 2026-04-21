@@ -42,9 +42,9 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
     const [museums, setMuseums] = useState<Location[]>([]);
     const [family, setFamily] = useState<RelatedHuman[]>([]);
     const [professional, setProfessional] = useState<RelatedHuman[]>([]);
-    const [intellectual, setIntellectual] = useState<RelatedHuman[]>([]);
-    const [social, setSocial] = useState<RelatedHuman[]>([]);
-    const [political, setPolitical] = useState<RelatedHuman[]>([]);    
+    // const [intellectual, setIntellectual] = useState<RelatedHuman[]>([]);
+    // const [social, setSocial] = useState<RelatedHuman[]>([]);
+    // const [political, setPolitical] = useState<RelatedHuman[]>([]);    
     // const [uniqueTypes, setUniqueTypes] = useState<string[]>([]);
    
     const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "professional"| "museums">("cv");
@@ -52,27 +52,6 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateError, setUpdateError] = useState<string | null>(null);
 
-
-   
-    
-    // const renderList = (
-    //     locations: any[] | undefined
-    //     ) => {
-    //     if (!locations || locations.length === 0) return null;
-
-    //     return (
-    //         <ul>
-    //             {locations.map((loc, idx) => (
-    //                 <li key={idx}>
-    //                 {loc.start_date} 
-    //                 {loc.start_date==loc.end_date? "" :` - ${loc.end_date} ` }   {loc.name} {loc.qid}— <em style={{ color: getColorForRelationTypeString(loc.relationship_type_name) }}>
-    //                     {loc.relationship_type_name}
-    //                     </em>
-    //                 </li>
-    //             ))}
-    //         </ul>
-    //     );
-    // };
 
     useEffect(() => {
         if(!isUpdating) {
@@ -94,9 +73,9 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                             setHumanLocations(cv_locs);
                             setFamily(data.family);
                             setProfessional(data.professional);
-                            setIntellectual(data.intellectual);
-                            setSocial(data.social);
-                            setPolitical(data.political);
+                            // setIntellectual(data.intellectual);
+                            // setSocial(data.social);
+                            // setPolitical(data.political);
 
                             // setUniqueTypes( Array.from(
                             //     new Set(
@@ -158,7 +137,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             
             setManualMode(false)
             setHumanLocations([]);
-            setHumanRelations(intellectual.concat(professional).concat(social).concat(political))
+            setHumanRelations(professional)
             
             // setUniqueTypes( Array.from(
             //     new Set(

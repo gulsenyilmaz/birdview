@@ -43,7 +43,7 @@ const RelationTimeline: React.FC<RelationTimelineProps> = ({
 
   }, [currentRelations, minYear, maxYear]);
 
-
+  console.log("currentRelations", currentRelations);
 
   const width = 900;
   const rowHeight = 6;
@@ -111,7 +111,7 @@ const RelationTimeline: React.FC<RelationTimelineProps> = ({
                   <rect
                     x={xS1}
                     y={y}
-                    width={barSWidth}
+                    width={barSWidth+1}
                     height={rowHeight-0.8}
                     rx={0}
                     fill={color}

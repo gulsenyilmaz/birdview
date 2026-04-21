@@ -102,7 +102,7 @@ export const getColorForAgeString = (
 
  export const getColorForRelationType = ( 
   type:string,
-  opacity: number = 250
+  opacity: number = 200
 
  ): [number, number, number, number] => {
    
@@ -157,7 +157,7 @@ case 'student':
   return [95, 150, 135, opacity];    // muted turquoise
 
 case 'student of':
-  return [80, 95, 130, opacity];     // ink blue
+  return [0, 95, 130, opacity];     // ink blue
 
 case 'collaborator':
   return [140, 145, 140, opacity];   // stone grey
