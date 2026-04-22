@@ -145,7 +145,7 @@ const MapScene: React.FC<MapSceneProps> = ({
       const enrichedRelatedHumans: RelatedHumanEnriched[] = humanRelations.filter(h => h.birth_date<selectedYear ).map((h) => {
           const age = (h.death_date && (selectedYear>h.death_date)?h.death_date:selectedYear) - h.birth_date;
           
-          let [lonOffsetSource, latOffsetSource] = offsetFibonacciPosition(h.lon, h.lat, age*2, viewState.zoom, h.index*15 || 0);
+          let [lonOffsetSource, latOffsetSource] = offsetFibonacciPosition(h.lon, h.lat, age*20/viewState.zoom, viewState.zoom, h.index*25 || 0);
           
           return {
             ...h,

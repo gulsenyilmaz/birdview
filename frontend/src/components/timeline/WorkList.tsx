@@ -74,27 +74,30 @@ const WorkList: React.FC<WorkListProps> = ({ filteredWorks }) => {
     <>
 
          {worksWithImages.map((a, index) => (
-        <div key={a.id} className="timeline-item" data-year={a.created_date}>
-          {a.image_url ? (
-            <img
-              src={a.image_url}
-              alt={a.title}
-              className="timeline-item-img"
-              onClick={() => openModal(index)}
-              style={{ cursor: "pointer" }}
-            />
-          ) : (
+          <div key={a.id} className="timeline-item" data-year={a.created_date}>
+            {a.image_url ? (
             <a
-              href={a.url}
-              target="_blank"
-              rel="noreferrer"
-              className="timeline-item-title"
-            >
-              <strong>{a.title}</strong>
-            </a>
-          )}
-        </div>
-      ))}
+                href={a.url}
+                target="_blank"
+                rel="noreferrer"
+                className="timeline-item-title"
+              >
+                <strong>{a.title}</strong>
+              </a>) : ( <strong>{a.title}</strong>)  
+            }
+            {a.image_url ? (
+              <img
+                src={a.image_url}
+                alt={a.title}
+                className="timeline-item-img"
+                onClick={() => openModal(index)}
+                style={{ cursor: "pointer" }}
+              />
+            ) : (
+              <strong>NO IMAGE</strong>
+            )}
+          </div>
+          ))}
 
         {selectedIndex !== null &&
           createPortal(

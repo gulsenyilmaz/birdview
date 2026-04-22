@@ -41,6 +41,7 @@ export function useAppSelection(selectedObject: SelectedObject) {
     if (isHuman(selectedObject)) {
       clearSelectionStates();
       setSelectedHuman(selectedObject);
+      
       return;
     }
 

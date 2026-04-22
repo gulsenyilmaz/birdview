@@ -25,7 +25,7 @@
   
   
   align-items:flex-end;
-  gap: 1rem;
+  gap: 0.7rem;
   height: 100%;
   /* width: 100%; */
   /* padding: 0.2rem; */
@@ -92,11 +92,11 @@
   min-width: 3vw;
   max-width: 7vw;
   
-  max-height: 18vh;
+  max-height: 25vh;
   flex-shrink: 0;
   color: white;
   padding: 0rem; 
-  background-color: #c8e15700;
+  background-color: #edfffc8c;
 }
 
 .timeline-item-img {
@@ -105,8 +105,8 @@
 }
 
 .timeline-item-title {
-  font-size: 0.6em;
-  color: #818181;
+  font-size: 0.9dvb;
+  color: #cb0909;
   text-decoration: none;
 }
 

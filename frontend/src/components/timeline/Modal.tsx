@@ -50,7 +50,11 @@ const Modal: React.FC<ModalProps> = ({
 
         <div className="modal-caption">
             {selectedWork.title && (
-                <div className="modal-title">{selectedWork.title}</div>
+                <div className="modal-title">{selectedWork.url ? (<a href={selectedWork.url} target="_blank" rel="noopener noreferrer">
+                  {selectedWork.title}
+                </a>) : (
+                  selectedWork.title
+                )}</div>
             )}
 
             <div className="modal-meta">

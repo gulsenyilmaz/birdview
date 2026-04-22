@@ -111,8 +111,14 @@ function App() {
 
     if (!selectedObject) {
       nextRange = activeFullRange;
-    } else if (selectedHuman || selectedLocation) {
+    } else if (selectedHuman) {
       setShowWorks(true);
+      
+      nextRange = humanLayer.fullRange;
+      // setShowHumans(false);
+    } else if (selectedLocation) {
+      setShowWorks(false);
+      setShowHumans(true);
       nextRange = humanLayer.fullRange;
     } else if (selectedMilitaryEvent) {
       nextRange = militaryLayer.fullRange;
@@ -154,29 +160,11 @@ function App() {
           } />
           }
           <div className="scene">
-         {/* <MapSection
-          humanLocations={humanLocations}
-          humans={humanLayer.filteredHumans}
-          militaryEvents={militaryLayer.filteredMilitaryEvents}
-          works={workLayer.filteredWorks}
-          humanRelations={humanRelations}
-          selectedYear={selectedYear}
-          setSelectedObject={setSelectedObject}
-          selectedObject={selectedObject}
-          detailMode={detailMode}
-          showEvents={showEvents}
-          showHumans={showHumans}
-          showWorks={showWorks}
-          manualMode={manualMode}
-          setManualMode={setManualMode}
-        /> */}
-
-        <div className="map-shell">
-          <MapScene
+          {/* <MapSection
             humanLocations={humanLocations}
             humans={humanLayer.filteredHumans}
             militaryEvents={militaryLayer.filteredMilitaryEvents}
-            // works={workLayer.filteredWorks}
+            works={workLayer.filteredWorks}
             humanRelations={humanRelations}
             selectedYear={selectedYear}
             setSelectedObject={setSelectedObject}
@@ -187,8 +175,26 @@ function App() {
             showWorks={showWorks}
             manualMode={manualMode}
             setManualMode={setManualMode}
-          />
-        </div>
+          /> */}
+
+          <div className="map-shell">
+            <MapScene
+              humanLocations={humanLocations}
+              humans={humanLayer.filteredHumans}
+              militaryEvents={militaryLayer.filteredMilitaryEvents}
+              // works={workLayer.filteredWorks}
+              humanRelations={humanRelations}
+              selectedYear={selectedYear}
+              setSelectedObject={setSelectedObject}
+              selectedObject={selectedObject}
+              detailMode={detailMode}
+              showEvents={showEvents}
+              showHumans={showHumans}
+              showWorks={showWorks}
+              manualMode={manualMode}
+              setManualMode={setManualMode}
+            />
+          </div>
         </div>
         <div className="overlay-layer">
         <AppPanels
