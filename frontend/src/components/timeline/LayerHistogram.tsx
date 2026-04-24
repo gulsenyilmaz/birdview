@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import "./TimeSlider.css";
-import { getLayerColor } from "../../utils/colorUtils";
+import "./LayerHistogram.css";
 
+import LayerButton from "./LayerButton";
 
 type YearCount = { year: number; count: number };
 
@@ -11,6 +11,7 @@ interface LayerHistogramProps {
   windowRange?: [number, number];
   aliveCounts?: YearCount[];
   binAggregation?: "avg" | "sum";
+  layerColor:string
   layerTypeName:string;
   showLayer?: boolean;
   setShowLayer: (ch: boolean) => void;
@@ -22,6 +23,7 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
   windowRange = [1200, 2025],
   aliveCounts = [],   
   binAggregation = "avg", 
+  layerColor,
   layerTypeName,  
   showLayer,
   setShowLayer
@@ -39,7 +41,7 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
     if (span <= 150) return 2;
     if (span <= 500) return 5;
     if (span <= 1500) return 10;
-    return 20;
+    return 10;
   }, [minYear, maxYear]);
 
   
@@ -85,13 +87,7 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
   const getWidthPercentForBin = (size: number): number =>
     (size / totalRange) * 100;
 
-   const handleShowAction = () => {
-    
-      setShowLayer(showLayer ? false : true);
-    
-   
-    
-  };
+  
 
   return (
     // <div className="component-container">
@@ -110,7 +106,7 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
                   <div
                     key={`${b.start}-${i}`}
                     className={`hist-bar ${showLayer? (b.value > 0 ? "active" : "") : "disabled"}`}
-                    style={{ left: `${left}%`, width: `${width}%`, height: `${height}%`, color:getLayerColor(layerTypeName) }}
+                    style={{ left: `${left}%`, width: `${width}%`, height: `${height}%`, color:layerColor }}
                     title={`${b.start}–${b.end}: ${binAggregation === "avg" ? "avg" : "sum"}=${b.value.toFixed(0)}`}
                     
                     onClick={showLayer ? () => b.value > 0 && setSelectedYear(b.start) : undefined}
@@ -122,10 +118,16 @@ const LayerHistogram: React.FC<LayerHistogramProps> = ({
           
         </div>
 
-        <div className="timeline-side" style={{ color:getLayerColor(layerTypeName) }}>
-         <button className={`label-button ${showLayer ? "active" : ""}`} style={{backgroundColor:getLayerColor(layerTypeName) }} onClick={handleShowAction}>
-            {layerTypeName}
-          </button>
+        <div className="timeline-side">
+          
+          <LayerButton
+            layerColor={layerColor}
+            layerTypeName={layerTypeName}
+            showLayer={showLayer}
+            setShowLayer={setShowLayer}
+          />
+
+         
         </div>
       
       </div>

@@ -1,3 +1,4 @@
+
 .tw-container {
   position: relative;
   width: 100%;
@@ -5,8 +6,9 @@
   display: flex;
   flex-direction: row;
   box-sizing: border-box;
-  background-color: #2C2C2A;
-  border-top: 1px solid #444441;
+  background-color: rgba(244, 242, 235, 0.97);
+  border-top: 1px solid #D3D1C7;
+  z-index: 4000;
 }
 
 .tw-container.hide {
@@ -14,6 +16,21 @@
 }
 
 .tw-window {
+  position: relative;
+  width: 95%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  
+  /* padding: 0 0.5rem; */
+}
+
+
+
+
+
+/* .tw-window {
   position: relative;
   width: 95%;
   height: 2.5dvh;
@@ -25,7 +42,7 @@
   justify-content: center;
   border: none;
   background-color: transparent;
-}
+} */
 
 .tw-year-label {
   position: absolute;
@@ -35,7 +52,7 @@
   text-align: center;
   padding: 0;
   font-size: 1dvb;
-  font-family: 'Inter', sans-serif;
+  
   font-weight: 500;
   letter-spacing: 0.06em;
   color: #888780;
@@ -81,14 +98,14 @@
   position: relative;
   width: 5%;
   height: 100%;
-  padding: 0.2dvw;
+  padding: 0.3dvw;
   display: flex;
   flex-direction: row;
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
-  background-color: #2C2C2A;
-  border-left: 1px solid #444441;
+  
+  
 }
 
 .zoom-label {
@@ -128,3 +145,5 @@
   transform: scale(1.1);
   background: #EF9F27;
 }
+
+

@@ -162,8 +162,9 @@
   justify-items: center;
   
   pointer-events: auto;
-  background-color:#2C2C2Ae8;
+  background-color:rgba(39, 38, 37, 0.92);
   
+  color: beige;
   border: none;
   z-index: 1550;
   
@@ -193,13 +194,14 @@
   right: 0;
   bottom: 0;
 
-  padding: .5rem;
-  padding-right: .5rem;
+  padding: 1rem;
+  padding-right: 1rem;
 
   width: 100%;
   height: auto; /* ikisini taşıyacak kadar */
+ 
   
-  
+  font-family: 'Georgia', sans-serif;
   overflow: hidden;
   z-index: 100;
   
@@ -220,7 +222,7 @@
   justify-content:last baseline;
   
 
-  background-color: rgba(255, 255, 255, 0);
+  background-color: rgba(255, 255, 255, 0.351);
   box-sizing: border-box;
   z-index: 100;
   
@@ -254,7 +256,7 @@
 
 .left-panel,
 .right-panel,
-.top-panel,
+.top-bar,
 .bottom-panel,
 .bottom-worklist-panel {
   pointer-events: auto;

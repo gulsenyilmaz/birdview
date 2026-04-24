@@ -1,6 +1,8 @@
+import "./Dashboard.css";
+
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
-import "./Dashboard.css";
+
 import type { Human } from "../../entities/Human";
 import {
   getColorForLabelString,
@@ -55,7 +57,7 @@ const BarChart: React.FC<{ data: ChartItem[]; labelWidth: number }> = ({ data, l
         .attr("font-family", "'Georgia', sans-serif")
         .attr("font-weight", 500)
         .attr("letter-spacing", "0.06em")
-        .attr("fill", "#888780")
+        .attr("fill", "#efefef")
         .text(d.label);
 
       g.append("rect")
@@ -104,7 +106,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, humans }) => {
     .map(([label, value]) => ({ label, value, color: getColorForLabelString(label) }));
 
   const cityData: ChartItem[] = Object.entries(cityCounter)
-    .map(([, { name, count }]) => ({ label: name, value: count, color: "#BA7517" }))
+    .map(([, { name, count }]) => ({ label: name, value: count, color: "#7aa260" }))
     .sort((a, b) => b.value - a.value)
     .slice(0, TOP_N);
 

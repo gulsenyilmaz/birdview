@@ -49,10 +49,10 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
     if (span <= 7000) return 500;
     return 1000;
   }, [minYear, maxYear]);
-
+  
 
   const getLeftPercent = (year: number): number =>
-    ((year - minYear) / totalRange) * 100;
+    ((year - minYear) / totalRange) * 95;
 
   const getWidthPercent = (year: number, n_year:number): number =>
     ((n_year - year) / step) * 100;
@@ -180,10 +180,16 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
           
         </div>
         <div className="timeline-side">
-          <button className="label-button" style={{backgroundColor:'#171717' }} onClick={handlePlayAction}>
+          <div className="label-item">
+          
+          <button className="label-button" style={{color:'#171717' }} onClick={handlePlayAction}>
             {isPlaying ? "⏸" : "▶"}
           </button>
-        </div>
+          <div className="label-title">
+                PLAY
+            </div>
+        </div></div>
+        
       </div>
       
   );

@@ -1,40 +1,61 @@
 // src/utils/colorUtils.ts
 
-export const colorPalette: string[] = [
-  "#4e79a7",
-  "#f28e2c",
-  "#e15759",
-  "#76b7b2",
-  "#59a14f",
-  "#edc949",
-  "#af7aa1",
-  "#ff9da7",
-  "#9c755f",
-  "#bab0ab",
-  "#8cd17d",
-  "#b6992d",
-  "#d37295",
-  "#5b5f97",
-  "#009fb7",
-];
+// export const colorPalette: string[] = [
+//   "#4e79a7",
+//   "#f28e2c",
+//   "#e15759",
+//   "#76b7b2",
+//   "#59a14f",
+//   "#edc949",
+//   "#af7aa1",
+//   "#ff9da7",
+//   "#9c755f",
+//   "#bab0ab",
+//   "#8cd17d",
+//   "#b6992d",
+//   "#d37295",
+//   "#5b5f97",
+//   "#009fb7",
+// ];
 
 // export const colorPalette: string[] = [
-//   "#BA7517", // amber
-//   "#1D9E75", // teal
-//   "#378ADD", // blue
-//   "#D85A30", // coral
-//   "#D4537E", // pink
-//   "#639922", // green
-//   "#7F77DD", // purple
-//   "#EF9F27", // light amber
-//   "#5DCAA5", // light teal
-//   "#85B7EB", // light blue
-//   "#F0997B", // light coral
-//   "#97C459", // light green
-//   "#AFA9EC", // light purple
-//   "#888780", // stone
-//   "#B4B2A9", // light stone
+//   "#4DAEA8", // teal - Chile
+//   "#E8845A", // orange - Argentina  
+//   "#8B7EC8", // purple - Brazil
+//   "#E86B9A", // pink - Bolivia
+//   "#7DB87D", // green - Peru
+//   "#C4A84F", // gold - Ecuador
+//   "#7BB8C4", // light blue - Colombia
+//   "#A8A8A8", // gray - Venezuela
+//   "#5BAD8F", // sage teal - Dominican Republic
+//   "#E8A06B", // light orange - Haiti
+//   "#9B8FD4", // lavender - Cuba
+//   "#E86BA0", // hot pink - Guatemala
+//   "#8DC46B", // lime green - Mexico
+//   "#D4B84A", // yellow gold - US
+//   "#B0B0B0", // medium gray - Canada
+//   "#5BB8B0", // turquoise - Sweden
 // ];
+
+export const colorPalette: string[] = [
+  // Teal ailesi
+  "#4DAEA8", "#2D8B85", "#7DCEC9", "#1A6E6A",
+  
+  // Mor ailesi
+  "#8B7EC8", "#6355A4", "#B0A6E0", "#473D80",
+  // Pembe ailesi
+  "#E86B9A", "#C44070", "#F097BC", "#A02858",
+  // Yeşil ailesi
+  "#7DB87D", "#4D8F4D", "#A8D4A8", "#2D6B2D",
+  // Sarı/Altın ailesi
+  "#C4A84F", "#9E7E28", "#DFC878", "#7A5C10",
+  // Mavi ailesi
+  "#7BB8C4", "#4A8F9E", "#A8D4DE", "#2A6878",
+  // Turuncu ailesi
+  "#E8845A", "#C45E32", "#F0A882", "#9c4123",
+  // Gri/Kahve ailesi
+  "#A89880", "#7A6A58", "#C4B4A0", "#5A4A38",
+];
 
 export const hashString = (str: string): number => {
   let hash = 0;
@@ -65,21 +86,14 @@ export const getColorForLabel= (
 
 
 
-// const genderColorMap: Record<string, [number, number, number]> = {
-//   "female": [255, 157, 167],             // pastel pink
-//   "male": [78, 121, 167],                // pastel blue
-//   "gender non-conforming": [50, 50, 60],
-//   "transgender woman": [231, 76, 60],
-//   default: [150, 150, 150]
-// };
-
 const genderColorMap: Record<string, [number, number, number]> = {
-  "female":               [212, 83, 126],   // pink-400
-  "male":                 [55, 138, 221],   // blue-400
-  "gender non-conforming":[127, 119, 221],  // purple-400
-  "transgender woman":    [208, 83, 126],   // pink
-  default:                [136, 135, 128],  // stone
+  "female": [255, 157, 167],             // pastel pink
+  "male": [78, 121, 167],                // pastel blue
+  "gender non-conforming": [50, 50, 60],
+  "transgender woman": [231, 76, 60],
+  default: [150, 150, 150]
 };
+
 
 export const getColorForGender = (
   gender: string,
@@ -126,78 +140,76 @@ export const getColorForAgeString = (
 
 
 
- export const getColorForRelationType = ( 
-  type:string,
+export const getColorForRelationType = (
+  type: string,
   opacity: number = 200
+): [number, number, number, number] => {
+  switch (type) {
+    // LOCATIONS
+    case 'birth_place':
+      return [29, 158, 117, opacity];    // teal-400 — #1D9E75
 
- ): [number, number, number, number] => {
-   
-    
-   switch (type) {
-     case 'birth_place':
-  return [112, 146, 120, opacity];   // muted sage green
+    case 'death_place':
+      return [216, 90, 48, opacity];     // coral-400 — #D85A30
 
-case 'death_place':
-  return [165, 96, 90, opacity];     // muted brick red
+    case 'educated_at':
+      return [127, 119, 221, opacity];   // purple-400 — #7F77DD
 
-case 'educated_at':
-  return [128, 112, 150, opacity];   // dusty violet
+    case 'residence':
+      return [55, 138, 221, opacity];    // blue-400 — #378ADD
 
-case 'residence':
-  return [100, 130, 160, opacity];   // muted steel blue
+    case 'work_location':
+      return [186, 117, 23, opacity];    // amber-400 — #BA7517
 
-case 'work_location':
-  return [170, 140, 95, opacity];    // ochre / parchment
+    case 'has_works_in':
+      return [93, 202, 165, opacity];    // teal-200 — #5DCAA5
 
-case 'has_works_in':
-  return [110, 150, 145, opacity];   // desaturated teal
+    case 'buried_at':
+      return [136, 135, 128, opacity];   // gray-400 — #888780
 
-case 'buried_at':
-  return [90, 90, 85, opacity];      // warm dark grey
+    // FAMILY
+    case 'father':
+      return [55, 138, 221, opacity];    // blue-400 — #378ADD
 
-case 'father':
-  return [95, 125, 155, opacity];    // muted blue
+    case 'mother':
+      return [212, 83, 126, opacity];    // pink-400 — #D4537E
 
-case 'mother':
-  return [175, 105, 110, opacity];   // dusty rose
+    case 'spouse':
+      return [175, 169, 236, opacity];   // purple-200 — #AFA9EC
 
-case 'spouse':
-  return [140, 110, 150, opacity];   // muted lavender
+    case 'child':
+      return [99, 153, 34, opacity];     // green-400 — #639922
 
-case 'child':
-  return [115, 160, 125, opacity];   // soft green
+    case 'sibling':
+      return [239, 159, 39, opacity];    // amber-200 — #EF9F27
 
-case 'sibling':
-  return [185, 165, 95, opacity];    // antique gold
+    case 'significant person':
+      return [216, 90, 48, opacity];     // coral-400 — #D85A30
 
-case 'significant person':
-  return [170, 125, 85, opacity];    // burnt sienna
+    case 'unmarried partner':
+    case 'madigudisi':
+      return [237, 147, 123, opacity];   // coral-200 — #ED937B
 
-case 'influenced':
-  return [105, 135, 165, opacity];   // academic blue
+    // PROFESSIONAL
+    case 'influenced':
+      return [133, 183, 235, opacity];   // blue-200 — #85B7EB
 
-case 'influenced by':
-  return [85, 110, 145, opacity];    // deeper muted blue
+    case 'influenced by':
+      return [24, 95, 165, opacity];     // blue-600 — #185FA5
 
-case 'student':
-  return [95, 150, 135, opacity];    // muted turquoise
+    case 'student':
+      return [93, 202, 165, opacity];    // teal-200 — #5DCAA5
 
-case 'student of':
-  return [0, 95, 130, opacity];     // ink blue
+    case 'student of':
+      return [15, 110, 86, opacity];     // teal-600 — #0F6E56
 
-case 'collaborator':
-  return [140, 145, 140, opacity];   // stone grey
+    case 'collaborator':
+      return [180, 178, 169, opacity];   // gray-200 — #B4B2A9
 
-case 'unmarried partner':
-case 'madigudisi':
-  return [190, 130, 150, opacity];   // faded pink
-
-default:
-  return [120, 120, 115, opacity];   // neutral academic grey
-    }
-    
-
+    default:
+      return [136, 135, 128, opacity];   // gray-400 — #888780
   }
+};
 
 
   export const getColorForRelationTypeString = (type:string
@@ -241,12 +253,14 @@ default:
   //       };
 
   export const getLayerColor = (layerName?: string) => {
-  switch (layerName?.toLowerCase()) {
-    case "relations":   return "#378ADD";
-    case "professional":return "#BA7517";
-    case "humans":      return "#BA7517";
-    case "wars":        return "#D85A30";
-    case "disasters":   return "#D4537E";
-    default:            return "#1D9E75";
-  }
-};
+    switch (layerName?.toLowerCase()) {
+      case "works":       return "#BA7517";
+      case "relations":   return "#378ADD";
+      case "professional":return "#378ADD";
+      case "humans":      return "#6e639e";
+      case "wars":        return "#5d895d";
+      case "disasters":   return "#d02d2dff";
+      case "movements":   return "#ef9b14";
+      default:            return "#1D9E75";
+    }
+  };

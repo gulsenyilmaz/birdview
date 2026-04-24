@@ -1,10 +1,18 @@
-import React, { useMemo, useState,useEffect } from "react";
 import "./TimeSlider.css";
+
+import React, { useMemo, useState,useEffect } from "react";
 import * as d3 from "d3";
-import { getLayerColor, getColorForRelationTypeString } from "../../utils/colorUtils";
+
+import LayerButton from "./LayerButton";
+import Legend from "../Legend";
+
+import { 
+  getLayerColor, 
+  getColorForRelationTypeString 
+} from "../../utils/colorUtils";
 // import type { RelatedHuman } from "../../entities/RelatedHuman";
 // import type { Location } from "../../entities/Location";
-import Legend from "../Legend";
+
 
 interface RelationTimelineProps {
   currentRelations: any[];
@@ -46,7 +54,8 @@ const RelationTimeline: React.FC<RelationTimelineProps> = ({
   console.log("currentRelations", currentRelations);
 
   const width = 900;
-  const rowHeight = 6;
+  const rowHeight = 5;
+  const rowGap = 1;
   
   const timelineHeight = filteredRelations.length * rowHeight;
   const height = timelineHeight +1;
@@ -67,9 +76,7 @@ const RelationTimeline: React.FC<RelationTimelineProps> = ({
 
 
 
-  const handleShowAction = () => {
-    setShowLayer(!showLayer);
-  };
+  
 
   useEffect(() => {
     setUniqueTypes( Array.from(
@@ -112,7 +119,7 @@ const RelationTimeline: React.FC<RelationTimelineProps> = ({
                     x={xS1}
                     y={y}
                     width={barSWidth+1}
-                    height={rowHeight-0.8}
+                    height={rowHeight-rowGap}
                     rx={0}
                     fill={color}
                     opacity={0.3}
@@ -121,7 +128,7 @@ const RelationTimeline: React.FC<RelationTimelineProps> = ({
                     x={x1}
                     y={y}
                     width={barWidth}
-                    height={rowHeight-0.8}
+                    height={rowHeight-rowGap}
                     rx={0}
                     fill={color}
                     opacity={0.7}
@@ -130,9 +137,9 @@ const RelationTimeline: React.FC<RelationTimelineProps> = ({
                   {/* optional dates */}
                   <text
                     x={x1}
-                    y={y + 4}
-                    fontSize="5"
-                    fontWeight={500}
+                    y={y + 3.2}
+                    fontSize="4"
+                    fontWeight={900}
                     fill="#fefcfc"
                   >{" – "}{rel.name}
                     {rel.start_date ?? rel.birth_date ?? "?"}
@@ -146,14 +153,21 @@ const RelationTimeline: React.FC<RelationTimelineProps> = ({
         )}
       </div>
 
-      <div className="timeline-side" style={{ color: getLayerColor(layerTypeName) }}>
-        <button
+      <div className="timeline-side">
+
+        <LayerButton
+            layerColor={getLayerColor(layerTypeName)}
+            layerTypeName={layerTypeName}
+            showLayer={showLayer}
+            setShowLayer={setShowLayer}
+          />
+        {/* <button
           className={`label-button ${showLayer ? "active" : ""}`}
-          style={{ backgroundColor: getLayerColor(layerTypeName) }}
+          style={{ color: getLayerColor(layerTypeName) }}
           onClick={handleShowAction}
         >
           {layerTypeName}
-        </button>
+        </button> */}
         {showLayer && (
         <Legend items={uniqueTypes} />
         )}

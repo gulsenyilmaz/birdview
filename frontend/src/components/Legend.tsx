@@ -1,3 +1,4 @@
+import "./Legend.css";
 import React from "react";
 import { getColorForRelationTypeString } from "../utils/colorUtils";
 

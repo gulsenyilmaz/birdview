@@ -1,0 +1,32 @@
+
+.legend {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: transparent;
+  font-size: 0.8dvb;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.1dvb;
+}
+
+.legend-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+}
+
+.legend-label {
+  font-weight: 500;
+  /* font-family: 'Inter', sans-serif; */
+  font-size: 0.8dvb;
+  text-transform: uppercase;
+  color: #888780;
+}

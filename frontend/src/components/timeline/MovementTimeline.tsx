@@ -1,7 +1,8 @@
 
 import "./TimeSlider.css";
+import LayerButton from "./LayerButton";
 import type { Movement } from "../../entities/Movement";
-import { getLayerColor,getColorForLabelString } from "../../utils/colorUtils";
+import { getColorForLabelString } from "../../utils/colorUtils";
 import { useMemo, useState } from "react";
 import * as d3 from "d3";
 
@@ -13,6 +14,7 @@ interface MovementTimelineProps {
   movements: Movement[];
   setSelectedMovement: (obj: Movement) => void;
   layerTypeName: string;
+  layerColor:string;
 
 }
 
@@ -23,6 +25,7 @@ const MovementTimeline: React.FC<MovementTimelineProps> = ({
   movements,
   setSelectedMovement,
   layerTypeName,
+  layerColor,
         
 }) => {
   const [showLayer, setShowLayer] = useState(false);
@@ -66,9 +69,7 @@ const MovementTimeline: React.FC<MovementTimelineProps> = ({
     }, [minYear, maxYear]);
 
   
-   const handleShowAction = () => {
-        setShowLayer(!showLayer);
-    };
+   
 
   return (
     
@@ -137,14 +138,23 @@ const MovementTimeline: React.FC<MovementTimelineProps> = ({
 
         </div>
        
-        <div className="timeline-side" style={{ color: getLayerColor(layerTypeName) }}>
-            <button
+        <div className="timeline-side">
+            <LayerButton
+                layerColor={layerColor}
+                layerTypeName={layerTypeName}
+                showLayer={showLayer}
+                setShowLayer={setShowLayer}
+            />
+            {/* <button
                 className={`label-button ${showLayer ? "active" : ""}`}
-                style={{ backgroundColor: getLayerColor(layerTypeName) }}
+                style={{color:getLayerColor(layerTypeName) }}
                 onClick={handleShowAction}
             >
+                
                 {layerTypeName}
-            </button>
+
+                {showLayer ? <FaEyeSlash /> : <FaEye />}
+            </button> */}
                 
         </div>
       </div> 

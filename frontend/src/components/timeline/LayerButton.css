@@ -1,0 +1,59 @@
+.label-item {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0.2rem;
+}
+
+.label-title {
+  flex: 1;
+  font-size: 1dvb;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: currentColor;
+  padding: 0 0.2dvw;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+
+.label-title.active {
+  opacity: 1;
+}
+
+.label-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4dvb;
+  height: 1.4dvb;
+  flex-shrink: 0;
+  font-size: 1.1dvb;
+  color: currentColor;
+  background-color: transparent;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  opacity: 1;
+  cursor: pointer;
+  transition: opacity 0.15s, background-color 0.15s;
+  padding: 0;
+}
+
+.label-button.active {
+  opacity: 1;
+  background-color: transparent;
+}
+
+.label-button:hover {
+  opacity: 0.8;
+}
+
+.label-button svg {
+  color: currentColor;
+  fill: currentColor;
+  width: 1em;
+  height: 1em;
+}

@@ -49,7 +49,8 @@ const INITIAL_VIEW_STATE: ViewStateType = {
   bearing: 0,
 };
 
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
+
 
 interface MapSceneProps {
 

@@ -1,4 +1,5 @@
 import TimeSlider from "./timeline/TimeSlider";
+
 import TimeWindowSlider from "./timeline/TimeWindowSlider";
 import LayerHistogram from "./timeline/LayerHistogram";
 import RelationTimeline from "./timeline/RelationTimeline";
@@ -17,6 +18,7 @@ import type { Location } from "../entities/Location";
 import YearLine from "./timeline/YearLine";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import MilitaryEventDetail from "./detail_panels/MilitaryEventDetail";
+import{getLayerColor } from "../utils/colorUtils"
 
 
 
@@ -97,6 +99,8 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   humanAliveCounts,
   militaryEventCounts,
 }) => {
+
+  getLayerColor
   return (
     <div className="bottom-panel-slot" >
       <div className={`bottom-worklist-panel ${(selectedHuman && showWorks) || (selectedMilitaryEvent && showEventDetails) || selectedLocation ? "open" : "hide"}`}>
@@ -128,7 +132,9 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
       <div className="bottom-panel">
         <div className="component-container">
 
-          <YearLine selectedYear={selectedYear} windowRange={windowRange} />
+          <YearLine 
+            selectedYear={selectedYear} 
+            windowRange={windowRange} />
         
           {selectedHuman && (
             <>
@@ -139,6 +145,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
                   aliveCounts={workCounts}
                   binAggregation="sum"
                   layerTypeName="WORKS"
+                  layerColor= {getLayerColor("WORKS")}
                   showLayer={showWorks}
                   setShowLayer={setShowWorks}
                 />
@@ -165,6 +172,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           setSelectedMovement={setSelectedObject}
           setManualMode={setManualMode}
         />
+        
 
         {!selectedHuman && (
             <LayerHistogram
@@ -172,6 +180,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
               windowRange={windowRange}
               aliveCounts={humanAliveCounts}
               binAggregation="sum"
+              layerColor= {getLayerColor("HUMANS")}
               layerTypeName="HUMANS"
               showLayer={showHumans}
               setShowLayer={setShowHumans}
@@ -184,6 +193,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           aliveCounts={militaryEventCounts}
           binAggregation="sum"
           layerTypeName="WARS"
+          layerColor= {getLayerColor("WARS")}
           showLayer={showEvents}
           setShowLayer={setShowEvents}
         />
@@ -194,6 +204,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           aliveCounts={militaryEventCounts}
           binAggregation="sum"
           layerTypeName="DISASTERS"
+          layerColor= {getLayerColor("DISASTERS")}
           showLayer={showDisasters}
           setShowLayer={setShowDisasters}
         />
@@ -203,11 +214,10 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
               movements={movements}
               setSelectedMovement={setSelectedObject}
               layerTypeName="MOVEMENTS"
+              layerColor= {getLayerColor("MOVEMENTS")}
             />
 
         {!selectedHuman && (
-          
-           
 
             <TimeWindowSlider
               fullRange={activeFullRange}

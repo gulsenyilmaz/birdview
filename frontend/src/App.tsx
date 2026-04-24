@@ -37,8 +37,10 @@ function App() {
   const [selectedGender, setSelectedGender] = useState<Gender| null>(null);
   const [selectedNationality, setSelectedNationality] = useState<Nationality| null>(null);
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
+
+  const defaultWindowRange:[number, number] = [1000, 2026];
   
-  const [windowRange, setWindowRange] = useState<[number, number]>([-800, 1950]);
+  const [windowRange, setWindowRange] = useState<[number, number]>(defaultWindowRange);
   const [movements, setMovements] = useState<Movement[]>([]); 
   const [humanRelations, setHumanRelations] = useState<RelatedHuman[]>([]);
 
@@ -47,6 +49,7 @@ function App() {
   const [showEventDetails, setShowEventDetails] = useState(false);
   const [showWorks, setShowWorks] = useState(false);
   const [showDisasters, setShowDisasters] = useState(false);
+
 
   const {
     manualMode,
@@ -111,31 +114,40 @@ function App() {
     let nextRange: [number, number] | null = null;
 
     if (!selectedObject) {
-      nextRange = activeFullRange;
-    } else if (selectedHuman) {
-      setShowWorks(true);
+
+      nextRange = defaultWindowRange;
       
+
+    } else if (selectedHuman) {
+
+      setShowWorks(true);
       nextRange = humanLayer.fullRange;
-      // setShowHumans(false);
+      
     } else if (selectedLocation) {
+
       setShowWorks(false);
       setShowHumans(true);
       nextRange = humanLayer.fullRange;
+
     } else if (selectedMilitaryEvent) {
+
+      setShowWorks(false);
       setShowEventDetails(true);
       nextRange = militaryLayer.fullRange;
+
     } else if (selectedMovement) {
+
       nextRange = [
         selectedMovement.start_date ?? humanLayer.fullRange[0],
         selectedMovement.end_date ?? humanLayer.fullRange[1],
       ];
+
     }
 
-    if (
-      nextRange &&
-      (windowRange[0] !== nextRange[0] || windowRange[1] !== nextRange[1])
-    ) {
+    if (nextRange && (windowRange[0] !== nextRange[0] || windowRange[1] !== nextRange[1])) {
+
       setWindowRange(nextRange);
+
     }
   }, [
     selectedObject,

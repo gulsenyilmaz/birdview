@@ -6,7 +6,7 @@ import type { CollisionFilterExtensionProps } from "@deck.gl/extensions";
 import type { RelatedHumanEnriched } from "../entities/RelatedHumanEnriched";
 // import type { Human } from "../entities/Human";
 import type { Location } from "../entities/Location";
-import {getColorForRelationType } from "../utils/colorUtils";
+import {getColorForRelationType, getColorForLabel } from "../utils/colorUtils";
 import { existsThatYear } from "../utils/dateUtils"
 
 
@@ -39,7 +39,7 @@ export function createSelectedHumanLayers({
             {
             id: 'IconLayer',
             data: humanLocations,
-            getColor: (d: Location) => getColorForRelationType(d.relationship_type_name, existsThatYear(d.start_date, d.end_date, selectedYear)?250:20),
+            getColor: (d: Location) => getColorForLabel(d.relationship_type_name, existsThatYear(d.start_date, d.end_date, selectedYear)?250:20),
             getIcon: () => 'marker',
             getPosition: (d: Location) => [d.loc_lon, d.loc_lat],
             getSize: 40,

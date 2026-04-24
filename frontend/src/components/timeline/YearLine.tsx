@@ -15,7 +15,11 @@ const YearLine: React.FC<YearLineProps> = ({
 
   const left = getLeftPercent(selectedYear);
 
-  return <div className="year-container" ><div className="year-line" style={{ left: `${left}%` }} /></div>;
+  return <div className="year-container" >
+      
+          <div className="year-line" style={{ left: `${left}%` }} />
+          {/* {minYear+(left*totalRange)/95} */}
+          </div>;
 };
 
 export default YearLine;

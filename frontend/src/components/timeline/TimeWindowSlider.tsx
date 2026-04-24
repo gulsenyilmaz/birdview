@@ -1,9 +1,8 @@
 
-import { useEffect, useState } from "react";
-import Slider from "rc-slider";
+import { useEffect, useState, useRef } from "react";
+
+import * as d3 from "d3";
 import "./TimeWindowSlider.css";
-// import "./TimeSlider.css";
-import "rc-slider/assets/index.css";
 
 
 type Props = {
@@ -16,6 +15,11 @@ type Props = {
 
 };
 
+const SNAP_STEP = 10;
+const HANDLE_W = 10;
+const HANDLE_H = 20;
+const TRACK_H = 20;
+
 export default function TimeWindowSlider({
   fullRange, 
   windowRange, 
@@ -26,10 +30,17 @@ export default function TimeWindowSlider({
 }: Props) {
 
   const [alltime_minYear, alltime_maxYear] = fullRange;
+  const [alltime_min, alltime_max] = fullRange;
   const [minYear, maxYear] = windowRange;
+  
   const alltime_totalRange = alltime_maxYear - alltime_minYear;
   const totalRange = maxYear - minYear;
   const [zoom, setZoom] = useState(totalRange);
+
+  const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+ 
+  
 
   useEffect(() => {
     let newYear = selectedYear;
@@ -40,6 +51,152 @@ export default function TimeWindowSlider({
       setSelectedYear(newYear);
     }
   }, [selectedYear, minYear, maxYear]); 
+
+  useEffect(() => {
+    const svg = d3.select(svgRef.current);
+    const container = containerRef.current;
+    if (!container) return;
+
+    const W = container.clientWidth;
+    const H = 50;
+    const padX = HANDLE_W / 2;
+
+    svg.attr("width", W).attr("height", H);
+    svg.selectAll("*").remove();
+
+    const xScale = d3.scaleLinear()
+      .domain([alltime_min, alltime_max])
+      .range([padX, W - padX]);
+
+    const snap = (val: number) =>
+      Math.round(val / SNAP_STEP) * SNAP_STEP;
+
+    const clamp = (val: number) =>
+      Math.max(alltime_min, Math.min(alltime_max, val));
+
+    // Rail
+    svg.append("rect")
+      .attr("x", padX)
+      .attr("y", H / 2 - TRACK_H / 2)
+      .attr("width", W - HANDLE_W)
+      .attr("height", TRACK_H)
+      .attr("fill", "#D3D1C7")
+      .attr("rx", 0);
+
+    // Track (seçili alan)
+    const track = svg.append("rect")
+      .attr("x", xScale(minYear))
+      .attr("y", H / 2 - TRACK_H / 2)
+      .attr("width", xScale(maxYear) - xScale(minYear))
+      .attr("height", TRACK_H)
+      .attr("fill", "#15b8bb92")
+      .attr("rx", 0);
+
+    // Min label
+    const minLabel = svg.append("text")
+      .attr("x", xScale(minYear)+14)
+      .attr("y", H / 2 + TRACK_H )
+      .attr("text-anchor", "middle")
+      .attr("font-size", 10)
+      .attr("font-family", "'Inter', sans-serif")
+      .attr("font-weight", 500)
+      .attr("fill", "#888780")
+      .text(minYear);
+
+    // Max label
+    const maxLabel = svg.append("text")
+      .attr("x", xScale(maxYear)-14)
+      .attr("y", H / 2 + TRACK_H)
+      .attr("text-anchor", "middle")
+      .attr("font-size", 10)
+      .attr("font-family", "'Inter', sans-serif")
+      .attr("font-weight", 500)
+      .attr("fill", "#888780")
+      .text(maxYear);
+
+    // Min handle
+    const minHandle = svg.append("rect")
+      .attr("x", xScale(minYear) - HANDLE_W / 2)
+      .attr("y", H / 2 - HANDLE_H / 2)
+      .attr("width", HANDLE_W)
+      .attr("height", HANDLE_H)
+      .attr("fill", "#15b8bbd7")
+      .attr("stroke", "#189799d7")
+      .attr("stroke-width", 1)
+      .attr("rx", 0)
+      .attr("cursor", "ew-resize");
+
+    // Max handle
+    const maxHandle = svg.append("rect")
+      .attr("x", xScale(maxYear) - HANDLE_W / 2)
+      .attr("y", H / 2 - HANDLE_H / 2)
+      .attr("width", HANDLE_W)
+      .attr("height", HANDLE_H)
+      .attr("fill", "#15b8bbd7")
+      .attr("stroke", "#189799d7")
+      .attr("stroke-width", 1)
+      .attr("rx", 0)
+      .attr("cursor", "ew-resize");
+
+    // Drag handlers
+    let currentMin = minYear;
+    let currentMax = maxYear;
+
+    const dragMin = d3.drag<SVGRectElement, unknown>()
+      .on("drag", (event) => {
+        const rawVal = xScale.invert(event.x);
+        const snapped = snap(clamp(rawVal));
+        if (snapped >= currentMax) return;
+        currentMin = snapped;
+
+        minHandle.attr("x", xScale(currentMin) - HANDLE_W / 2);
+        track
+          .attr("x", xScale(currentMin))
+          .attr("width", xScale(currentMax) - xScale(currentMin));
+        minLabel.attr("x", xScale(currentMin)).text(currentMin);
+      })
+      .on("end", () => {
+        setWindowRange([currentMin, currentMax]);
+      });
+
+    const dragMax = d3.drag<SVGRectElement, unknown>()
+      .on("drag", (event) => {
+        const rawVal = xScale.invert(event.x);
+        const snapped = snap(clamp(rawVal));
+        if (snapped <= currentMin) return;
+        currentMax = Math.min(snapped, alltime_max);
+
+        maxHandle.attr("x", xScale(currentMax) - HANDLE_W / 2);
+        track.attr("width", xScale(currentMax) - xScale(currentMin));
+        maxLabel.attr("x", xScale(currentMax)).text(currentMax);
+      })
+      .on("end", () => {
+        setWindowRange([currentMin, currentMax]);
+      });
+
+    minHandle.call(dragMin);
+    maxHandle.call(dragMax);
+
+    // Alltime labels
+    svg.append("text")
+      .attr("x", padX+14)
+      .attr("y", H / 2 + TRACK_H)
+      .attr("text-anchor", "middle")
+      .attr("font-size", 10)
+      .attr("font-family", "'Inter', sans-serif")
+      .attr("fill", "#888780")
+      .text(alltime_min);
+
+    svg.append("text")
+      .attr("x", W - padX-14)
+      .attr("y", H / 2 + TRACK_H)
+      .attr("text-anchor", "middle")
+      .attr("font-size", 10)
+      .attr("font-family", "'Inter', sans-serif")
+      .attr("fill", "#888780")
+      .text(alltime_max);
+
+  }, [fullRange, windowRange]);
 
 
   useEffect(() => {
@@ -76,70 +233,13 @@ export default function TimeWindowSlider({
   
 
   return (
+
+    
     <div className="tw-container">
   
-          <div className="tw-window">
-            <div className="tw-year-label" style={{left: 0 }}>
-              <span>{alltime_minYear}</span>
-            </div>
-
-            <Slider
-                range              
-                min={alltime_minYear}
-                max={alltime_maxYear}
-                step={10}
-                value={[minYear, maxYear]}
-                onChange={(vals) => {
-                    const [start, end] = vals as [number, number];
-                    setWindowRange([start, end]);
-                }}
-
-              
-                allowCross={true}
-                pushable={alltime_maxYear-alltime_minYear<100?alltime_maxYear-alltime_minYear:100}
-
-                railStyle={{ backgroundColor: "#444441", borderRadius: 0, height: 4 }}
-trackStyle={[{ backgroundColor: "#BA751560", borderRadius: 0, height: 4 }]}
-                handleStyle={[
-  {
-    borderColor: "#EF9F27",
-    borderRadius: 0,
-    backgroundColor: "#2C2C2A",
-    width: 10,
-    height: 20,
-    marginTop: -5,
-    opacity: 1,
-  },
-  {
-    borderColor: "#EF9F27",
-    borderRadius: 0,
-    backgroundColor: "#2C2C2A",
-    width: 10,
-    height: 20,
-    marginTop: -5,
-    opacity: 1,
-  }
-]}
-                />
-            <div className="tw-year-label"
-                  style={{
-                    position: "absolute",
-                  left: `${((minYear - alltime_minYear) / (alltime_maxYear - alltime_minYear)) * 100}%`}}>
-                    <span>{minYear}</span>
-            </div>
-            <div className="tw-year-label"
-                 style={{
-                    position: "absolute",
-                    right: `${(1 - (maxYear - alltime_minYear) / (alltime_maxYear - alltime_minYear)) * 100}%`}}>
-                    <span>{maxYear}</span>
-            </div>
-
-            <div className="tw-year-label"
-                style={{
-                      right: 0 }}>
-                <span>{alltime_maxYear}</span>
-            </div>
-          </div>
+          <div className="tw-window" ref={containerRef}>
+      <svg ref={svgRef} style={{ display: "block", overflow: "visible" }} />
+    </div>
           
 
           <div className="zoom-slider-wrapper">
