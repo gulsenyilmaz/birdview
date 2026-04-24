@@ -44,6 +44,7 @@ function App() {
 
   const [showHumans, setShowHumans] = useState(true);
   const [showEvents, setShowEvents] = useState(false);
+  const [showEventDetails, setShowEventDetails] = useState(false);
   const [showWorks, setShowWorks] = useState(false);
   const [showDisasters, setShowDisasters] = useState(false);
 
@@ -121,6 +122,7 @@ function App() {
       setShowHumans(true);
       nextRange = humanLayer.fullRange;
     } else if (selectedMilitaryEvent) {
+      setShowEventDetails(true);
       nextRange = militaryLayer.fullRange;
     } else if (selectedMovement) {
       nextRange = [
@@ -228,7 +230,7 @@ function App() {
           movements={movements}
           setMovements={setMovements}
           filteredHumans={humanLayer.filteredHumans}
-          filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
+          // filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
           setManualMode={setManualMode}
         />
 
@@ -244,16 +246,22 @@ function App() {
           movements={movements}
           setSelectedObject={setSelectedObject}
           setManualMode={setManualMode}
+          selectedMilitaryEvent={selectedMilitaryEvent}
           selectedHuman={selectedHuman}
+          selectedLocation={selectedLocation}
+          filteredHumans={humanLayer.filteredHumans}
           showWorks={showWorks}
           setShowWorks={setShowWorks}
           showHumans={showHumans}
           setShowHumans={setShowHumans}
           showEvents={showEvents}
           setShowEvents={setShowEvents}
+          showEventDetails={showEventDetails}
+          setShowEventDetails = {setShowEventDetails}
           showDisasters={showDisasters}
           setShowDisasters={setShowDisasters}
           filteredWorks={workLayer.filteredWorks}
+          filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
           workCounts={workLayer.workCounts}
           humanAliveCounts={humanLayer.aliveCounts}
           militaryEventCounts={militaryLayer.eventCounts}

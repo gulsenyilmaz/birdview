@@ -1,19 +1,14 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import * as d3 from "d3";
 import "./Dashboard.css";
 import type { Human } from "../../entities/Human";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-} from "recharts";
 import {
   getColorForLabelString,
   getColorForGenderString,
 } from "../../utils/colorUtils";
 
 interface DashboardProps {
+  selectedYear: number;
   humans: Human[];
 }
 
@@ -23,160 +18,137 @@ interface ChartItem {
   color: string;
 }
 
-const chartMargin = { top: 5, right: 5, left: 5, bottom: 5 };
+const TOP_N = 5;
+const BAR_HEIGHT = 10;
+const BAR_GAP = 5;
+const MARGIN = { top: 8, right: 16, bottom: 4, left: 0 };
 
-const commonAxisStyle = {
-  fontSize: 10,
-  fill: "white",
-  fontFamily: "'Inter', sans-serif",
+const BarChart: React.FC<{ data: ChartItem[]; labelWidth: number }> = ({ data, labelWidth }) => {
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  useEffect(() => {
+    const svg = d3.select(svgRef.current);
+    svg.selectAll("*").remove();
+
+    if (!data.length) return;
+
+    const containerWidth = svgRef.current?.parentElement?.clientWidth ?? 200;
+    const barAreaWidth = containerWidth - labelWidth - MARGIN.right;
+    const totalHeight = TOP_N * (BAR_HEIGHT + BAR_GAP) + MARGIN.top + MARGIN.bottom;
+
+    svg.attr("width", containerWidth).attr("height", totalHeight);
+
+    const xScale = d3.scaleLinear()
+      .domain([0, d3.max(data, d => d.value) ?? 1])
+      .range([0, barAreaWidth]);
+
+    const g = svg.append("g").attr("transform", `translate(${labelWidth}, ${MARGIN.top})`);
+
+    data.forEach((d, i) => {
+      const y = i * (BAR_HEIGHT + BAR_GAP);
+
+      g.append("text")
+        .attr("x", -6)
+        .attr("y", y + BAR_HEIGHT / 2 + 3)
+        .attr("text-anchor", "end")
+        .attr("font-size", 10)
+        .attr("font-family", "'Georgia', sans-serif")
+        .attr("font-weight", 500)
+        .attr("letter-spacing", "0.06em")
+        .attr("fill", "#888780")
+        .text(d.label);
+
+      g.append("rect")
+        .attr("x", 0)
+        .attr("y", y)
+        .attr("width", Math.max(xScale(d.value), 0))
+        .attr("height", BAR_HEIGHT)
+        .attr("rx", 2)
+        .attr("fill", d.color);
+
+      g.append("text")
+        .attr("x", xScale(d.value) + 4)
+        .attr("y", y + BAR_HEIGHT / 2 + 3)
+        .attr("font-size", 9)
+        .attr("font-family", "'Georgia', sans-serif")
+        .attr("fill", "#5F5E5A")
+        .text(d.value);
+    });
+
+  }, [data, labelWidth]);
+
+  return <svg ref={svgRef} style={{ display: "block", overflow: "visible" }} />;
 };
 
-const getYAxisWidth = (data: ChartItem[], minWidth = 65) => {
-  const longest = data.reduce((max, item) => Math.max(max, item.label.length), 0);
-  return Math.max(minWidth, longest * 7);
-};
-
-interface CustomBarShapeProps {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  payload?: ChartItem;
-}
-
-const CustomBarShape: React.FC<CustomBarShapeProps> = ({
-  x = 0,
-  y = 0,
-  width = 0,
-  height = 0,
-  payload,
-}) => {
-  const radius = 4;
-  const color = payload?.color || "#8884d8";
-
-  const safeWidth = Math.max(width, 0);
-  const safeHeight = Math.max(height, 0);
-
-  return (
-    <path
-      d={`
-        M${x},${y}
-        H${x + safeWidth - radius}
-        Q${x + safeWidth},${y} ${x + safeWidth},${y + radius}
-        V${y + safeHeight - radius}
-        Q${x + safeWidth},${y + safeHeight} ${x + safeWidth - radius},${y + safeHeight}
-        H${x}
-        Z
-      `}
-      fill={color}
-    />
-  );
-};
-
-const Dashboard: React.FC<DashboardProps> = ({ humans }) => {
+const Dashboard: React.FC<DashboardProps> = ({ selectedYear, humans }) => {
   const nationalityCounter: Record<string, number> = {};
   const cityCounter: Record<number, { name: string; count: number }> = {};
   const genderCounter: Record<string, number> = {};
 
   for (const h of humans) {
     if (h.nationality) {
-      nationalityCounter[h.nationality] =
-        (nationalityCounter[h.nationality] || 0) + 1;
+      nationalityCounter[h.nationality] = (nationalityCounter[h.nationality] || 0) + 1;
     }
-
     if (h.city_id && h.city) {
-      if (!cityCounter[h.city_id]) {
-        cityCounter[h.city_id] = { name: h.city, count: 0 };
-      }
+      if (!cityCounter[h.city_id]) cityCounter[h.city_id] = { name: h.city, count: 0 };
       cityCounter[h.city_id].count += 1;
     }
-
     if (h.gender) {
       genderCounter[h.gender] = (genderCounter[h.gender] || 0) + 1;
     }
   }
 
-  const nationalities = Object.entries(nationalityCounter).sort(
-    (a, b) => b[1] - a[1]
-  );
-  const topNationalities = nationalities.slice(0, 5);
+  const nationalityData: ChartItem[] = Object.entries(nationalityCounter)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, TOP_N)
+    .map(([label, value]) => ({ label, value, color: getColorForLabelString(label) }));
 
-  const nationalityData: ChartItem[] = topNationalities.map(([label, value]) => ({
-    label,
-    value,
-    color: getColorForLabelString(label),
-  }));
+  const cityData: ChartItem[] = Object.entries(cityCounter)
+    .map(([, { name, count }]) => ({ label: name, value: count, color: "#BA7517" }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, TOP_N);
 
-  const genders = Object.entries(genderCounter).sort((a, b) => b[1] - a[1]);
+  const genderData: ChartItem[] = Object.entries(genderCounter)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, TOP_N)
+    .map(([label, value]) => ({ label, value, color: getColorForGenderString(label) }));
 
-  const genderData: ChartItem[] = genders.map(([label, value]) => ({
-    label,
-    value,
-    color: getColorForGenderString(label),
-  }));
-
-  const cities = Object.entries(cityCounter)
-    .map(([id, { name, count }]) => ({
-      id: Number(id),
-      name,
-      count,
-    }))
-    .sort((a, b) => b.count - a.count);
-
-  const topCities = cities.slice(0, 5);
-
-  const cityData: ChartItem[] = topCities.map((c) => ({
-    label: c.name,
-    value: c.count,
-    color: "#c7af48",
-  }));
-
-  const renderHorizontalBarChart = (data: ChartItem[]) => {
-  const yAxisWidth = getYAxisWidth(data);
+  const labelW = (data: ChartItem[]) =>
+    Math.max(50, Math.max(0, ...data.map(d => d.label.length)) * 7);
 
   return (
-    <ResponsiveContainer width="100%" height={120}>
-      <BarChart data={data} layout="vertical" margin={chartMargin}>
-        <XAxis type="number" hide />
-        <YAxis
-          type="category"
-          dataKey="label"
-          width={yAxisWidth}
-          axisLine={false}
-          tickLine={false}
-          tick={commonAxisStyle}
-        />
-        <Bar
-          dataKey="value"
-          shape={<CustomBarShape />}
-          isAnimationActive={false}
-        />
-      </BarChart>
-    </ResponsiveContainer>
-  );
-};
+  <>
+    {humans && humans.length > 0 && (
+      <div className="dashboard-container active">
 
-  return (
-    <>
-      {humans && humans.length > 0 && (
-        <div className="dashboard-container active">
-          <div className="dashboard-charts">
-            <div className="chart-box">
-              {renderHorizontalBarChart(nationalityData)}
-            </div>
+        <div className="year-display">
+          <span className="year-display-label">year</span>
+          <span className="year-display-value">{selectedYear}</span>
+        </div>
 
-            <div className="chart-box">
-              {renderHorizontalBarChart(cityData)}
-            </div>
+        <div className="chart-divider" style={{ margin: "0 0.4rem" }} />
 
-            <div className="chart-box">
-              {renderHorizontalBarChart(genderData)}
-            </div>
+        <div className="dashboard-charts">
+          <div className="chart-box">
+            <div className="chart-box-title">nationality</div>
+            <BarChart data={nationalityData} labelWidth={labelW(nationalityData)} />
+          </div>
+          <div className="chart-divider" />
+          <div className="chart-box">
+            <div className="chart-box-title">city</div>
+            <BarChart data={cityData} labelWidth={labelW(cityData)} />
+          </div>
+          <div className="chart-divider" />
+          <div className="chart-box">
+            <div className="chart-box-title">gender</div>
+            <BarChart data={genderData} labelWidth={labelW(genderData)} />
           </div>
         </div>
-      )}
-    </>
-  );
+
+      </div>
+    )}
+  </>
+);
 };
 
 export default Dashboard;

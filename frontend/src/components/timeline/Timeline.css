@@ -94,7 +94,8 @@
   
   max-height: 25vh;
   flex-shrink: 0;
-  color: white;
+  color: rgb(60, 60, 60);
+  font-size: 0.9dvb;
   padding: 0rem; 
   background-color: #edfffc8c;
 }

@@ -5,10 +5,10 @@ import PersonBox from "./detail_panels/PersonBox";
 import LocationBox from "./detail_panels/LocationBox";
 import MilitaryEventBox from "./detail_panels/MilitaryEventBox";
 import MovementBox from "./detail_panels/MovementBox";
-import ContentStrip from "./timeline/ContentStrip";
+// import ContentStrip from "./timeline/ContentStrip";
 
-import HumanList from "./timeline/HumanList";
-import MilitaryEventDetail from "./detail_panels/MilitaryEventDetail";
+// import HumanList from "./timeline/HumanList";
+// import MilitaryEventDetail from "./detail_panels/MilitaryEventDetail";
 import FilterList from "./general_panels/FilterList";
 
 import type { Human } from "../entities/Human";
@@ -56,7 +56,7 @@ interface AppPanelsProps {
   setMovements: React.Dispatch<React.SetStateAction<Movement[]>>;
 
   filteredHumans: Human[];
-  filteredMilitaryEvents: MilitaryEvent[];
+  // filteredMilitaryEvents: MilitaryEvent[];
   
 
   setManualMode: React.Dispatch<React.SetStateAction<boolean>>;
@@ -88,7 +88,7 @@ const AppPanels: React.FC<AppPanelsProps> = ({
   movements,
   setMovements,
   filteredHumans,
-  filteredMilitaryEvents,
+  // filteredMilitaryEvents,
 
   setManualMode,
 }) => {
@@ -116,9 +116,9 @@ const AppPanels: React.FC<AppPanelsProps> = ({
 
   return (
     <>
-      <div className={`right-panel ${selectedObject ? "open" : ""}`}>
+      <div className={`right-panel ${detailMode ? "open" : ""}`}>
         <DetailBox
-          selectedYear={selectedYear}
+          
           detailMode={detailMode}
           setDetailMode={setDetailMode}
         >
@@ -133,15 +133,13 @@ const AppPanels: React.FC<AppPanelsProps> = ({
 
           {selectedLocation && <LocationBox location={selectedLocation} />}
 
-          {selectedMilitaryEvent && (
-            <MilitaryEventBox militaryEvent={selectedMilitaryEvent} />
-          )}
+          {selectedMilitaryEvent && <MilitaryEventBox militaryEvent={selectedMilitaryEvent} />}
 
           {selectedMovement && <MovementBox movement={selectedMovement} />}
         </DetailBox>
       </div>
 
-      <div className={`top-panel ${selectedObject && selectedMilitaryEvent ? "open" : ""}`}>
+      {/* <div className={`top-panel ${selectedObject ? "open" : ""}`}>
         {selectedObject && !selectedMovement && (
           <ContentStrip selectedYear={selectedYear} selectedObject={selectedObject}>
             {selectedLocation && (
@@ -151,24 +149,21 @@ const AppPanels: React.FC<AppPanelsProps> = ({
               />
             )}
 
-            {selectedMilitaryEvent && (
-              <MilitaryEventDetail
-                selectedYear={selectedYear}
-                militaryEvents={filteredMilitaryEvents}
-                setSelectedObject={setSelectedObject}
-              />
-            )}
+            
           </ContentStrip>
         )}
-      </div>
+      </div> */}
 {isInitiated && ( <>
-      <div className={`top-panel-dashboard ${
-            selectedObject ? (selectedMovement ? "squeezed" : "close") : ""
+      <div className={`top-bar ${
+            selectedObject ?"squeezed" : ""
         }`}
         >
         
             
-            <Dashboard humans={filteredHumans} />
+            <Dashboard 
+              selectedYear={selectedYear}
+              humans={filteredHumans} 
+            />
             <DescriptionBanner
                 humans={filteredHumans}
                 selectedMovement={selectedMovement}

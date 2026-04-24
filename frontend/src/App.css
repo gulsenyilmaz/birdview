@@ -94,18 +94,20 @@
 
   width: 16dvw;
   height: auto;
-  max-height: 60dvh;
+  max-height: 90dvh;
 
-  background-color: transparent;
-  box-shadow: 7px 7px 15px rgba(49, 49, 49, 0.51);
+  
+  border: 1px solid #444441;
+  box-shadow: none;
   padding: 0;
   box-sizing: border-box;
   border: 1px solid #000000c8;
+  background-color:#2C2C2Ae8;
   
 
   z-index: 200;
 
-  transition: transform 0.45s ease-in-out;
+  transition: transform 2s ease-in-out;
   transform: translateX(100%);
 
 }
@@ -123,25 +125,26 @@
   flex-direction: row;
   width: 88dvw;
   /* height: 16dvh; */
-  background-color: #d8d8d8cf;
-  box-shadow: 0 3px 5px rgba(93, 93, 93, 0.538);
+  background-color: #919118cf;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  border: 1px solid #444441;
   
   padding: 0;
   box-sizing: border-box;
   border: 1px solid #74747400;
   z-index: 150;
 
-  transition: transform 0.45s ease-in-out, width 0.2s ease-in-out;
-  transform: translateY(-100%);
+  transition: transform 0.45s ease-in-out;
+ 
   
 }
 
-.top-panel.open {
-  transform: translateY(0%);
-}
+/* .top-panel.open {
+  
+} */
 
 
-.top-panel-dashboard {
+.top-bar {
   position: absolute;
 
   top: 0;
@@ -149,7 +152,7 @@
   right: 0;
 
   width: 100dvw;
-  height: 12dvh;
+  height: 11dvh;
   
   display: flex;
   flex-direction: column;
@@ -158,28 +161,27 @@
   justify-content: center;
   justify-items: center;
   
-  
-  background-color:#20262d58;
+  pointer-events: auto;
+  background-color:#2C2C2Ae8;
   
   border: none;
   z-index: 1550;
   
+  font-family: 'Georgia', sans-serif;
   
+    
   transition:
-    transform 0.45s ease-in-out,
-    width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    right 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-  
+    width 2s ease-in-out;
 }
 
 
 
-.top-panel-dashboard.close {
+.top-bar.close {
   transform: translateY(-100%);
 }
 
-.top-panel-dashboard.squeezed {
-  right: 20dvw;
+.top-bar.squeezed {
+  /* right: 20dvw; */
   width: 84dvw;
 }
 
@@ -253,10 +255,9 @@
 .left-panel,
 .right-panel,
 .top-panel,
-.top-panel-dashboard,
 .bottom-panel,
 .bottom-worklist-panel {
   pointer-events: auto;
-  background-color: transparent;
+  /* background-color: transparent; */
 }
 

@@ -18,6 +18,24 @@ export const colorPalette: string[] = [
   "#009fb7",
 ];
 
+// export const colorPalette: string[] = [
+//   "#BA7517", // amber
+//   "#1D9E75", // teal
+//   "#378ADD", // blue
+//   "#D85A30", // coral
+//   "#D4537E", // pink
+//   "#639922", // green
+//   "#7F77DD", // purple
+//   "#EF9F27", // light amber
+//   "#5DCAA5", // light teal
+//   "#85B7EB", // light blue
+//   "#F0997B", // light coral
+//   "#97C459", // light green
+//   "#AFA9EC", // light purple
+//   "#888780", // stone
+//   "#B4B2A9", // light stone
+// ];
+
 export const hashString = (str: string): number => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -47,12 +65,20 @@ export const getColorForLabel= (
 
 
 
+// const genderColorMap: Record<string, [number, number, number]> = {
+//   "female": [255, 157, 167],             // pastel pink
+//   "male": [78, 121, 167],                // pastel blue
+//   "gender non-conforming": [50, 50, 60],
+//   "transgender woman": [231, 76, 60],
+//   default: [150, 150, 150]
+// };
+
 const genderColorMap: Record<string, [number, number, number]> = {
-  "female": [255, 157, 167],             // pastel pink
-  "male": [78, 121, 167],                // pastel blue
-  "gender non-conforming": [50, 50, 60],
-  "transgender woman": [231, 76, 60],
-  default: [150, 150, 150]
+  "female":               [212, 83, 126],   // pink-400
+  "male":                 [55, 138, 221],   // blue-400
+  "gender non-conforming":[127, 119, 221],  // purple-400
+  "transgender woman":    [208, 83, 126],   // pink
+  default:                [136, 135, 128],  // stone
 };
 
 export const getColorForGender = (
@@ -196,22 +222,31 @@ default:
         };
 
 
-  export const getLayerColor = (layerName?: string) => {
-          switch (layerName?.toLowerCase()) {
-            case "relations":
-              return "#44608e"; // soft coral
-            case "professional":
-              return "#eec12f"; // soft coral
-            case "humans":
-              return "#a4558f"; // soft coral
-            case "wars":
-              return "#59a14f"; // sky blue
-            case "disasters":
-              return "#e74c3c"; // red
+  // export const getLayerColor = (layerName?: string) => {
+  //         switch (layerName?.toLowerCase()) {
+  //           case "relations":
+  //             return "#44608e"; // soft coral
+  //           case "professional":
+  //             return "#eec12f"; // soft coral
+  //           case "humans":
+  //             return "#a4558f"; // soft coral
+  //           case "wars":
+  //             return "#59a14f"; // sky blue
+  //           case "disasters":
+  //             return "#e74c3c"; // red
            
-            default:
-              return "#f58e2fff"; // warm apricot
-          }
-        };
+  //           default:
+  //             return "#f58e2fff"; // warm apricot
+  //         }
+  //       };
 
-  
+  export const getLayerColor = (layerName?: string) => {
+  switch (layerName?.toLowerCase()) {
+    case "relations":   return "#378ADD";
+    case "professional":return "#BA7517";
+    case "humans":      return "#BA7517";
+    case "wars":        return "#D85A30";
+    case "disasters":   return "#D4537E";
+    default:            return "#1D9E75";
+  }
+};

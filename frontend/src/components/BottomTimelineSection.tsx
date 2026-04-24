@@ -6,6 +6,7 @@ import MovementTimeline from "./timeline/MovementTimeline";
 
 import Timeline from "./timeline/Timeline";
 import WorkList from "./timeline/WorkList";
+import HumanList from "./timeline/HumanList";
 
 import type { SelectedObject } from "../hooks/useAppSelection";
 import type { Work } from "../entities/Work";
@@ -14,6 +15,8 @@ import type { Human } from "../entities/Human";
 import type { RelatedHuman } from "../entities/RelatedHuman";
 import type { Location } from "../entities/Location";
 import YearLine from "./timeline/YearLine";
+import type { MilitaryEvent } from "../entities/MilitaryEvent";
+import MilitaryEventDetail from "./detail_panels/MilitaryEventDetail";
 
 
 
@@ -34,16 +37,23 @@ interface BottomTimelineSectionProps {
   
   // detailMode: boolean;
   filteredWorks: Work[];
+  filteredMilitaryEvents: MilitaryEvent[];
+  filteredHumans: Human[];
+
   movements: Movement[];
   setSelectedObject: React.Dispatch<React.SetStateAction<SelectedObject>>;
   setManualMode: React.Dispatch<React.SetStateAction<boolean>>;
 
   selectedHuman: Human | null;
+  selectedMilitaryEvent: MilitaryEvent | null;
+  selectedLocation: Location | null;
 
   showWorks: boolean;
   setShowWorks: React.Dispatch<React.SetStateAction<boolean>>;
   showHumans: boolean;
   setShowHumans: React.Dispatch<React.SetStateAction<boolean>>;
+  showEventDetails: boolean;
+  setShowEventDetails: React.Dispatch<React.SetStateAction<boolean>>;
   showEvents: boolean;
   setShowEvents: React.Dispatch<React.SetStateAction<boolean>>;
   showDisasters: boolean;
@@ -59,6 +69,8 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   setSelectedYear,
   activeFullRange,
   filteredWorks,
+  filteredMilitaryEvents,
+  filteredHumans,
   humanRelations,
   humanLocations,
   windowRange,
@@ -67,13 +79,18 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   movements,
   setSelectedObject,
   setManualMode,
+  selectedMilitaryEvent,
   selectedHuman,
+  selectedLocation,
+
   showWorks,
   setShowWorks,
   showHumans,
   setShowHumans,
   showEvents,
   setShowEvents,
+  showEventDetails,
+  setShowEventDetails,
   showDisasters,
   setShowDisasters,
   workCounts,
@@ -82,12 +99,31 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
 }) => {
   return (
     <div className="bottom-panel-slot" >
-      <div className={`bottom-worklist-panel ${selectedHuman && showWorks ? "open" : "hide"}`}>
+      <div className={`bottom-worklist-panel ${(selectedHuman && showWorks) || (selectedMilitaryEvent && showEventDetails) || selectedLocation ? "open" : "hide"}`}>
+        <Timeline selectedYear={selectedYear} windowRange={windowRange}>
           {selectedHuman && (
-            <Timeline selectedYear={selectedYear} windowRange={windowRange}>
+            
               <WorkList filteredWorks={filteredWorks} />
-            </Timeline>
+            
           )}
+
+          {selectedMilitaryEvent && (
+              <MilitaryEventDetail
+                selectedYear={selectedYear}
+                militaryEvents={filteredMilitaryEvents}
+                setSelectedObject={setSelectedObject}
+                setShowEventDetails={setShowEventDetails}
+              />
+            )}
+
+          {selectedLocation && (
+              <HumanList
+                humans={filteredHumans}
+                setSelectedObject={setSelectedObject}
+                
+              />
+            )}
+        </Timeline>
       </div>
       <div className="bottom-panel">
         <div className="component-container">

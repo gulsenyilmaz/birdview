@@ -98,12 +98,28 @@ export default function TimeWindowSlider({
                 allowCross={true}
                 pushable={alltime_maxYear-alltime_minYear<100?alltime_maxYear-alltime_minYear:100}
 
-                railStyle={{ backgroundColor: "#4a4a4a74",  borderRadius:0, height: 10 }}
-                trackStyle={[{ backgroundColor: "#4e4e4e", borderRadius:0, height: 10 }]}
+                railStyle={{ backgroundColor: "#444441", borderRadius: 0, height: 4 }}
+trackStyle={[{ backgroundColor: "#BA751560", borderRadius: 0, height: 4 }]}
                 handleStyle={[
-                    { borderColor: "#4a4a4a76", borderRadius:0, backgroundColor: "#4a4a4a74", width: 5, height: 20 },
-                    { borderColor: "#4a4a4a74", borderRadius:0, backgroundColor: "#4a4a4a74", width: 5, height: 20 }
-                ]}
+  {
+    borderColor: "#EF9F27",
+    borderRadius: 0,
+    backgroundColor: "#2C2C2A",
+    width: 10,
+    height: 20,
+    marginTop: -5,
+    opacity: 1,
+  },
+  {
+    borderColor: "#EF9F27",
+    borderRadius: 0,
+    backgroundColor: "#2C2C2A",
+    width: 10,
+    height: 20,
+    marginTop: -5,
+    opacity: 1,
+  }
+]}
                 />
             <div className="tw-year-label"
                   style={{

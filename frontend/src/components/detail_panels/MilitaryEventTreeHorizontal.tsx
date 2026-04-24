@@ -78,115 +78,204 @@ const MilitaryEventTreeHorizontal: React.FC<MilitaryEventTreeProps> = ({
 
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  useEffect(() => {
-    if (!militaryEventsTree || !svgRef.current) return;
+//   useEffect(() => {
+//     if (!militaryEventsTree || !svgRef.current) return;
   
-    const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove();
+//     const svg = d3.select(svgRef.current);
+//     svg.selectAll("*").remove();
 
-    // const dx = 1400/(maxNumberOfNodesAtDepth<150?maxNumberOfNodesAtDepth:150);
-    const dx = (700/maxNumberOfNodesAtDepth)<8?8:(700/maxNumberOfNodesAtDepth);
-    const dy = 700/maxNumberDepth;
+//     // const dx = 1400/(maxNumberOfNodesAtDepth<150?maxNumberOfNodesAtDepth:150);
+//     const dx = (700/maxNumberOfNodesAtDepth)<8?8:(700/maxNumberOfNodesAtDepth);
+//     const dy = 700/maxNumberDepth;
 
-    const root = d3.hierarchy<EventNode>(militaryEventsTree as EventNode);
-    const treeLayout = d3.tree<EventNode>().nodeSize([dx, dy]);
-    treeLayout(root);
+//     const root = d3.hierarchy<EventNode>(militaryEventsTree as EventNode);
+//     const treeLayout = d3.tree<EventNode>().nodeSize([dx, dy]);
+//     treeLayout(root);
 
   
-    const nodes = root.descendants();
-    const xs = nodes.map((d) => d.x ?? 0);
-    const ys = nodes.map((d) => d.y ?? 0);
+//     const nodes = root.descendants();
+//     const xs = nodes.map((d) => d.x ?? 0);
+//     const ys = nodes.map((d) => d.y ?? 0);
 
-    const xMin = Math.min(...xs);
-    const xMax = Math.max(...xs);
-    const yMin = Math.min(...ys);
-    const yMax = Math.max(...ys);
+//     const xMin = Math.min(...xs);
+//     const xMax = Math.max(...xs);
+//     const yMin = Math.min(...ys);
+//     const yMax = Math.max(...ys);
 
-    // padding
-    const paddingX = 50;
-    const paddingY = 50;
+//     // padding
+//     const paddingX = 50;
+//     const paddingY = 50;
 
-    const autoWidth = (xMax - xMin) + paddingX * 2;
-    const autoHeight = (yMax - yMin) + dy ;
-
-
-    svg.attr("width", autoWidth).attr("height", autoHeight);
+//     const autoWidth = (xMax - xMin) + paddingX * 2;
+//     const autoHeight = (yMax - yMin) + dy ;
 
 
-    const g = svg
-      .append("g")
-      .attr("stroke-linejoin", "round")
-      .attr("stroke-width", 3)
-      .attr("transform", `translate(${paddingX-xMin },${paddingY-yMin})`)
-      .attr("style", "max-width:100%; height: auto; height: intrinsic;")
-      .attr("font-family", "sans-serif")
-      .attr("font-size", 10);
+//     svg.attr("width", autoWidth).attr("height", autoHeight);
+
+
+//     const g = svg
+//       .append("g")
+//       .attr("stroke-linejoin", "round")
+//       .attr("stroke-width", 3)
+//       .attr("transform", `translate(${paddingX-xMin },${paddingY-yMin})`)
+//       .attr("style", "max-width:100%; height: auto; height: intrinsic;")
+//       .attr("font-family", "sans-serif")
+//       .attr("font-size", 10);
   
-    const linkGenerator = d3
-      .linkVertical<
-        d3.HierarchyPointLink<EventNode>,
-        d3.HierarchyPointNode<EventNode>
-      >()
-      .x((d) => d.x ?? 0)
-      .y((d) => d.y ?? 0);
+//     const linkGenerator = d3
+//       .linkVertical<
+//         d3.HierarchyPointLink<EventNode>,
+//         d3.HierarchyPointNode<EventNode>
+//       >()
+//       .x((d) => d.x ?? 0)
+//       .y((d) => d.y ?? 0);
 
-    g.selectAll(".link")
-      .data(root.links())
-      .enter()
-      .append("path")
-      .attr("class", "link")
-      .attr("d", linkGenerator as any)
-      .attr("fill", "none")
-      .attr("stroke", (l) => getStatusColorForMilitaryEvents(l.target.data.status))
-      .attr("stroke-width", (l) => (l.target.data.status === "ongoing" ? 2 : 1.2))
-      .attr("opacity", (l) => (l.target.data.status === "ongoing" ? 1 : 0.35));
+//     g.selectAll(".link")
+//       .data(root.links())
+//       .enter()
+//       .append("path")
+//       .attr("class", "link")
+//       .attr("d", linkGenerator as any)
+//       .attr("fill", "none")
+//       .attr("stroke", (l) => getStatusColorForMilitaryEvents(l.target.data.status))
+//       .attr("stroke-width", (l) => (l.target.data.status === "ongoing" ? 2 : 1.2))
+//       .attr("opacity", (l) => (l.target.data.status === "ongoing" ? 1 : 0.35));
 
-    const node = g
-      .selectAll(".node")
-      .data(nodes)
-      .enter()
-      .append("g")
-      .attr("class", "node")
-      .attr("transform", (d) => `translate(${d.x ?? 0},${d.y ?? 0})`)
-      .attr("cursor", "pointer")
-      .on("click", (_, d) => setSelectedObject(d.data.me));
+//     const node = g
+//       .selectAll(".node")
+//       .data(nodes)
+//       .enter()
+//       .append("g")
+//       .attr("class", "node")
+//       .attr("transform", (d) => `translate(${d.x ?? 0},${d.y ?? 0})`)
+//       .attr("cursor", "pointer")
+//       .on("click", (_, d) => setSelectedObject(d.data.me));
 
-    node
-      .append("circle")
-      .attr("r", 5)
-      .attr("fill", (d) => getStatusColorForMilitaryEvents(d.data.status))
+//     node
+//       .append("circle")
+//       .attr("r", 5)
+//       .attr("fill", (d) => getStatusColorForMilitaryEvents(d.data.status))
       
-    node.append("text")
-        .attr("dy", "1.6em")
-        .attr("text-anchor", (d) => d.data.isLeaf ? "end" : "end")
-        .attr("y", d => d.data.isLeaf ? -12: -12)
-        .attr("x", d => d.data.isLeaf ? -12: -12)
-        .attr("transform", (d) => {
-          return d.data.isLeaf ? "rotate(-90, 0, 0)" : `translate(10,-10)`; 
-        })
-        .attr("fill", (d) => getStatusColorForMilitaryEvents(d.data.status))
-        .attr("font-size", (d) => (d.data.status=="ongoing" ? "10px" : "9px"))
-        .attr("font-family", "Arial, sans-serif")
-        .attr("font-weight", (d) => (d.data.status=="ongoing" ? "bold" : "normal"))
-        .attr("stroke","#cbccceff")
-        .attr("paint-order", "stroke")
-        .text(d => d.data.name.toLocaleUpperCase())
-        .call((text) => {
-          text.each(function(d) {
-            const self = d3.select(this);
-            const textLength = (self.node() as SVGTextElement).getComputedTextLength();
-            const availableWidth = d.data.isLeaf ? dy : dy-20; 
+//     node.append("text")
+//         .attr("dy", "1.6em")
+//         .attr("text-anchor", (d) => d.data.isLeaf ? "end" : "end")
+//         .attr("y", d => d.data.isLeaf ? -12: -12)
+//         .attr("x", d => d.data.isLeaf ? -12: -12)
+//         .attr("transform", (d) => {
+//           return d.data.isLeaf ? "rotate(-90, 0, 0)" : `translate(10,-10)`; 
+//         })
+//         .attr("fill", (d) => getStatusColorForMilitaryEvents(d.data.status))
+//         .attr("font-size", (d) => (d.data.status=="ongoing" ? "10px" : "9px"))
+//         .attr("font-family", "Arial, sans-serif")
+//         .attr("font-weight", (d) => (d.data.status=="ongoing" ? "bold" : "normal"))
+//         .attr("stroke","#cbccceff")
+//         .attr("paint-order", "stroke")
+//         .text(d => d.data.name.toLocaleUpperCase())
+//         .call((text) => {
+//           text.each(function(d) {
+//             const self = d3.select(this);
+//             const textLength = (self.node() as SVGTextElement).getComputedTextLength();
+//             const availableWidth = d.data.isLeaf ? dy : dy-20; 
 
-            if (textLength > availableWidth) {
-              let truncatedText = d.data.name.toLocaleUpperCase();
-              while (truncatedText.length > 0 && (self.text(truncatedText + '...').node() as SVGTextElement).getComputedTextLength() > availableWidth) {
-                truncatedText = truncatedText.slice(0, -1);
-              }
-              self.text(truncatedText + '...');
-            }
-          }); 
-        });
+//             if (textLength > availableWidth) {
+//               let truncatedText = d.data.name.toLocaleUpperCase();
+//               while (truncatedText.length > 0 && (self.text(truncatedText + '...').node() as SVGTextElement).getComputedTextLength() > availableWidth) {
+//                 truncatedText = truncatedText.slice(0, -1);
+//               }
+//               self.text(truncatedText + '...');
+//             }
+//           }); 
+//         });
 
+// }, [militaryEventsTree, selectedYear, setSelectedObject]);
+
+useEffect(() => {
+  if (!militaryEventsTree || !svgRef.current) return;
+
+  const svg = d3.select(svgRef.current);
+  svg.selectAll("*").remove();
+
+  const dx = (800 / maxNumberOfNodesAtDepth) < 8 ? 8 : (800 / maxNumberOfNodesAtDepth);
+  const dy = 800 / maxNumberDepth;
+
+  const root = d3.hierarchy<EventNode>(militaryEventsTree as EventNode);
+  const treeLayout = d3.tree<EventNode>().nodeSize([dx, dy]);
+  treeLayout(root);
+
+  const nodes = root.descendants();
+
+  const xs = nodes.map(d => d.x ?? 0);
+  const ys = nodes.map(d => d.y ?? 0);
+
+  const xMin = Math.min(...xs);
+  const xMax = Math.max(...xs);
+  const yMin = Math.min(...ys);
+  const yMax = Math.max(...ys);
+
+  const paddingX = 50;
+  const paddingY = 80;
+
+  const autoWidth = (xMax - xMin) + paddingX * 4;
+  const autoHeight = (yMax - yMin) + dy;
+
+  svg.attr("width", autoWidth).attr("height", autoHeight);
+
+  const g = svg
+    .append("g")
+    .attr("transform", `translate(${paddingX - xMin},${paddingY-110})`)
+    .attr("font-family", "sans-serif")
+    .attr("font-size", 12);
+
+  // 🔴 Y terslenmiş link generator
+  const linkGenerator = d3.linkVertical<
+    d3.HierarchyPointLink<EventNode>,
+    d3.HierarchyPointNode<EventNode>
+  >()
+    .x(d => (d.x  ?? 0))
+    .y(d => autoHeight - (d.y ?? 0));
+
+  g.selectAll(".link")
+    .data(root.links())
+    .enter()
+    .append("path")
+    .attr("d", linkGenerator as any)
+    .attr("fill", "none")
+    .attr("stroke", l => getStatusColorForMilitaryEvents(l.target.data.status))
+    .attr("stroke-width", l => l.target.data.status === "ongoing" ? 2 : 1.2)
+    .attr("opacity", l => l.target.data.status === "ongoing" ? 1 : 0.35);
+
+  const node = g.selectAll(".node")
+    .data(nodes)
+    .enter()
+    .append("g")
+    .attr("transform", d => {
+      const x = d.x ?? 0;
+      const y = autoHeight - (d.y ?? 0); // 🔴 ters
+      return `translate(${x},${y})`;
+    })
+    .attr("cursor", "pointer")
+    .on("click", (_, d) => setSelectedObject(d.data.me));
+
+  node.append("circle")
+    .attr("r", 5)
+    .attr("fill", d => getStatusColorForMilitaryEvents(d.data.status));
+
+  node.append("text")
+    .attr("dy", "1.6em")
+    .attr("text-anchor", "start")
+    .attr("y", -12)
+    .attr("x", 12)
+    .attr("transform", d =>
+      d.data.isLeaf
+        ? "rotate(-90, 0, 0)"
+        : "translate(-20,20)"
+    )
+    .attr("fill", d => getStatusColorForMilitaryEvents(d.data.status))
+    .attr("font-size", d => d.data.status === "ongoing" ? "10px" : "9px")
+    .attr("font-weight", d => d.data.status === "ongoing" ? "bold" : "normal")
+    .attr("stroke", "#cbccceff")
+    .attr("paint-order", "stroke")
+    .text(d => d.data.name.toUpperCase());
 }, [militaryEventsTree, selectedYear, setSelectedObject]);
 
 

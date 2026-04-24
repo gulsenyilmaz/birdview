@@ -76,18 +76,17 @@ const LocationBox: React.FC<LocationBoxProps> = ({location}) => {
                     
                     </p>
                 </div>
-              
 
-                
-                <div className="content-details">
-
-                  {locationDetails.img_url && (
+                <div className="location-details-container">
+                {locationDetails.img_url && (
                     <img src={locationDetails.img_url} alt="portrait" className="portrait" />
                   )}
 
                   {locationDetails.logo_url && (
                     <img src={locationDetails.logo_url} alt="logo" className="logo" />
                   )}
+                </div>
+                <div className="content-details">
                   
                   <div style={{height: 'auto'}}>
                     {locationDetails.country_label && (<p><strong>IN COUNTRY: </strong> {locationDetails.country_label}</p>)}
