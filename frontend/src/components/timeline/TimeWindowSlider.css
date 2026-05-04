@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: row;
   box-sizing: border-box;
-  background-color: rgba(244, 242, 235, 0.97);
+  background-color: rgba(244, 243, 241, 0.97);
   border-top: 1px solid #D3D1C7;
   z-index: 4000;
 }

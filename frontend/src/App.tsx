@@ -76,7 +76,6 @@ function App() {
       collection_id: selectedCollection?.id,
       location_id: selectedLocation?.id,
       relationship_type_name: selectedLocation?.relationship_type_name,
-
     },
     selectedYear,
   });
@@ -113,10 +112,9 @@ function App() {
   useEffect(() => {
     let nextRange: [number, number] | null = null;
 
-    if (!selectedObject) {
+    if (!selectedObject && !selectedOccupation && !selectedGender && !selectedNationality && !selectedCollection) {
 
       nextRange = defaultWindowRange;
-      
 
     } else if (selectedHuman) {
 
@@ -143,6 +141,13 @@ function App() {
       ];
 
     }
+    else if (selectedOccupation || selectedGender || selectedNationality || selectedCollection) {
+
+      setShowWorks(false);
+      setShowHumans(true);
+      nextRange = humanLayer.fullRange;
+
+    }
 
     if (nextRange && (windowRange[0] !== nextRange[0] || windowRange[1] !== nextRange[1])) {
 
@@ -155,6 +160,10 @@ function App() {
     selectedLocation,
     selectedMilitaryEvent,
     selectedMovement,
+    selectedOccupation,
+    selectedGender,
+    selectedNationality,
+    selectedCollection,
     activeFullRange,
     humanLayer.fullRange,
     militaryLayer.fullRange,

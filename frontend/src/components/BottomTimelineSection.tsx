@@ -1,9 +1,10 @@
-import TimeSlider from "./timeline/TimeSlider";
+import TimelineCanvas from "./timeline/TimelineCanvas";
+
+import React, { useMemo, useState } from "react";
 
 import TimeWindowSlider from "./timeline/TimeWindowSlider";
-import LayerHistogram from "./timeline/LayerHistogram";
-import RelationTimeline from "./timeline/RelationTimeline";
-import MovementTimeline from "./timeline/MovementTimeline";
+// import LayerHistogram from "./timeline/LayerHistogram";
+// import BarTimeline from "./timeline/BarTimeline";
 
 import Timeline from "./timeline/Timeline";
 import WorkList from "./timeline/WorkList";
@@ -15,10 +16,11 @@ import type { Movement } from "../entities/Movement";
 import type { Human } from "../entities/Human";
 import type { RelatedHuman } from "../entities/RelatedHuman";
 import type { Location } from "../entities/Location";
-import YearLine from "./timeline/YearLine";
+// import YearLine from "./timeline/YearLine";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import MilitaryEventDetail from "./detail_panels/MilitaryEventDetail";
-import{getLayerColor } from "../utils/colorUtils"
+
+import { getLayerColor, getColorForLabelString, getColorForRelationTypeString } from "../utils/colorUtils"
 
 
 
@@ -99,140 +101,137 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   humanAliveCounts,
   militaryEventCounts,
 }) => {
+  const [showMovements, setShowMovements] = useState(false);
+  const layers = useMemo(() => {
+    const result: any[] = [];
 
-  getLayerColor
+    if (selectedHuman) {
+      if (workCounts.length > 0) {
+        result.push({
+          id: "works",
+          type: "histogram",
+          label: "WORKS",
+          color: getLayerColor("WORKS"),
+          show: showWorks,
+          setShow: setShowWorks,
+          counts: workCounts,
+          binAggregation: "sum",
+        });
+      }
+      result.push({
+        id: "relations",
+        type: "bar",
+        label: "RELATIONS",
+        color: getLayerColor("RELATIONS"),
+        show: showHumans,
+        setShow: setShowHumans,
+        objectColor: getColorForRelationTypeString,
+        data: humanRelations.length > 0 ? humanRelations : humanLocations,
+        onSelect: setSelectedObject,
+      });
+    }
+
+    if (!selectedHuman) {
+      result.push({
+        id: "humans",
+        type: "histogram",
+        label: "HUMANS",
+        color: getLayerColor("HUMANS"),
+        show: showHumans,
+        setShow: setShowHumans,
+        counts: humanAliveCounts,
+        binAggregation: "sum",
+      });
+    }
+
+    result.push({
+      id: "wars",
+      type: "histogram",
+      label: "WARS",
+      color: getLayerColor("WARS"),
+      show: showEvents,
+      setShow: setShowEvents,
+      counts: militaryEventCounts,
+      binAggregation: "sum",
+    });
+
+    result.push({
+      id: "disasters",
+      type: "histogram",
+      label: "DISASTERS",
+      color: getLayerColor("DISASTERS"),
+      show: showDisasters,
+      setShow: setShowDisasters,
+      counts: militaryEventCounts,
+      binAggregation: "sum",
+    });
+
+    result.push({
+      id: "movements",
+      type: "bar",
+      label: "MOVEMENTS",
+      color: getLayerColor("MOVEMENTS"),
+      show: showMovements,
+      setShow: setShowMovements,
+      objectColor: getColorForLabelString,
+      data: movements.filter(m => m.start_date && m.end_date),
+      onSelect: setSelectedObject,
+    });
+
+    return result;
+  }, [
+    selectedHuman, workCounts, humanAliveCounts, militaryEventCounts,
+    movements, humanRelations, humanLocations,
+    showWorks, showHumans, showEvents, showDisasters,showMovements,
+  ]);
+
   return (
-    <div className="bottom-panel-slot" >
-      <div className={`bottom-worklist-panel ${(selectedHuman && showWorks) || (selectedMilitaryEvent && showEventDetails) || selectedLocation ? "open" : "hide"}`}>
+    <div className="bottom-panel-slot">
+      <div className={`bottom-worklist-panel ${
+        (selectedHuman && showWorks) ||
+        (selectedMilitaryEvent && showEventDetails) ||
+        selectedLocation ? "open" : "hide"
+      }`}>
         <Timeline selectedYear={selectedYear} windowRange={windowRange}>
-          {selectedHuman && (
-            
-              <WorkList filteredWorks={filteredWorks} />
-            
-          )}
-
+          {selectedHuman && <WorkList filteredWorks={filteredWorks} />}
           {selectedMilitaryEvent && (
-              <MilitaryEventDetail
-                selectedYear={selectedYear}
-                militaryEvents={filteredMilitaryEvents}
-                setSelectedObject={setSelectedObject}
-                setShowEventDetails={setShowEventDetails}
-              />
-            )}
-
+            <MilitaryEventDetail
+              selectedYear={selectedYear}
+              militaryEvents={filteredMilitaryEvents}
+              setSelectedObject={setSelectedObject}
+              setShowEventDetails={setShowEventDetails}
+            />
+          )}
           {selectedLocation && (
-              <HumanList
-                humans={filteredHumans}
-                setSelectedObject={setSelectedObject}
-                
-              />
-            )}
+            <HumanList humans={filteredHumans} setSelectedObject={setSelectedObject} />
+          )}
         </Timeline>
       </div>
+
       <div className="bottom-panel">
         <div className="component-container">
+          <TimelineCanvas
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+            fullRange={activeFullRange}
+            windowRange={windowRange}
+            setWindowRange={setWindowRange}
+            setManualMode={setManualMode}
+            layers={layers}
+          />
 
-          <YearLine 
-            selectedYear={selectedYear} 
-            windowRange={windowRange} />
-        
-          {selectedHuman && (
-            <>
-              {workCounts.length > 0 && (
-                <LayerHistogram
-                  setSelectedYear={setSelectedYear}
-                  windowRange={windowRange}
-                  aliveCounts={workCounts}
-                  binAggregation="sum"
-                  layerTypeName="WORKS"
-                  layerColor= {getLayerColor("WORKS")}
-                  showLayer={showWorks}
-                  setShowLayer={setShowWorks}
-                />
-              )}
-            
-
-              <RelationTimeline
-                windowRange={windowRange}
-                layerTypeName="RElATIONS"
-                currentRelations={humanRelations.length > 0 ? humanRelations : humanLocations}
-                // humanRelations={humanRelations}
-                // humanLocations={humanLocations}
-                showLayer={showHumans}
-                setShowLayer={setShowHumans}
-              />
-          </>
-          )}
-        <TimeSlider
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          fullRange={activeFullRange}
-          windowRange={windowRange}
-          setWindowRange={setWindowRange}
-          setSelectedMovement={setSelectedObject}
-          setManualMode={setManualMode}
-        />
-        
-
-        {!selectedHuman && (
-            <LayerHistogram
-              setSelectedYear={setSelectedYear}
-              windowRange={windowRange}
-              aliveCounts={humanAliveCounts}
-              binAggregation="sum"
-              layerColor= {getLayerColor("HUMANS")}
-              layerTypeName="HUMANS"
-              showLayer={showHumans}
-              setShowLayer={setShowHumans}
-            />
-        )}
-
-        <LayerHistogram
-          setSelectedYear={setSelectedYear}
-          windowRange={windowRange}
-          aliveCounts={militaryEventCounts}
-          binAggregation="sum"
-          layerTypeName="WARS"
-          layerColor= {getLayerColor("WARS")}
-          showLayer={showEvents}
-          setShowLayer={setShowEvents}
-        />
-
-        <LayerHistogram
-          setSelectedYear={setSelectedYear}
-          windowRange={windowRange}
-          aliveCounts={militaryEventCounts}
-          binAggregation="sum"
-          layerTypeName="DISASTERS"
-          layerColor= {getLayerColor("DISASTERS")}
-          showLayer={showDisasters}
-          setShowLayer={setShowDisasters}
-        />
-
-         <MovementTimeline
-              windowRange={windowRange}
-              movements={movements}
-              setSelectedMovement={setSelectedObject}
-              layerTypeName="MOVEMENTS"
-              layerColor= {getLayerColor("MOVEMENTS")}
-            />
-
-        {!selectedHuman && (
-
+          {!selectedHuman && (
             <TimeWindowSlider
               fullRange={activeFullRange}
               windowRange={windowRange}
               setWindowRange={setWindowRange}
               setSelectedYear={setSelectedYear}
               selectedYear={selectedYear}
-              
             />
-          
-        )}
-
+          )}
         </div>
       </div>
-  </div>
+    </div>
   );
 };
 

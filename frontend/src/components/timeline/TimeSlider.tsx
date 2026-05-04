@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState,useRef  } from "react";
 import "./TimeSlider.css";
 import type { Movement } from "../../entities/Movement";
+import D3YearSlider from "../ui/D3YearSlider"
 
 // ⬇️ yeni: dışarıdan verilecek "yıl -> hayatta olan sayısı"
 // type YearCount = { year: number; count: number };
@@ -15,6 +16,7 @@ interface TimeSliderProps {
   setSelectedMovement: (obj: Movement) => void;
  
   setManualMode:(obj: boolean) => void
+  // timelineHeight:number
 }
 
 const TimeSlider: React.FC<TimeSliderProps> = ({
@@ -26,6 +28,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   setWindowRange,
   
   setManualMode
+  // timelineHeight
         
 }) => {
 
@@ -100,10 +103,10 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
     
   };
 
-  const stopAndSetSelectedYear= (n_year:number) => {
-    setIsPlaying(false);
-    setSelectedYear(n_year)
-  };
+  // const stopAndSetSelectedYear= (n_year:number) => {
+  //   setIsPlaying(false);
+  //   setSelectedYear(n_year)
+  // };
 
 
   const isDragging = useRef<boolean>(false);
@@ -137,6 +140,16 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
     isDragging.current = false;
   };
 
+  // const sliderContainerRef = useRef<HTMLDivElement>(null);
+  // const [timelineHeight, setTimelineHeight] = useState(200);
+
+  //   useEffect(() => {
+  //     if (!sliderContainerRef.current) return;
+  //     const parent = sliderContainerRef.current.closest(".component-container");
+  //     if (!parent) return;
+  //     setTimelineHeight(parent.getBoundingClientRect().height);
+  //   }, [windowRange]);
+
   
 
   return (
@@ -166,15 +179,23 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
             )}
           </div>
           <div className="slider-wrapper">
+
+            <D3YearSlider 
+              minYear= {minYear}
+              maxYear= {maxYear}
+              selectedYear= {selectedYear}
+              onYearChange={setSelectedYear}
+              // timelineHeight={timelineHeight}
+            />
             
-            <input
+            {/* <input
               type="range"
               min={minYear}
               max={maxYear}
               step={1}
               value={selectedYear}
               onChange={(e) => stopAndSetSelectedYear(Number(e.target.value))}
-            />
+            /> */}
             
           </div>
           

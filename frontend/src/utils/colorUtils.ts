@@ -254,12 +254,12 @@ export const getColorForRelationType = (
 
   export const getLayerColor = (layerName?: string) => {
     switch (layerName?.toLowerCase()) {
-      case "works":       return "#BA7517";
+      case "works":       return "#eb9422f1";
       case "relations":   return "#378ADD";
       case "professional":return "#378ADD";
       case "humans":      return "#6e639e";
       case "wars":        return "#5d895d";
-      case "disasters":   return "#d02d2dff";
+      case "disasters":   return "#d02d2d";
       case "movements":   return "#ef9b14";
       default:            return "#1D9E75";
     }
