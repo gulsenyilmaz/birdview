@@ -169,14 +169,15 @@ const TimelineCanvas: React.FC<TimelineCanvasProps> = ({
   const isDragging = useRef(false);
   const dragStart = useRef<{ x: number; min: number; max: number } | null>(null);
 
-  const handleLabelMouseDown = (e: React.MouseEvent) => {
+  const handleLabelPointerDown = (e: React.PointerEvent<SVGGElement>) => {
     isDragging.current = true;
-    dragStart.current = { x: e.pageX, min: minYear, max: maxYear };
+    dragStart.current = { x: e.clientX, min: minYear, max: maxYear };
+    e.currentTarget.setPointerCapture(e.pointerId);
   };
 
-  const handleLabelMouseMove = (e: React.MouseEvent) => {
+  const handleLabelPointerMove = (e: React.PointerEvent<SVGGElement>) => {
     if (!isDragging.current || !dragStart.current) return;
-    const dx = e.pageX - dragStart.current.x;
+    const dx = e.clientX - dragStart.current.x;
     const walk = Math.round(dx / 100) * step;
     if (walk === 0) return;
     let newMin = Math.max(alltime_min, dragStart.current.min - walk);
@@ -186,26 +187,40 @@ const TimelineCanvas: React.FC<TimelineCanvasProps> = ({
     setWindowRange([newMin, newMax]);
   };
 
-  const handleLabelMouseUp = () => { isDragging.current = false; };
+  const handleLabelPointerUp = (e: React.PointerEvent<SVGGElement>) => {
+    isDragging.current = false;
+    dragStart.current = null;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  };
 
-  const handleSliderDrag = (e: React.MouseEvent<SVGRectElement>) => {
+  const sliderDragRect = useRef<DOMRect | null>(null);
+
+  const handleSliderPointerDown = (e: React.PointerEvent<SVGRectElement>) => {
     const svg = svgRef.current;
     if (!svg) return;
     e.preventDefault();
-    const rect = svg.getBoundingClientRect();
+    e.stopPropagation();
+    sliderDragRect.current = svg.getBoundingClientRect();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setIsPlaying(false);
+  };
+
+  const handleSliderPointerMove = (e: React.PointerEvent<SVGRectElement>) => {
+    const rect = sliderDragRect.current;
+    if (!rect || !e.currentTarget.hasPointerCapture(e.pointerId)) return;
     const scaleX = SVG_W / rect.width;
-    const onMove = (ev: MouseEvent) => {
-      const x = (ev.clientX - rect.left) * scaleX;
-      const year = Math.round(Math.max(minYear, Math.min(maxYear, xScale.invert(x))));
-      setSelectedYear(year);
-      setIsPlaying(false);
-    };
-    const onUp = () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
+    const x = (e.clientX - rect.left) * scaleX;
+    const year = Math.round(Math.max(minYear, Math.min(maxYear, xScale.invert(x))));
+    setSelectedYear(year);
+  };
+
+  const handleSliderPointerUp = (e: React.PointerEvent<SVGRectElement>) => {
+    sliderDragRect.current = null;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
   };
 
   const handleSvgClick = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -331,7 +346,7 @@ const TimelineCanvas: React.FC<TimelineCanvasProps> = ({
                           fill={color} opacity={0.75} />
                         <text x={x1 + 1} y={rowY + BAR_ROW_H - 1}
                           fontSize={4.5} fill="#fff" fontWeight={900}>
-                          {d.name} {d.start_date ?? d.birth_date ?? "?"} – {d.end_date ?? d.death_date ?? "?"}
+                          {d.name} {d.relationship_type_name} {d.start_date ?? d.birth_date ?? "?"} – {d.end_date ?? d.death_date ?? "?"}
                         </text>
                       </g>
                     );
@@ -346,11 +361,11 @@ const TimelineCanvas: React.FC<TimelineCanvasProps> = ({
 
           {/* ── YEAR LABELS ── */}
           <g
-            onMouseDown={handleLabelMouseDown}
-            onMouseMove={handleLabelMouseMove}
-            onMouseUp={handleLabelMouseUp}
-            onMouseLeave={handleLabelMouseUp}
-            style={{ cursor: "grab" }}
+            onPointerDown={handleLabelPointerDown}
+            onPointerMove={handleLabelPointerMove}
+            onPointerUp={handleLabelPointerUp}
+            onPointerCancel={handleLabelPointerUp}
+            style={{ cursor: "grab", touchAction: "none" }}
           >
             <rect x={0} y={yearLabelsY} width={drawW} height={LABEL_ROW_H}
               fill="rgba(172, 172, 172, 0.95)" />
@@ -408,8 +423,11 @@ const TimelineCanvas: React.FC<TimelineCanvasProps> = ({
               fill="#D85A30"
               stroke="#F0997B"
               strokeWidth={1}
-              style={{ cursor: "col-resize" }}
-              onMouseDown={handleSliderDrag}
+              style={{ cursor: "col-resize", touchAction: "none" }}
+              onPointerDown={handleSliderPointerDown}
+              onPointerMove={handleSliderPointerMove}
+              onPointerUp={handleSliderPointerUp}
+              onPointerCancel={handleSliderPointerUp}
             />
           </g>
 

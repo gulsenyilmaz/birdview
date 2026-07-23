@@ -107,6 +107,7 @@ const MovementTimeline: React.FC<MovementTimelineProps> = ({
                                     fill={color}
                                     opacity={0.3}
                                 />
+
                                 <rect
                                     x={x1}
                                     y={y}
@@ -117,7 +118,6 @@ const MovementTimeline: React.FC<MovementTimelineProps> = ({
                                     opacity={0.7}
                                 />
                 
-                                {/* optional dates */}
                                 <text
                                     x={x1}
                                     y={y + 4}

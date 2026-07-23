@@ -159,13 +159,13 @@ export const getColorForRelationType = (
       return [55, 138, 221, opacity];    // blue-400 — #378ADD
 
     case 'work_location':
-      return [186, 117, 23, opacity];    // amber-400 — #BA7517
+      return [186, 117, 23, opacity];    // amber-400 — #BA7517 rgb(186, 117, 23)
 
     case 'has_works_in':
-      return [93, 202, 165, opacity];    // teal-200 — #5DCAA5
+      return [93, 202, 165, opacity];    // teal-200 — #5DCAA5 rgb(93, 202, 165)
 
     case 'buried_at':
-      return [136, 135, 128, opacity];   // gray-400 — #888780
+      return [136, 135, 128, opacity];   // gray-400 — #888780 rgb(136, 135, 128)
 
     // FAMILY
     case 'father':
@@ -218,7 +218,7 @@ export const getColorForRelationType = (
       const [r, g, b] = getColorForRelationType(type).slice(0, 3);
       return `rgba(${r},${g},${b})`;
 
-      };
+        };
   
   export const getStatusColorForMilitaryEvents = (status?: string) => {
           switch (status) {
