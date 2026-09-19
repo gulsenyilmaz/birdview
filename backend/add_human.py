@@ -1,18 +1,18 @@
-import pandas as pd
 import sqlite3
-import csv  
+import csv
+
 from entities.Human import Human
 from dataparsers.HumanFromWikidata import HumanFromWikidata
-import numpy
 
 
-OUTPUT_CSV = "StoryofArt_report_02.csv"
+OUTPUT_CSV = "ssm_artist_report.csv"
 DB_PATH = "birdview.db"
+SSM_COLLECTION_ID = 8
 
 
-def log_results(w, constituent_id, name, qid, is_human):
-    w.writerow([constituent_id, name, qid,is_human])
-    print(f"🎨 {constituent_id}, {name}, {qid}, {is_human}")
+def log_results(w, source_id, name, qid, is_human):
+    w.writerow([source_id, name, qid,is_human])
+    print(f"🎨 {source_id}, {name}, {qid}, {is_human}")
 
 def add_humans(file_path):
 
@@ -21,62 +21,142 @@ def add_humans(file_path):
     conn.execute("PRAGMA foreign_keys = ON;")
     cursor = conn.cursor()
 
-    with open(OUTPUT_CSV, mode="w", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
-        writer.writerow(["constituent_id", "name", "qid","is_human"])
+    with open(
+        OUTPUT_CSV,
+        mode="w",
+        newline="",
+        encoding="utf-8"
+    ) as output_file:
 
-        df = pd.read_csv(file_path, low_memory=False)
-        df = df.where(pd.notna(df), None)
-        
-       
+        writer = csv.writer(output_file)
 
-        for row in df.itertuples(index=False, name="HumanRow"):
-            
-            qid = row.qid
-            name = row.name
-            constituent_id = row.constituent_id
-            is_human=row.is_human
+        writer.writerow([
+            "source_id",
+            "name",
+            "qid",
+            "is_human"
+        ])
 
-            if is_human!=2:
-                log_results(writer, constituent_id, name, qid, is_human)
-                continue
-            
+        with open(
+            file_path,
+            mode="r",
+            newline="",
+            encoding="utf-8-sig"
+        ) as input_file:
 
-            human = Human(name=name, cursor=cursor, w=writer)
-            print(human.name,human.id)
+            reader = csv.DictReader(input_file)
 
-            if human.id is None: 
-                print(qid)
-                if qid is None:
-                    qid = human.get_wikidata_qid_by_langs()
-                    if qid is None:
-                        log_results(writer, constituent_id, name, "", 2)
+            for row in reader:
+
+                source_id = (row.get("source_id") or "").strip()
+                human_id = (row.get("birdview_id") or "").strip()
+                name = (row.get("name") or "").strip()
+                qid = (row.get("qid") or "").strip()
+                is_human = (row.get("is_human") or "").strip()
+
+                # -------------------------
+                # 1. BirdView ID zaten varsa
+                # -------------------------
+
+                if human_id:
+
+                    # CSV'de 123 veya 123.0 biçiminde olabilir
+                    human_id = int(float(human_id))
+
+                    human = Human(
+                        id=human_id,
+                        cursor=cursor,
+                        w=writer
+                    )
+
+                    human.add_collection(
+                        SSM_COLLECTION_ID,
+                        source_id
+                    )
+
+                    log_results(
+                        writer,
+                        source_id,
+                        human.name,
+                        human.qid,
+                        1
+                    )
+
+                    conn.commit()
+                    continue
+
+                # -------------------------
+                # 2. QID varsa
+                # -------------------------
+
+                if qid.startswith("Q"):
+
+                    human = Human(
+                        qid=qid,
+                        cursor=cursor,
+                        w=writer
+                    )
+
+                    # QID var ama kişi BirdView'de henüz yok
+                    if human.id is None:
+
+                        try:
+                            human.save_from_wikidata(qid)
+
+                        except Exception as e:
+                            print(f"❌ {name}: {e}")
+
+                            log_results(
+                                writer,
+                                source_id,
+                                name,
+                                qid,
+                                0
+                            )
+                            continue
+
+                    # Wikidata'dan ekleme de başarısız oldu
+                    if human.id is None:
+
+                        log_results(
+                            writer,
+                            source_id,
+                            name,
+                            qid,
+                            0
+                        )
                         continue
 
-                human = Human(qid=qid, cursor=cursor, w=writer)
-            
-            if human.id is not None: 
+                    human.add_collection(
+                        SSM_COLLECTION_ID,
+                        source_id
+                    )
 
-                log_results(writer, constituent_id, human.name, human.qid, 1)
-                human.add_collection(7, constituent_id)  
-                conn.commit()
-                continue
+                    log_results(
+                        writer,
+                        source_id,
+                        human.name,
+                        human.qid,
+                        1
+                    )
 
-            
+                    conn.commit()
+                    continue
 
-            human.save_from_wikidata(qid)
-            if human.id is None:
-                log_results(writer, constituent_id, name, qid, 0)
-                continue
-            
-            human.add_collection(7, constituent_id)
-            log_results(writer, constituent_id, human.name, human.qid, 1)
-            # log_results(writer, qid, name, "Added successfully")
-            conn.commit()
+                # -------------------------
+                # 3. Ne BirdView ID ne QID
+                # -------------------------
 
-        conn.close()
+                log_results(
+                    writer,
+                    source_id,
+                    name,
+                    "",
+                    is_human
+                )
 
-# def add_human_location
+    conn.close()
+
 
 def delete_human(human_id):
 
@@ -140,9 +220,7 @@ def add_relatives(qid):
 
 if __name__ == "__main__":
     
-    add_relatives("Q83229")
 
-    # add_to_collection(591,2,5490)
-    # delete_human(7127)
+    add_humans("ssm_artists.csv")
     
 

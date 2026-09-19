@@ -161,8 +161,10 @@ class HumanFromWikidata:
 
         # self.name = self._pick_label(entity)
         labels = entity.get("labels", {})
+        print("labels---------------------------",labels)
 
         self.name = entity.get("labels", {}).get("en", {}).get("value")
+        print("human_wiki_entity self.name---------------------------",self.name)
         if not self.name:
             self.name = next((v.get("value") for v in labels.values() if v.get("value")), None)
 

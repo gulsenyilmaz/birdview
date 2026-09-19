@@ -5,6 +5,8 @@ import PersonBox from "./detail_panels/PersonBox";
 import LocationBox from "./detail_panels/LocationBox";
 import MilitaryEventBox from "./detail_panels/MilitaryEventBox";
 import MovementBox from "./detail_panels/MovementBox";
+
+import TimeWindowSlider from "./timeline/TimeWindowSlider";
 // import ContentStrip from "./timeline/ContentStrip";
 
 // import HumanList from "./timeline/HumanList";
@@ -25,6 +27,10 @@ import type { SelectedObject } from "../hooks/useAppSelection";
 
 interface AppPanelsProps {
   selectedYear: number;
+  setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
+  activeFullRange: [number, number];
+  windowRange: [number, number];
+  setWindowRange: React.Dispatch<React.SetStateAction<[number, number]>>;
   isInitiated: boolean;
   detailMode: boolean;
   setDetailMode: (value: boolean) => void;
@@ -63,7 +69,11 @@ interface AppPanelsProps {
 }
 
 const AppPanels: React.FC<AppPanelsProps> = ({
-  selectedYear,
+    selectedYear,
+  setSelectedYear,
+  activeFullRange,
+   windowRange,
+  setWindowRange,
   detailMode,
   isInitiated,
   setDetailMode,
@@ -116,9 +126,52 @@ const AppPanels: React.FC<AppPanelsProps> = ({
 
   return (
     <>
-      <div className={`right-panel ${detailMode ? "open" : ""}`}>
+      
+    {isInitiated && ( <>
+      <div className={`left_dashboard-panel ${!detailMode ? "open" : ""}`}>
+        <Dashboard 
+            selectedYear={selectedYear}
+            humans={filteredHumans} 
+          />
+      </div>
+
+      {/* <div className={`top-bar ${selectedObject ?"squeezed" : ""}`}>
+        <DescriptionBanner
+            humans={filteredHumans}
+            selectedMovement={selectedMovement}
+            selectedOccupation={selectedOccupation}
+            selectedGender={selectedGender}
+            selectedNationality={selectedNationality}
+            selectedCollection={selectedCollection}
+            onClearFilter={handleClearFilter}
+        />
+      </div> */}
+
+        <div className={`right-panel ${selectedObject && !selectedMovement ? "hide" : ""}`}>
+        
+            <FilterList
+                selectedOccupation={selectedOccupation}
+                selectedGender={selectedGender}
+                selectedNationality={selectedNationality}
+                selectedMovement={selectedMovement}
+                selectedCollection={selectedCollection}
+                setSelectedOccupation={setSelectedOccupation}
+                setSelectedGender={setSelectedGender}
+                setSelectedNationality={setSelectedNationality}
+                setSelectedMovement={setSelectedObject}
+                setSelectedCollection={setSelectedCollection}
+                setSelectedObject={setSelectedObject}
+                backendUrl={backendUrl}
+                setMovements={setMovements}
+                movements={movements}
+            /> 
+        
+        </div>
+      </>
+      )}
+
+      <div className={`left-panel ${detailMode ? "open" : ""}`}>
         <DetailBox
-          
           detailMode={detailMode}
           setDetailMode={setDetailMode}
         >
@@ -137,75 +190,30 @@ const AppPanels: React.FC<AppPanelsProps> = ({
 
           {selectedMovement && <MovementBox movement={selectedMovement} />}
         </DetailBox>
+
       </div>
 
-      {/* <div className={`top-panel ${selectedObject ? "open" : ""}`}>
-        {selectedObject && !selectedMovement && (
-          <ContentStrip selectedYear={selectedYear} selectedObject={selectedObject}>
-            {selectedLocation && (
-              <HumanList
-                humans={filteredHumans}
-                setSelectedObject={setSelectedObject}
-              />
-            )}
+      <div className={`top-panel ${selectedHuman ? "hide" : ""}`}>
+       
+        <TimeWindowSlider
+          fullRange={activeFullRange}
+          windowRange={windowRange}
+          setWindowRange={setWindowRange}
+          setSelectedYear={setSelectedYear}
+          selectedYear={selectedYear}
+        />
 
-            
-          </ContentStrip>
-        )}
-      </div> */}
-{isInitiated && ( <>
-      <div className={`top-bar ${
-            selectedObject ?"squeezed" : ""
-        }`}
-        >
-        
-            
-            <Dashboard 
-              selectedYear={selectedYear}
-              humans={filteredHumans} 
-            />
-            <DescriptionBanner
-                humans={filteredHumans}
-                selectedMovement={selectedMovement}
-                selectedOccupation={selectedOccupation}
-                selectedGender={selectedGender}
-                selectedNationality={selectedNationality}
-                selectedCollection={selectedCollection}
-                onClearFilter={handleClearFilter}
-            />
-            
-        
-        </div>
-
-      <div className={`left-panel ${selectedObject && !selectedMovement ? "hide" : ""}`}>
-        
-            <FilterList
+        <DescriptionBanner
+            humans={filteredHumans}
+            selectedMovement={selectedMovement}
             selectedOccupation={selectedOccupation}
             selectedGender={selectedGender}
             selectedNationality={selectedNationality}
-            selectedMovement={selectedMovement}
             selectedCollection={selectedCollection}
-            setSelectedOccupation={setSelectedOccupation}
-            setSelectedGender={setSelectedGender}
-            setSelectedNationality={setSelectedNationality}
-            setSelectedMovement={setSelectedObject}
-            setSelectedCollection={setSelectedCollection}
-            setSelectedObject={setSelectedObject}
-            backendUrl={backendUrl}
-            setMovements={setMovements}
-            movements={movements}
-            /> 
-        
-      </div></>
-  )}
+            onClearFilter={handleClearFilter}
+        />
 
-      {/* <div className={`bottom-worklist-panel ${selectedHuman && showWorks ? "open" : ""}`}>
-        {selectedHuman && (
-          <Timeline selectedYear={selectedYear} windowRange={windowRange}>
-            <WorkList filteredWorks={filteredWorks} />
-          </Timeline>
-        )}
-      </div> */}
+      </div>
     </>
   );
 };

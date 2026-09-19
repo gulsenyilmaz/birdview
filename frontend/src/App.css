@@ -56,11 +56,11 @@
 }
 
 
-.left-panel {
+.right-panel {
   position: absolute;
   
-  top: 14dvh;
-  left: 0;
+  top: 17dvh;
+  right: 0;
 
   display: flex;
   flex-direction: row;
@@ -79,22 +79,21 @@
   
 }
 
-.left-panel.hide {
-  transform: translateX(-100%);
+.right-panel.hide {
+  transform: translateX(100%);
 }
 
 
-.right-panel {
+.left-panel {
   position: absolute;
   top: 0;
-  right:0;
+  left:0;
 
   display: flex;
   flex-direction: row;
 
-  width: 16dvw;
-  height: auto;
-  max-height: 90dvh;
+  width: 21dvw;
+  height:100dvh;
 
   
   border: 1px solid #444441;
@@ -108,51 +107,79 @@
   z-index: 200;
 
   transition: transform 2s ease-in-out;
-  transform: translateX(100%);
+  transform: translateX(-100%);
 
 }
 
-.right-panel.open {
+.left-panel.open {
+  transform: translateX(0%);
+}
+
+.left_dashboard-panel {
+  position: absolute;
+  top: 10dvh;
+  left:0;
+
+  width:15dvw;
+  height:auto;
+
+  padding: .5rem;
+  box-sizing: border-box;
+ 
+  background-color:#e2e21500;
+  
+
+  z-index: 200;
+
+  transition: transform 2s ease-in-out;
+  transform: translateX(-100%);
+
+}
+
+.left_dashboard-panel.open {
   transform: translateX(0%);
 }
 
 .top-panel {
   position: absolute;
-  top: 0;
-  left: 0vw;
 
   display: flex;
-  flex-direction: row;
-  width: 88dvw;
-  /* height: 16dvh; */
-  background-color: #919118cf;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  border: 1px solid #444441;
-  
-  padding: 0;
-  box-sizing: border-box;
-  border: 1px solid #74747400;
-  z-index: 150;
-
-  transition: transform 0.45s ease-in-out;
- 
-  
-}
-
-/* .top-panel.open {
-  
-} */
-
-
-.top-bar {
-  position: absolute;
+  flex-direction: column;
 
   top: 0;
   left: 0;
   right: 0;
 
+  width: 100%;
+  height: auto;
+
+  padding: .5rem;
+  padding-top: 0rem;
+  box-sizing: border-box;
+
+  background-color:transparent;
+ 
+  z-index: 1500;
+
+  transition: transform 0.45s ease-in-out;
+  transform: translateY(0%);
+}
+
+.top-panel.hide {
+  
+  transform: translateY(-100%);
+}
+
+
+.top-bar {
+  position: absolute;
+
+  top: 3dvh;
+  left: 0;
+  right: 0;
+
   width: 100dvw;
-  height: 11dvh;
+  height: 18dvh;
   
   display: flex;
   flex-direction: column;
@@ -162,7 +189,7 @@
   justify-items: center;
   
   pointer-events: auto;
-  background-color:rgba(39, 38, 37, 0.92);
+  background-color:#8e2e09;
   
   color: beige;
   border: none;
@@ -172,6 +199,7 @@
   
     
   transition:
+    left 2s ease-in-out,
     width 2s ease-in-out;
 }
 
@@ -182,8 +210,8 @@
 }
 
 .top-bar.squeezed {
-  /* right: 20dvw; */
-  width: 84dvw;
+  left: 21dvw;
+  width: 79dvw;
 }
 
 
@@ -194,17 +222,24 @@
   right: 0;
   bottom: 0;
 
-  padding: 1rem;
-  padding-right: 1rem;
+  padding: .5rem;
 
-  width: 100%;
+  width: 100dvw;
   height: auto; /* ikisini taşıyacak kadar */
   
   
   font-family: 'Georgia', sans-serif;
   overflow: hidden;
   z-index: 100;
-  
+
+  transition:
+    left 2s ease-in-out,
+    width 2s ease-in-out;
+}
+
+.bottom-panel-slot.squeezed {
+  left: 21dvw;
+  width: 79dvw;
 }
 
 .bottom-panel {
@@ -212,9 +247,6 @@
 
   width: 100%;
   height: auto;
-  
-  /* padding-left: .5rem;
-  padding-right: .5rem; */
 
   display: flex;
   flex-direction: column;
@@ -222,32 +254,18 @@
   justify-content:last baseline;
   
 
-  background-color: rgba(255, 255, 255, 0.351);
+  background-color: rgba(255, 255, 255, 0.63);
   box-shadow: 0 2px 2px rgba(158, 158, 158, 0.5);
   box-sizing: border-box;
   z-index: 100;
   
 }
 
-.component-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
 
-  max-height: 30dvh;
-  gap: 0;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  overflow-y: auto;
-  /* border-top: 1px solid #D3D1C7;
-  border-bottom: 1px solid #D3D1C7; */
-}
 
 
 .bottom-worklist-panel {
-  width: 95dvw;
+  width: 68dvw;
   height: auto;
   
 
@@ -256,6 +274,7 @@
   align-items: flex-start;  
   justify-content:last baseline;
   box-sizing: border-box;
+  background-color: rgba(30, 145, 217, 0);
   
   
   z-index: 10;
@@ -269,9 +288,9 @@
 }
 
 
-
-.left-panel,
+.top-panel,
 .right-panel,
+.left-panel,
 .top-bar,
 .bottom-panel,
 .bottom-worklist-panel {

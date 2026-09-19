@@ -237,28 +237,28 @@ export default function TimeWindowSlider({
     
     <div className="tw-container">
   
-          <div className="tw-window" ref={containerRef}>
-      <svg ref={svgRef} style={{ display: "block", overflow: "visible" }} />
-    </div>
+      <div className="tw-window" ref={containerRef}>
+        <svg ref={svgRef} style={{ display: "block", overflow: "visible" }} />
+      </div>
           
 
-          <div className="zoom-slider-wrapper">
-            <span className="zoom-label"> - </span>
-              <input
-                  // className="zoom-slider"
-                  type="range"
-                  min= {100}
-                  max={alltime_totalRange}
-                  step={1}
-                  value={zoom}
-                  onChange={(e) => {
-                    const v = Number(e.target.value);
-                    // setZoom(v);
-                    recalculateWindowRange(v);
-                  }}
-                />
-            <span className="zoom-label"> + </span>
-          </div>
+      <div className="zoom-slider-wrapper">
+        <span className="zoom-label"> - </span>
+          <input
+              // className="zoom-slider"
+              type="range"
+              min= {100}
+              max={alltime_totalRange}
+              step={1}
+              value={zoom}
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                // setZoom(v);
+                recalculateWindowRange(v);
+              }}
+            />
+        <span className="zoom-label"> + </span>
+      </div>
           
     </div>
   );

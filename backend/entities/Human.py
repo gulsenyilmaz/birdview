@@ -23,6 +23,8 @@ from entities.State import State
 from entities.Citizenship import Citizenship
 from entities.BaseEntity import BaseEntity
 
+import requests
+
 
 class Human(BaseEntity):
     TABLE_NAME = "humans"
@@ -71,15 +73,37 @@ class Human(BaseEntity):
         return s.replace("\\", "\\\\").replace('"', '\\"')
     
     def get_wikidata_qid_by_langs(self):
-        langs = ["en","tr","it","fr","de","es","pt","nl","ru","ar","fa","el","pl","sv","no","da","fi","cs","hu","ro","bg","uk","he","ja","zh","ko","sq","sr", "hr", "bs"]
+        # langs = ["en","tr","it","fr","de","es","pt","nl","ru","ar","fa","el","pl","sv","no","da","fi","cs","hu","ro","bg","uk","he","ja","zh","ko","sq","sr", "hr", "bs"]
+        langs = ["tr","en"]
+        
+
         safe_name = self.sparql_escape(self.name)
+
         for lang in langs:
             print("looking for qid---------------------------", lang)
-            self.SPARQL_QUERY = self.build_label_query(safe_name, lang)
-            qid = self.get_wikidata_qid()   
+
+            self.SPARQL_QUERY = self.build_label_query(
+                safe_name,
+                lang
+            )
+
+            try:
+                qid = self.get_wikidata_qid()
+
+            except requests.exceptions.RequestException as e:
+                print(
+                    f"⚠️ Wikidata connection error "
+                    f"for {self.name}: {e}"
+                )
+                return None
+
             if qid:
-                print("found a qid---------------------------", qid)
+                print(
+                    "found a qid---------------------------",
+                    qid
+                )
                 return qid
+
         return None
 
     def update_gender(self, gender):
@@ -518,7 +542,7 @@ class Human(BaseEntity):
                     }
                 )
 
-    def add_collection(self, collection_id, constituent_id):
+    def add_collection(self, collection_id, source_id):
 
         if not collection_id:
             self.log_results("❌ Failed to fetch collection_id")
@@ -544,7 +568,7 @@ class Human(BaseEntity):
 
         if human_collection_database_entity.id:
             human_collection_database_entity.update(
-                {"constituent_id": constituent_id}
+                {"source_id": source_id}
             )
             return
        
@@ -552,7 +576,7 @@ class Human(BaseEntity):
             {
                 "human_id": self.id,
                 "collection_id": collection_database_entity.id,
-                "constituent_id": constituent_id
+                "source_id": source_id
             }
         )
 
@@ -562,7 +586,7 @@ class Human(BaseEntity):
             if not self.id:
                 return []
             query = f"""
-                SELECT collection_id, constituent_id FROM human_collection
+                SELECT collection_id, source_id FROM human_collection
                 WHERE human_id=?
             """
             self.cursor.execute(query, (self.id,))
@@ -596,9 +620,7 @@ class Human(BaseEntity):
             )
         
         if human_wiki_entity.instance_qid != "Q5":
-            # self.log_results("", "", f"❌ {self.name} is not human")
-            
-            
+            self.log_results("", "", f"❌ {self.name} is not human")
             return
 
         self.set_data(
@@ -625,6 +647,9 @@ class Human(BaseEntity):
         self.update_uniqueplace(5, human_wiki_entity.death_place, human_wiki_entity.death_date) 
         # self.update_relatives(human_wiki_entity.relatives)
 
+        if self.id is None:
+            return
+
     def update_from_wikidata(self):
         print("update_from_wikidata---------------------------",self.name)
         qid = self.qid
@@ -647,6 +672,8 @@ class Human(BaseEntity):
                 status_code=500,
                 detail=f"Wikidata fetch failed: {str(e)}"
             )
+        
+        print("human_wiki_entity---------------------------",human_wiki_entity.death_date)    
 
         self.update(
             {

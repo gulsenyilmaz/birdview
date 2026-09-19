@@ -31,8 +31,8 @@ interface TimelineCanvasProps {
 
 const LABEL_ROW_H = 12;
 const SLIDER_ROW_H = 12;
-const HIST_ROW_H = 15;
-const BAR_ROW_H = 5;
+const HIST_ROW_H = 25;
+const BAR_ROW_H = 15;
 const BAR_GAP = 1;
 const SIDE_W = 120;
 const SVG_W = 1200;
@@ -345,7 +345,8 @@ const TimelineCanvas: React.FC<TimelineCanvasProps> = ({
                         <rect x={x1} y={rowY} width={bw} height={BAR_ROW_H}
                           fill={color} opacity={0.75} />
                         <text x={x1 + 1} y={rowY + BAR_ROW_H - 1}
-                          fontSize={4.5} fill="#fff" fontWeight={900}>
+                          fontFamily="Arial, serif"
+                          fontSize={11} fill="#fff0f0" fontWeight={600}>
                           {d.name} {d.relationship_type_name} {d.start_date ?? d.birth_date ?? "?"} – {d.end_date ?? d.death_date ?? "?"}
                         </text>
                       </g>
@@ -383,11 +384,11 @@ const TimelineCanvas: React.FC<TimelineCanvasProps> = ({
                   />
                   <text
                     x={x + 3} y={yearLabelsY + LABEL_ROW_H - 3}
-                    fontSize={7}
-                    fontFamily="Georgia, serif"
+                    fontSize={11}
+                    fontFamily="Arial, serif"
                     fontWeight={isActive ? 600 : 400}
                     fill={isActive ? "#BA7517" : "#5F5E5A"}
-                  >{year}</text>
+                  >{year} </text>
                 </g>
               );
             })}
@@ -454,6 +455,7 @@ const TimelineCanvas: React.FC<TimelineCanvasProps> = ({
                 height: `${(layout.h / totalSvgH) * 100}%`,
                 display: "flex",
                 alignItems: "flex-start",
+                fontSize: "14px",
                 paddingTop: "2px",
                 borderBottom: "1px solid #E8E6DF",
               }}

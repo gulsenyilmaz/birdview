@@ -220,8 +220,13 @@ function App() {
           </div>
         </div>
         <div className="overlay-layer">
+        
         <AppPanels
           selectedYear={selectedYear}
+          setSelectedYear={setSelectedYear}
+          activeFullRange={activeFullRange}
+          windowRange={windowRange}
+          setWindowRange={setWindowRange}
           detailMode={detailMode}
           setDetailMode={(value) => {
             if (!value) {
@@ -254,7 +259,7 @@ function App() {
           // filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
           setManualMode={setManualMode}
         />
-
+        
         <BottomTimelineSection
           selectedYear={selectedYear}
           setSelectedYear={setSelectedYear}
@@ -287,11 +292,8 @@ function App() {
           humanAliveCounts={humanLayer.aliveCounts}
           militaryEventCounts={militaryLayer.eventCounts}
         />
-       </div>
-       
-
         
-       
+       </div>
       </div>
     </div>
   );

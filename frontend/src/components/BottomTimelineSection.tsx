@@ -2,7 +2,7 @@ import TimelineCanvas from "./timeline/TimelineCanvas";
 
 import React, { useMemo, useState } from "react";
 
-import TimeWindowSlider from "./timeline/TimeWindowSlider";
+// import TimeWindowSlider from "./timeline/TimeWindowSlider";
 // import LayerHistogram from "./timeline/LayerHistogram";
 // import BarTimeline from "./timeline/BarTimeline";
 
@@ -72,13 +72,14 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   selectedYear,
   setSelectedYear,
   activeFullRange,
+   windowRange,
+  setWindowRange,
   filteredWorks,
   filteredMilitaryEvents,
   filteredHumans,
   humanRelations,
   humanLocations,
-  windowRange,
-  setWindowRange,
+ 
   // detailMode,
   movements,
   setSelectedObject,
@@ -186,7 +187,12 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   ]);
 
   return (
-    <div className="bottom-panel-slot">
+   
+
+    <div className={`bottom-panel-slot ${
+            selectedHuman ?"squeezed" : ""
+        }`}
+        >
       <div className={`bottom-worklist-panel ${
         (selectedHuman && showWorks) ||
         (selectedMilitaryEvent && showEventDetails) ||
@@ -220,7 +226,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
             layers={layers}
           />
 
-          {!selectedHuman && (
+          {/* {!selectedHuman && (
             <TimeWindowSlider
               fullRange={activeFullRange}
               windowRange={windowRange}
@@ -228,7 +234,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
               setSelectedYear={setSelectedYear}
               selectedYear={selectedYear}
             />
-          )}
+          )} */}
         </div>
       </div>
     </div>

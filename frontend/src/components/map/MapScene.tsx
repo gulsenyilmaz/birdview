@@ -253,54 +253,54 @@ const layers = useMemo(() => {
 }, [selectedObject, showEvents, showHumans, showWorks, humanLocations, processedRelatedHumans, processedHumans, viewState.zoom, selectedLayerType,  militaryEvents]);
 
   return (
-      <div className="map-scene-root">
+  <div className="map-scene-root">
     <div className="map-canvas">
   
         <DeckGL
-        width="100%"
-        height="100%"
-          views={new MapView({repeat: false})}
-          layers={layers}
-          viewState={viewState}
-          onViewStateChange={( obj :any) => {
-            
-             setViewState(
-              obj.viewState
-            );
+          width="100%"
+          height="100%"
+            views={new MapView({repeat: false})}
+            layers={layers}
+            viewState={viewState}
+            onViewStateChange={( obj :any) => {
+              
+              setViewState(
+                obj.viewState
+              );
 
-          }}
-          
-          controller={true}
-          
-          getTooltip={({ object }) =>
-                    object ? {
-                      text: `${object.tooltip_text? object.tooltip_text :object.name?object.name:object.title }`,
-                      style: { fontSize: "14px", color: "white" }
-                    } : null
-                  }
+            }}
+            
+            controller={true}
+            
+            getTooltip={({ object }) =>
+                      object ? {
+                        text: `${object.tooltip_text? object.tooltip_text :object.name?object.name:object.title }`,
+                        style: { fontSize: "14px", color: "white" }
+                      } : null
+                    }
+                    
+            
+            onClick={({ object }) => {
+                if (object) {
                   
-          
-          onClick={({ object }) => {
-              if (object) {
-                
-                // setManualMode(true);
-                setSelectedObject(object);
-              }
-          }}
-          onDragStart={({ object }) => {
-                
-              console.log("onDragStart object:",object);
-              setManualMode(true);
-          }}
-          
-
-          >
-          <Map
+                  // setManualMode(true);
+                  setSelectedObject(object);
+                }
+            }}
+            onDragStart={({ object }) => {
+                  
+                console.log("onDragStart object:",object);
+                setManualMode(true);
+            }}
             
-            id="map"
-            mapLib={maplibregl}
-            mapStyle={MAP_STYLE}
-          />
+
+            >
+            <Map
+              
+              id="map"
+              mapLib={maplibregl}
+              mapStyle={MAP_STYLE}
+            />
          
         </DeckGL>
         

@@ -1,0 +1,69 @@
+{
+  "pager": {
+    "start": "1",
+    "maxrecs": "1",
+    "total": 716
+  },
+  "records": [
+    {
+      "collection": "/ResimKlksyn",
+      "pointer": 665,
+      "filetype": "tif",
+      "parentobject": -1,
+      "typeb": "Fausto Zonaro (1854-1929)",
+      "find": "648.tif"
+    }
+  ],
+  "facets": [
+    {
+      "name": "abidin dino (1913-1993)",
+      "label": "typeb",
+      "count": "192"
+    },
+    {
+      "name": "nazmi ziya guran (1881-1937)",
+      "label": "typeb",
+      "count": "27"
+    },
+    {
+      "name": "erol akyavas (1932-1999)",
+      "label": "typeb",
+      "count": "25"
+    },
+    {
+      "name": "bedri rahmi eyuboglu (1911-1975)",
+      "label": "typeb",
+      "count": "20"
+    },
+    {
+      "name": "fikret mualla (1903-1967)",
+      "label": "typeb",
+      "count": "20"
+    },
+    {
+      "name": "ibrahim calli (1882-1960)",
+      "label": "typeb",
+      "count": "19"
+    },
+    {
+      "name": "feyhaman duran (1886-1970)",
+      "label": "typeb",
+      "count": "17"
+    },
+    {
+      "name": "avni arbas (1919-2003)",
+      "label": "typeb",
+      "count": "16"
+    },
+    {
+      "name": "sanatcisi bilinmiyor / artist unknown",
+      "label": "typeb",
+      "count": "16"
+    },
+    {
+      "name": "hikmet onat (1885-1977)",
+      "label": "typeb",
+      "count": "13"
+    }
+  ]
+}

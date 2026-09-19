@@ -23,60 +23,85 @@ interface ChartItem {
 const TOP_N = 5;
 const BAR_HEIGHT = 10;
 const BAR_GAP = 5;
-const MARGIN = { top: 8, right: 16, bottom: 4, left: 0 };
+const BAR_HEIGHT_RATIO = BAR_HEIGHT / (BAR_HEIGHT + BAR_GAP);
+const MARGIN = { top: 6, right: 16, bottom: 4, left: 0 };
 
 const BarChart: React.FC<{ data: ChartItem[]; labelWidth: number }> = ({ data, labelWidth }) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove();
+    const svgEl = svgRef.current;
+    const container = svgEl?.parentElement;
+    if (!svgEl || !container) return;
 
-    if (!data.length) return;
+    const draw = () => {
+      const svg = d3.select(svgEl);
+      svg.selectAll("*").remove();
 
-    const containerWidth = svgRef.current?.parentElement?.clientWidth ?? 200;
-    const barAreaWidth = containerWidth - labelWidth - MARGIN.right;
-    const totalHeight = TOP_N * (BAR_HEIGHT + BAR_GAP) + MARGIN.top + MARGIN.bottom;
+      if (!data.length) return;
 
-    svg.attr("width", containerWidth).attr("height", totalHeight);
+      const containerWidth = container.clientWidth || 200;
+      const containerHeight = container.clientHeight
+        || data.length * (BAR_HEIGHT + BAR_GAP) + MARGIN.top + MARGIN.bottom;
 
-    const xScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.value) ?? 1])
-      .range([0, barAreaWidth]);
+      const barAreaWidth = Math.max(0, containerWidth - labelWidth - MARGIN.right);
+      // Row pitch always derives from the actual item count so the rows exactly
+      // fill the available height — no leftover gap, no forced overflow.
+      // const rowHeight = Math.max(1, (containerHeight - MARGIN.top - MARGIN.bottom) / data.length);
+      const rowHeight = 15;
+      const barHeight = rowHeight * BAR_HEIGHT_RATIO;
+      // No lower floor: font must never exceed the row pitch it's drawn into,
+      // or consecutive rows overlap. Only cap the upper size for aesthetics.
+      const labelFontSize = Math.min(9, rowHeight * 0.65);
+      const valueFontSize = Math.min(9, rowHeight * 0.65);
 
-    const g = svg.append("g").attr("transform", `translate(${labelWidth}, ${MARGIN.top})`);
+      svg.attr("width", containerWidth).attr("height", rowHeight * data.length + MARGIN.top + MARGIN.bottom);
 
-    data.forEach((d, i) => {
-      const y = i * (BAR_HEIGHT + BAR_GAP);
+      const xScale = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.value) ?? 1])
+        .range([0, barAreaWidth]);
 
-      g.append("text")
-        .attr("x", -6)
-        .attr("y", y + BAR_HEIGHT / 2 + 3)
-        .attr("text-anchor", "end")
-        .attr("font-size", 10)
-        .attr("font-family", "'Georgia', sans-serif")
-        .attr("font-weight", 500)
-        .attr("letter-spacing", "0.06em")
-        .attr("fill", "#efefef")
-        .text(d.label);
+      const g = svg.append("g").attr("transform", `translate(${labelWidth}, ${MARGIN.top})`);
 
-      g.append("rect")
-        .attr("x", 0)
-        .attr("y", y)
-        .attr("width", Math.max(xScale(d.value), 0))
-        .attr("height", BAR_HEIGHT)
-        .attr("rx", 2)
-        .attr("fill", d.color);
+      data.forEach((d, i) => {
+        const y = i * rowHeight;
 
-      g.append("text")
-        .attr("x", xScale(d.value) + 4)
-        .attr("y", y + BAR_HEIGHT / 2 + 3)
-        .attr("font-size", 9)
-        .attr("font-family", "'Georgia', sans-serif")
-        .attr("fill", "#5F5E5A")
-        .text(d.value);
-    });
+        g.append("text")
+          .attr("x", -2)
+          .attr("y", y + barHeight / 2 + 3)
+          .attr("text-anchor", "end")
+          .attr("font-size", labelFontSize)
+          .attr("font-family", "'Arial', sans-serif")
+          .attr("font-weight", 500)
+          .attr("letter-spacing", "0.06em")
+          .attr("fill", "#828080")
+          .text(d.label.toUpperCase());
 
+        g.append("rect")
+          .attr("x", 0)
+          .attr("y", y)
+          .attr("width", Math.max(xScale(d.value), 0))
+          .attr("height", barHeight)
+          .attr("rx", 2)
+          .attr("fill", d.color);
+
+        g.append("text")
+          .attr("x", xScale(d.value) )
+          .attr("y", y + barHeight / 2 + 3)
+          .attr("font-size", valueFontSize)
+          .attr("font-family", "'Arial', sans-serif")
+          .attr("fill", "#828080")
+          .attr("font-weight", 500)
+          .text(d.value);
+      });
+    };
+
+    draw();
+
+    const resizeObserver = new ResizeObserver(() => draw());
+    resizeObserver.observe(container);
+
+    return () => resizeObserver.disconnect();
   }, [data, labelWidth]);
 
   return <svg ref={svgRef} style={{ display: "block", overflow: "visible" }} />;
@@ -120,35 +145,41 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, humans }) => {
 
   return (
   <>
-    {humans && humans.length > 0 && (
+   
       <div className="dashboard-container active">
 
-        <div className="year-display">
+        {/* <div className="year-display">
           <span className="year-display-label">year</span>
           <span className="year-display-value">{selectedYear}</span>
-        </div>
+        </div> */}
 
-        <div className="chart-divider" style={{ margin: "0 0.4rem" }} />
-
+        
+ {humans && humans.length > 0 && (
         <div className="dashboard-charts">
           <div className="chart-box">
             <div className="chart-box-title">nationality</div>
-            <BarChart data={nationalityData} labelWidth={labelW(nationalityData)} />
+            <div className="chart-box-canvas">
+              <BarChart data={nationalityData} labelWidth={labelW(nationalityData)} />
+            </div>
           </div>
-          <div className="chart-divider" />
           <div className="chart-box">
             <div className="chart-box-title">city</div>
-            <BarChart data={cityData} labelWidth={labelW(cityData)} />
+            <div className="chart-box-canvas">
+              <BarChart data={cityData} labelWidth={labelW(cityData)} />
+            </div>
           </div>
-          <div className="chart-divider" />
           <div className="chart-box">
             <div className="chart-box-title">gender</div>
-            <BarChart data={genderData} labelWidth={labelW(genderData)} />
+            <div className="chart-box-canvas">
+              <BarChart data={genderData} labelWidth={labelW(genderData)} />
+            </div>
           </div>
         </div>
 
+      )}
+
       </div>
-    )}
+    
   </>
 );
 };

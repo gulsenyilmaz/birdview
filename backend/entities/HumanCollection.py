@@ -8,5 +8,6 @@ class HumanCollection(BaseEntity):
         "human_id",
         "collection_id", 
         "constituent_id", 
+        "source_id", 
         "url"
     ]
