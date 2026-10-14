@@ -43,7 +43,7 @@ export function createHumanLayers({
 
   }
 
-  if (selectedLayerType === "text" || selectedLayerType === "circle") {
+  if ( selectedLayerType === "circle") {
 
     layers.push(
       new ScatterplotLayer<HumanEnriched>({
@@ -74,20 +74,20 @@ export function createHumanLayers({
         fontSettings: { buffer: 2, sdf: true },
         getText: d => (d.awarded ? "✨" : " ") + d.name + " ",// + "  (" + d.num_of_identifiers + ")",
         getPosition: d => [d.lonOffsetSource, d.latOffsetSource],
-        getSize: d => zoom/3 * Math.pow((d.num_of_identifiers + 10) * 30 * d.age, 0.25) / 40,
-        getColor: [255, 255, 255, 190],
+        getSize: d =>  Math.pow((d.num_of_identifiers + 10) * 20 * d.age, 0.25) / 30,
+        getColor:  d => d.fillColor,
         sizeScale: fontSize,
         sizeMinPixels,
         sizeMaxPixels,
         maxWidth: 64 * 12,
         background: true,
-        getBackgroundColor: d => d.fillColor,
+        getBackgroundColor: [255, 255, 255, 190],
         pickable: true,
         collisionEnabled: true,
         getCollisionPriority: d => Math.log2(d.num_of_identifiers + 20),
         collisionTestProps: {
           sizeScale: fontSize * 2,
-          sizeMaxPixels: sizeMaxPixels * 2,
+          sizeMaxPixels: sizeMaxPixels * 1.5,
           sizeMinPixels: sizeMinPixels * 2
         },
         getTextAnchor: "middle",

@@ -12,6 +12,7 @@ interface PersonBoxProps {
   setHumanLocations: (arr: Location[]) => void;
   setHumanRelations:(arr: RelatedHuman[]) => void;
 //   setSelectedObjectThumbnail: (str:string | null) => void;
+setShowWorks:(obj: boolean) => void;
   setManualMode:(obj: boolean) => void
   
 }
@@ -34,7 +35,7 @@ interface PersonDetails {
   gender: string;
 }
 
-const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHumanRelations, setManualMode}) => {
+const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHumanRelations, setShowWorks, setManualMode}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [personDetails, setPersonDetails] = useState<PersonDetails | null>(null);
@@ -47,7 +48,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
     // const [political, setPolitical] = useState<RelatedHuman[]>([]);    
     // const [uniqueTypes, setUniqueTypes] = useState<string[]>([]);
    
-    const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "professional"| "museums">("cv");
+    const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "professional"| "museums"| "works">("cv");
     const [fallbackImage, setFallbackImage] = useState<string | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateError, setUpdateError] = useState<string | null>(null);
@@ -115,6 +116,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             setManualMode(false)
             setHumanRelations([]);
             setHumanLocations(cv_locations);
+            setShowWorks(false);
             
             // setUniqueTypes( Array.from(
             //     new Set(
@@ -124,9 +126,11 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
            
          }
          else if(selectedTab=="family"){
-            setManualMode(false)
+            setManualMode(false);
             setHumanLocations([]);
-            setHumanRelations(family)
+            setHumanRelations(family);
+            setShowWorks(false);
+
             // setUniqueTypes( Array.from(
             //     new Set(
             //         family.map(l => l.relationship_type_name)
@@ -135,9 +139,11 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
          }
          else if(selectedTab=="professional"){
             
-            setManualMode(false)
+            setManualMode(false);
             setHumanLocations([]);
             setHumanRelations(professional)
+            setShowWorks(false);
+
             
             // setUniqueTypes( Array.from(
             //     new Set(
@@ -149,6 +155,18 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             setManualMode(false)
             setHumanRelations([]);
             setHumanLocations(museums);
+            setShowWorks(false);
+            // setUniqueTypes( Array.from(
+            //     new Set(
+            //         museums.map(l => l.relationship_type_name)
+            //     )
+            // ))
+         }
+         else if(selectedTab=="works"){
+            setManualMode(false)
+            setHumanRelations([]);
+            setHumanLocations([]);
+            setShowWorks(true);
             // setUniqueTypes( Array.from(
             //     new Set(
             //         museums.map(l => l.relationship_type_name)
@@ -235,7 +253,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
 
                         {personDetails.citizenships && personDetails.citizenships.length > 0 && (
                             <p>
-                            <strong>Citizenships:</strong> {personDetails.citizenships.join(", ")}
+                                <strong>Citizenships:</strong> {personDetails.citizenships.join(", ")}
                             </p>
                         )}
 
@@ -297,24 +315,37 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                             Museums
                         </button></>
                     )}
+                    
                         
                 </div>
+                <div className="tab-buttons">
+                    <button
+                        className={selectedTab === "works" ? "active" : ""}
+                        onClick={() => setSelectedTab("works")}
+                    >
+                        WORKS
+                    </button>
+                   
+                    
+                        
+                </div>
+                
                 <div className="admin-tools">
                     <a
-                    href={`https://www.wikidata.org/wiki/${person.qid}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="qid-link"
-                    >
-                    {person.qid}
+                        href={`https://www.wikidata.org/wiki/${person.qid}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="qid-link"
+                        >
+                        {person.qid}
                     </a>
 
                     <button
-                    onClick={handleUpdatePersonDetails}
-                    disabled={isUpdating}
-                    className="update-button"
-                    >
-                    {isUpdating ? "..." : "↻"}
+                        onClick={handleUpdatePersonDetails}
+                        disabled={isUpdating}
+                        className="update-button"
+                        >
+                        {isUpdating ? "..." : "↻"}
                     </button>
 
                     {updateError && <span className="update-error">!</span>}

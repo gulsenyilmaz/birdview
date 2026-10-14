@@ -1,5 +1,6 @@
 import './MapScene.css';
 import React, { useEffect, useState, useMemo } from "react";
+
 import { FlyToInterpolator } from '@deck.gl/core';
 
 import { DeckGL } from "@deck.gl/react";
@@ -44,7 +45,7 @@ type ViewStateType = {
 const INITIAL_VIEW_STATE: ViewStateType = {
   latitude: 20,
   longitude: 0,
-  zoom: 1.5,
+  zoom: 0.9,
   pitch: 0,
   bearing: 0,
 };
@@ -96,6 +97,37 @@ const MapScene: React.FC<MapSceneProps> = ({
   const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text' | 'circle'>('text');
   const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("nationality");
 
+  const [animationProgress, setAnimationProgress] = useState(.2);
+
+  useEffect(() => {
+    let frameId: number;
+
+    const duration = 1400;
+
+    const start = performance.now();
+
+    setAnimationProgress(0);
+
+    const animate = (now: number) => {
+      const progress = Math.min(
+        (now - start) / duration,
+        1
+      );
+
+      setAnimationProgress(progress);
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(animate);
+      }
+    };
+
+    frameId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, [selectedYear]);
+
 
   useEffect(() => {
     if(showHumans){
@@ -114,7 +146,7 @@ const MapScene: React.FC<MapSceneProps> = ({
               fillTColor = getColorForGender(h.gender, 0);
               break;
             case "nationality":
-              fillColor = getColorForLabel(h.nationality || "", 200);
+              fillColor = getColorForLabel(h.nationality || "", 255);
               fillTColor = getColorForLabel(h.nationality || "", 0);
               break;
             case "age":
@@ -224,18 +256,19 @@ const layers = useMemo(() => {
 
     layersArray.push(
       ...createSelectedHumanLayers({
-        processedRelatedHumans,
-        humanLocations,
-        selectedYear,
-        // selectedObject,
-        fontSize,
-        sizeMinPixels,
-        sizeMaxPixels
-      })
+          processedRelatedHumans,
+          humanLocations,
+          selectedYear,
+          animationProgress,
+          fontSize,
+          sizeMinPixels,
+          sizeMaxPixels
+        })
     );
+
   }
 
-  if (showHumans) {
+  if (showHumans && !isHuman(selectedObject)) {
     layersArray.push(
       ...createHumanLayers({
         processedHumans,
@@ -250,13 +283,12 @@ const layers = useMemo(() => {
 
   return layersArray;
 
-}, [selectedObject, showEvents, showHumans, showWorks, humanLocations, processedRelatedHumans, processedHumans, viewState.zoom, selectedLayerType,  militaryEvents]);
+}, [selectedObject, showEvents, showHumans, showWorks, humanLocations,animationProgress, processedRelatedHumans, processedHumans, viewState.zoom, selectedLayerType,  militaryEvents]);
 
   return (
   <div className="map-scene-root">
     <div className="map-canvas">
-  
-        <DeckGL
+      <DeckGL
           width="100%"
           height="100%"
             views={new MapView({repeat: false})}
@@ -302,21 +334,21 @@ const layers = useMemo(() => {
               mapStyle={MAP_STYLE}
             />
          
-        </DeckGL>
+      </DeckGL>
+    </div>
+    <div className="layer-selector">
+         <label>
+          
+          <input
+              type="checkbox"
+              checked={manualMode}
+              onChange={(e) => setManualMode(e.target.checked)}
+            />
+            <span className="label-title">Manuel Mode</span>
         
-        </div>
-        <div className="layer-selector">
-            <label>
-              <span className="label-title">Manuel Mode</span>
-              <input
-                  type="checkbox"
-                  checked={manualMode}
-                  onChange={(e) => setManualMode(e.target.checked)}
-                />
-            
-            </label>
+        </label> 
       
-            {(showHumans && !detailMode) && (
+             {(showHumans && !detailMode) && (
               <>
               <div className="radio-group">
                 <label>
@@ -326,7 +358,7 @@ const layers = useMemo(() => {
                     checked={selectedLayerType === "arc"}
                     onChange={() => setSelectedLayerType("arc")}
                   />
-                  Arc
+                  <span className="label-title">Arc</span>
                 </label>
 
                 <label>
@@ -336,7 +368,8 @@ const layers = useMemo(() => {
                     checked={selectedLayerType === 'text'}
                     onChange={() => setSelectedLayerType('text')}
                   />
-                  Text Layer
+                  <span className="label-title">Text Layer</span>
+                  
                 </label>
 
                 <label>
@@ -346,7 +379,8 @@ const layers = useMemo(() => {
                     checked={selectedLayerType === 'circle'}
                     onChange={() => setSelectedLayerType('circle')}
                   />
-                  Circle Layer
+                  <span className="label-title">Circle Layer</span>
+                  
                 </label>
               </div>
               <div className="radio-group">
@@ -357,7 +391,8 @@ const layers = useMemo(() => {
                     checked={colorFilterType === "age"}
                     onChange={() => setColorFilterType("age")}
                   />
-                  Age
+                  <span className="label-title">Age</span>
+                  
                 </label>
 
                 <label>
@@ -367,7 +402,8 @@ const layers = useMemo(() => {
                     checked={colorFilterType === "gender"}
                     onChange={() => setColorFilterType("gender")}
                   />
-                  Gender
+                  <span className="label-title">Gender</span>
+                  
                 </label>
                 <label>
                   <input
@@ -376,12 +412,13 @@ const layers = useMemo(() => {
                     checked={colorFilterType === "nationality"}
                     onChange={() => setColorFilterType("nationality")}
                   />
-                  Nationality
+                  <span className="label-title">Nationality</span>
+                  
                 </label>
                 
               </div>
               </>
-          )}
+          )} 
         </div>
       
   </div>

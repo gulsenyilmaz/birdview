@@ -1,14 +1,13 @@
-import TimelineCanvas from "./timeline/TimelineCanvas";
-
 import React, { useMemo, useState } from "react";
 
-// import TimeWindowSlider from "./timeline/TimeWindowSlider";
-// import LayerHistogram from "./timeline/LayerHistogram";
-// import BarTimeline from "./timeline/BarTimeline";
+import type { LayerConfig } from "./timeline/timelineTypes";
 
-import Timeline from "./timeline/Timeline";
-import WorkList from "./timeline/WorkList";
-import HumanList from "./timeline/HumanList";
+import TimelineCanvas from "./timeline/canvas/TimelineCanvas";
+import LayerPicker from "./timeline/picker/LayerPicker";
+
+import ContentTrack from "./timeline/content/ContentTrack";
+import WorkList from "./timeline/content/types/WorkList";
+import HumanList from "./timeline/content/types/HumanList";
 
 import type { SelectedObject } from "../hooks/useAppSelection";
 import type { Work } from "../entities/Work";
@@ -16,7 +15,6 @@ import type { Movement } from "../entities/Movement";
 import type { Human } from "../entities/Human";
 import type { RelatedHuman } from "../entities/RelatedHuman";
 import type { Location } from "../entities/Location";
-// import YearLine from "./timeline/YearLine";
 import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import MilitaryEventDetail from "./detail_panels/MilitaryEventDetail";
 
@@ -45,6 +43,7 @@ interface BottomTimelineSectionProps {
   filteredHumans: Human[];
 
   movements: Movement[];
+  selectedObject: SelectedObject;
   setSelectedObject: React.Dispatch<React.SetStateAction<SelectedObject>>;
   setManualMode: React.Dispatch<React.SetStateAction<boolean>>;
 
@@ -72,7 +71,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   selectedYear,
   setSelectedYear,
   activeFullRange,
-   windowRange,
+  windowRange,
   setWindowRange,
   filteredWorks,
   filteredMilitaryEvents,
@@ -82,8 +81,9 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
  
   // detailMode,
   movements,
+  selectedObject,
   setSelectedObject,
-  setManualMode,
+  // setManualMode,
   selectedMilitaryEvent,
   selectedHuman,
   selectedLocation,
@@ -103,14 +103,15 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   militaryEventCounts,
 }) => {
   const [showMovements, setShowMovements] = useState(false);
-  const layers = useMemo(() => {
-    const result: any[] = [];
+  const layers = useMemo<LayerConfig[]>(() => {
+     const result: LayerConfig[] = [];
 
     if (selectedHuman) {
       if (workCounts.length > 0) {
         result.push({
           id: "works",
           type: "histogram",
+          scope: "detail",
           label: "WORKS",
           color: getLayerColor("WORKS"),
           show: showWorks,
@@ -122,6 +123,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
       result.push({
         id: "relations",
         type: "bar",
+        scope: "general",
         label: "RELATIONS",
         color: getLayerColor("RELATIONS"),
         show: showHumans,
@@ -136,6 +138,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
       result.push({
         id: "humans",
         type: "histogram",
+        scope: "general",
         label: "HUMANS",
         color: getLayerColor("HUMANS"),
         show: showHumans,
@@ -148,6 +151,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
     result.push({
       id: "wars",
       type: "histogram",
+      scope: "general",
       label: "WARS",
       color: getLayerColor("WARS"),
       show: showEvents,
@@ -159,6 +163,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
     result.push({
       id: "disasters",
       type: "histogram",
+      scope: "general",
       label: "DISASTERS",
       color: getLayerColor("DISASTERS"),
       show: showDisasters,
@@ -168,8 +173,33 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
     });
 
     result.push({
+      id: "landmarks",
+      type: "histogram",
+      scope: "general",
+      label: "LANDMARKS",
+      color: getLayerColor("LANDMARKS"),
+      show: showDisasters,
+      setShow: setShowDisasters,
+      counts: militaryEventCounts,
+      binAggregation: "sum",
+    });
+
+    result.push({
+      id: "cities",
+      type: "histogram",
+      scope: "general",
+      label: "CITIES",
+      color: getLayerColor("CITIES"),
+      show: showDisasters,
+      setShow: setShowDisasters,
+      counts: militaryEventCounts,
+      binAggregation: "sum",
+    });
+
+    result.push({
       id: "movements",
       type: "bar",
+      scope: "general",
       label: "MOVEMENTS",
       color: getLayerColor("MOVEMENTS"),
       show: showMovements,
@@ -190,15 +220,16 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
    
 
     <div className={`bottom-panel-slot ${
-            selectedHuman ?"squeezed" : ""
+            selectedObject ?"squeezed" : ""
         }`}
         >
+          
       <div className={`bottom-worklist-panel ${
         (selectedHuman && showWorks) ||
         (selectedMilitaryEvent && showEventDetails) ||
         selectedLocation ? "open" : "hide"
       }`}>
-        <Timeline selectedYear={selectedYear} windowRange={windowRange}>
+        <ContentTrack selectedYear={selectedYear} windowRange={windowRange}>
           {selectedHuman && <WorkList filteredWorks={filteredWorks} />}
           {selectedMilitaryEvent && (
             <MilitaryEventDetail
@@ -211,31 +242,23 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           {selectedLocation && (
             <HumanList humans={filteredHumans} setSelectedObject={setSelectedObject} />
           )}
-        </Timeline>
+        </ContentTrack>
       </div>
 
       <div className="bottom-panel">
-        <div className="component-container">
+          <LayerPicker
+            layers={layers}
+          />
+        
           <TimelineCanvas
             selectedYear={selectedYear}
             setSelectedYear={setSelectedYear}
             fullRange={activeFullRange}
             windowRange={windowRange}
             setWindowRange={setWindowRange}
-            setManualMode={setManualMode}
+            // setManualMode={setManualMode}
             layers={layers}
           />
-
-          {/* {!selectedHuman && (
-            <TimeWindowSlider
-              fullRange={activeFullRange}
-              windowRange={windowRange}
-              setWindowRange={setWindowRange}
-              setSelectedYear={setSelectedYear}
-              selectedYear={selectedYear}
-            />
-          )} */}
-        </div>
       </div>
     </div>
   );

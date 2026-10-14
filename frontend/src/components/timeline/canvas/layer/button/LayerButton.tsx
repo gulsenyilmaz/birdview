@@ -1,7 +1,6 @@
 import React from "react";
 import "./LayerButton.css";
-
-import { BiLayerMinus, BiLayerPlus } from "react-icons/bi";
+import { IoIosAdd, IoIosClose } from "react-icons/io";
 
 interface LayerButtonProps {
   layerColor:string;
@@ -25,17 +24,18 @@ const LayerButton: React.FC<LayerButtonProps> = ({
     return (
    
           <div className="label-item" style={{color:layerColor }}>
-            
+            <div className={`label-title ${showLayer ? "active" : ""}`}>
+                {layerTypeName}
+            </div>
             
             <button 
                 className={`label-button ${showLayer ? "active" : ""}`} 
                 onClick={handleShowAction}
                 >
-                {showLayer ? <BiLayerMinus /> : <BiLayerPlus />}
+                {showLayer ? <IoIosClose  /> : <IoIosAdd />}
+                
             </button>
-            <div className={`label-title ${showLayer ? "active" : ""}`}>
-                {layerTypeName}
-            </div>
+            
           </div>
        
     

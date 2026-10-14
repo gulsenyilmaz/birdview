@@ -6,17 +6,21 @@ interface DetailBoxProps {
   detailMode: boolean;
   setDetailMode: (obj: boolean) => void;
   children: React.ReactNode;
+  selectedYear: number;
 }
 
 const DetailBox: React.FC<DetailBoxProps> = ({
   
   detailMode,
   setDetailMode,
-  children
+  children,
+  selectedYear
 }) => {
   return (
     <div className="detail-box">
-    
+       <div className="year-display">
+          <span className="year-display-value">in {selectedYear}</span>
+        </div>
       
       <button
         className="detail-close"

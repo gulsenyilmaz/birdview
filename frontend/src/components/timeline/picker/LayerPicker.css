@@ -1,0 +1,80 @@
+/* ============================================================
+   LAYER PICKER
+============================================================ */
+
+.layer-picker {
+  position: relative;
+
+  width: fit-content;
+  height: fit-content;
+
+  margin-left: auto;
+
+  box-sizing: border-box;
+
+  z-index: 3000;
+}
+
+
+/* ============================================================
+   ADD LAYER BUTTON
+============================================================ */
+
+.layer-picker-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: fit-content;
+
+  padding: 3px 8px;
+
+  background: transparent;
+
+  border: 1px solid #ababab;
+  border-bottom: none;
+
+  color: #5f5e5a;
+
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  user-select: none;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.layer-picker-toggle:hover {
+  background-color: #e8e6df69;
+  color: #202020;
+}
+
+
+/* ============================================================
+   DROPDOWN
+
+   Yukarı doğru açılır.
+   Absolute olduğu için layout'u büyütmez.
+============================================================ */
+
+.layer-picker-menu {
+  position: absolute;
+
+  right: 0;
+  bottom: 100%;
+
+  min-width: 120px;
+
+  background-color: rgba(255, 255, 255, 0.41);
+
+  border: 1px solid #ababab62;
+
+  box-sizing: border-box;
+
+  z-index: 3100;
+}

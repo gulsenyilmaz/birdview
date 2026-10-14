@@ -37,7 +37,7 @@
 .layer-selector {
   position: absolute;
 
-  top: 10vh;
+  bottom: 0;
   right: 0;
 
   width: auto;
@@ -71,7 +71,7 @@
   box-sizing: border-box;
   align-items: center;
   
-  background-color: #ffffffd3;
+  background-color: #dededdf7;
   font-size: 0.6rem;
   color: #333;
 

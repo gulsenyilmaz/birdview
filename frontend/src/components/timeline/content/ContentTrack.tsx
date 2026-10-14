@@ -1,13 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
-import "./Timeline.css";
+import "./ContentTrack.css";
 
-interface TimelineProps {
+interface ContentTrackProps {
   children: React.ReactNode;
   selectedYear:Number;
   windowRange?: [number, number];
 }
 
-const Timeline: React.FC<TimelineProps> = ({ children, selectedYear, windowRange = [1200, 2025] }) => {
+const ContentTrack: React.FC<ContentTrackProps> = ({ children, selectedYear, windowRange = [1200, 2025] }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const stripRef = useRef<HTMLDivElement | null>(null); 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -124,7 +124,7 @@ const Timeline: React.FC<TimelineProps> = ({ children, selectedYear, windowRange
   return (
     <>
       {/* {works.length > 0 ? ( */}
-        <div className="timeline-strip-container" ref={containerRef} >
+        <div className="content-track-container" ref={containerRef} >
           {canScrollLeft && (
             <button className="scroll-button left" onClick={() => scrollWorks(-1)}>
               ⟨
@@ -132,7 +132,7 @@ const Timeline: React.FC<TimelineProps> = ({ children, selectedYear, windowRange
           )}
 
           <div
-            className="timeline-strip"
+            className="content-track"
             ref={stripRef}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -157,4 +157,4 @@ const Timeline: React.FC<TimelineProps> = ({ children, selectedYear, windowRange
   );
 };
 
-export default Timeline;
+export default ContentTrack;

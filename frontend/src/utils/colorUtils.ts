@@ -142,7 +142,7 @@ export const getColorForAgeString = (
 
 export const getColorForRelationType = (
   type: string,
-  opacity: number = 200
+  opacity: number = 255
 ): [number, number, number, number] => {
   switch (type) {
     // LOCATIONS

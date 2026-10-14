@@ -6,7 +6,8 @@
   flex-direction: column;
   box-sizing: border-box;
   /* align-self: flex-start; */
-  background-color: rgba(43, 44, 46, 0);
+  background-color: transparent;
+  
   
   z-index: 1100;
 }
@@ -24,19 +25,16 @@
 .stats-box,
 .chart-box,
 .chart-box-title {
-  font-family: 'font-family: 'Georgia', sans-serif;', sans-serif;
+  font-family: Georgia, sans-serif;
   font-weight: 400;
   line-height: 1;
   letter-spacing: 0.06em;
-  
+  text-transform: uppercase;
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  /* justify-content: flex-start; */
-  background-color:rgba(0, 255, 255, 0);
-  
   z-index: 11;
 }
 
@@ -52,24 +50,23 @@
   /* justify-content:flex-start; */
   align-items: flex-start;
   background-color:rgba(237, 240, 240, 0.81);
-  
-  
+  color: #2b2a2a;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.148);
   z-index: 11;
 }
 
 .chart-box-title {
   flex: 1;
   width: 100%;
-  padding:.1rem 0.5rem;
+  padding:.1rem 0.5rem 0.1rem 0.5rem;
   box-sizing: border-box;
-  background-color: rgb(105, 103, 103);
   
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   font-weight: 500;
   /* letter-spacing: 0.12em; */
   text-transform: uppercase;
-  
-  color: #f7f7f7;
+  color: #666766;
+  text-decoration: underline;
   z-index: 100;
 }
 
@@ -80,10 +77,10 @@
   width: 100%;
   height: auto; 
   overflow: hidden;
-  background-color: rgba(251, 248, 248, 0.533);
-
-   font-size: 0.6rem;
-   font-weight: 500;
+  
+  padding-right: 0.2rem;
+  font-size: 0.6rem;
+  font-weight: 500;
 }
 
 
@@ -106,32 +103,27 @@
   z-index: 11;
 }
 
-.year-display {
-  width: 8%;
+
+.dashboard-close {
+  position: absolute;
+  top: 0;
+  right: -1.5rem;
+  width: 1.5rem;
+  height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 1.2rem;
-  /* flex-shrink: 0; */
-  gap: 2px;
-  
+  background: #444441ca;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.148);
+  border: none;
+  color: #FAECE7;
+  font-weight: 600;
+  font-size: 1.2rem;  
+  cursor: pointer;
+  z-index: 1550;
+  transition: background 0.15s;
 }
 
-.year-display-label {
-  font-size: 9px;
-  font-family: 'Arial', sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  
-}
-
-.year-display-value {
-  font-family: 'Georgia', serif;
-  font-size: 2rem;
-  font-weight: 500;
-  
-  letter-spacing: 0.04em;
-  line-height: 1;
+.dashboard-close:hover {
+  background: #c51616;
 }

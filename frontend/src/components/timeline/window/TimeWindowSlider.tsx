@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import * as d3 from "d3";
 import "./TimeWindowSlider.css";
@@ -11,14 +11,13 @@ type Props = {
   setWindowRange: (r: [number, number]) => void;
   selectedYear: number;                      // seçili yıl
   setSelectedYear: (y: number) => void;
-  
-
 };
 
 const SNAP_STEP = 10;
-const HANDLE_W = 10;
-const HANDLE_H = 20;
+const HANDLE_W = 7;
+const HANDLE_H = 30;
 const TRACK_H = 20;
+const GUIDE_H = 15;
 
 export default function TimeWindowSlider({
   fullRange, 
@@ -29,18 +28,12 @@ export default function TimeWindowSlider({
  
 }: Props) {
 
-  const [alltime_minYear, alltime_maxYear] = fullRange;
   const [alltime_min, alltime_max] = fullRange;
   const [minYear, maxYear] = windowRange;
-  
-  const alltime_totalRange = alltime_maxYear - alltime_minYear;
-  const totalRange = maxYear - minYear;
-  const [zoom, setZoom] = useState(totalRange);
 
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
  
-  
 
   useEffect(() => {
     let newYear = selectedYear;
@@ -58,7 +51,7 @@ export default function TimeWindowSlider({
     if (!container) return;
 
     const W = container.clientWidth;
-    const H = 50;
+    const H = 22;
     const padX = HANDLE_W / 2;
 
     svg.attr("width", W).attr("height", H);
@@ -83,13 +76,21 @@ export default function TimeWindowSlider({
       .attr("fill", "#D3D1C7")
       .attr("rx", 0);
 
+    svg.append("rect")
+      .attr("x", padX)
+      .attr("y", H / 2 + TRACK_H / 2)
+      .attr("width", W - HANDLE_W)
+      .attr("height", GUIDE_H)
+      .attr("fill", "#b1afac84")
+      .attr("rx", 0);
+
     // Track (seçili alan)
     const track = svg.append("rect")
       .attr("x", xScale(minYear))
       .attr("y", H / 2 - TRACK_H / 2)
       .attr("width", xScale(maxYear) - xScale(minYear))
       .attr("height", TRACK_H)
-      .attr("fill", "#15b8bb92")
+      .attr("fill", "#af0202b5")
       .attr("rx", 0);
 
     // Min label
@@ -100,7 +101,7 @@ export default function TimeWindowSlider({
       .attr("font-size", 10)
       .attr("font-family", "'Inter', sans-serif")
       .attr("font-weight", 500)
-      .attr("fill", "#888780")
+      .attr("fill", "#D3D1C7")
       .text(minYear);
 
     // Max label
@@ -111,7 +112,7 @@ export default function TimeWindowSlider({
       .attr("font-size", 10)
       .attr("font-family", "'Inter', sans-serif")
       .attr("font-weight", 500)
-      .attr("fill", "#888780")
+      .attr("fill", "#D3D1C7")
       .text(maxYear);
 
     // Min handle
@@ -120,8 +121,8 @@ export default function TimeWindowSlider({
       .attr("y", H / 2 - HANDLE_H / 2)
       .attr("width", HANDLE_W)
       .attr("height", HANDLE_H)
-      .attr("fill", "#15b8bbd7")
-      .attr("stroke", "#189799d7")
+      .attr("fill", "#ae1414")
+      .attr("stroke", "#9a1414")
       .attr("stroke-width", 1)
       .attr("rx", 0)
       .attr("cursor", "ew-resize");
@@ -132,8 +133,8 @@ export default function TimeWindowSlider({
       .attr("y", H / 2 - HANDLE_H / 2)
       .attr("width", HANDLE_W)
       .attr("height", HANDLE_H)
-      .attr("fill", "#15b8bbd7")
-      .attr("stroke", "#189799d7")
+      .attr("fill", "#ae1414")
+      .attr("stroke", "#9a1414")
       .attr("stroke-width", 1)
       .attr("rx", 0)
       .attr("cursor", "ew-resize");
@@ -184,7 +185,7 @@ export default function TimeWindowSlider({
       .attr("text-anchor", "middle")
       .attr("font-size", 10)
       .attr("font-family", "'Inter', sans-serif")
-      .attr("fill", "#888780")
+      .attr("fill", "#D3D1C7")
       .text(alltime_min);
 
     svg.append("text")
@@ -193,41 +194,11 @@ export default function TimeWindowSlider({
       .attr("text-anchor", "middle")
       .attr("font-size", 10)
       .attr("font-family", "'Inter', sans-serif")
-      .attr("fill", "#888780")
+      .attr("fill", "#D3D1C7")
       .text(alltime_max);
 
   }, [fullRange, windowRange]);
 
-
-  useEffect(() => {
-    setZoom(maxYear - minYear);
-  }, [minYear, maxYear]);
-  
-  const recalculateWindowRange = (n_totalRange:number) => {
-    const centerYear = (minYear + maxYear) / 2;
-    const halfRange = n_totalRange / 2;
-    let newMin = Math.max(alltime_minYear, Math.floor(centerYear - halfRange));
-    let newMax = Math.min(alltime_maxYear, Math.ceil(centerYear + halfRange));
-
-    // Sınır kontrolleri
-    if (newMin === alltime_minYear) {
-      newMax = newMin + n_totalRange;
-    } else if (newMax === alltime_maxYear) {
-      newMin = newMax - n_totalRange;
-    }
-
-    // Eğer seçili yıl yeni aralığın dışındaysa, onu da ortala
-    if (selectedYear < newMin || selectedYear > newMax) {
-      const adjustedCenter = Math.min(
-        Math.max(selectedYear, alltime_minYear + halfRange),
-        alltime_maxYear - halfRange
-      );
-      newMin = Math.floor(adjustedCenter - halfRange);
-      newMax = Math.ceil(adjustedCenter + halfRange);
-    }
-
-    setWindowRange([newMin, newMax]);
-  }
 
 
   
@@ -235,31 +206,12 @@ export default function TimeWindowSlider({
   return (
 
     
-    <div className="tw-container">
+    // <div className="tw-container">
   
       <div className="tw-window" ref={containerRef}>
         <svg ref={svgRef} style={{ display: "block", overflow: "visible" }} />
       </div>
           
-
-      <div className="zoom-slider-wrapper">
-        <span className="zoom-label"> - </span>
-          <input
-              // className="zoom-slider"
-              type="range"
-              min= {100}
-              max={alltime_totalRange}
-              step={1}
-              value={zoom}
-              onChange={(e) => {
-                const v = Number(e.target.value);
-                // setZoom(v);
-                recalculateWindowRange(v);
-              }}
-            />
-        <span className="zoom-label"> + </span>
-      </div>
-          
-    </div>
+    // </div>
   );
 }

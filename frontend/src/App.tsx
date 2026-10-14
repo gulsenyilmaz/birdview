@@ -17,7 +17,6 @@ import { unionRanges } from "./utils/dateUtils";
 import { useAppSelection, type SelectedObject } from "./hooks/useAppSelection";
 
 import BottomTimelineSection from "./components/BottomTimelineSection";
-// import MapSection from "./components/MapSection";
 import AppPanels from "./components/AppPanels";
 import MapScene from "./components/map/MapScene";
 
@@ -118,7 +117,7 @@ function App() {
 
     } else if (selectedHuman) {
 
-      setShowWorks(true);
+      setShowWorks(false);
       nextRange = humanLayer.fullRange;
       
     } else if (selectedLocation) {
@@ -183,118 +182,103 @@ function App() {
           } />
           }
           <div className="scene">
-          {/* <MapSection
-            humanLocations={humanLocations}
-            humans={humanLayer.filteredHumans}
-            militaryEvents={militaryLayer.filteredMilitaryEvents}
-            works={workLayer.filteredWorks}
-            humanRelations={humanRelations}
-            selectedYear={selectedYear}
-            setSelectedObject={setSelectedObject}
-            selectedObject={selectedObject}
-            detailMode={detailMode}
-            showEvents={showEvents}
-            showHumans={showHumans}
-            showWorks={showWorks}
-            manualMode={manualMode}
-            setManualMode={setManualMode}
-          /> */}
 
-          <div className="map-shell">
-            <MapScene
-              humanLocations={humanLocations}
-              humans={humanLayer.filteredHumans}
-              militaryEvents={militaryLayer.filteredMilitaryEvents}
-              // works={workLayer.filteredWorks}
-              humanRelations={humanRelations}
+            <div className="map-shell">
+              <MapScene
+                humanLocations={humanLocations}
+                humans={humanLayer.filteredHumans}
+                militaryEvents={militaryLayer.filteredMilitaryEvents}
+                // works={workLayer.filteredWorks}
+                humanRelations={humanRelations}
+                selectedYear={selectedYear}
+                setSelectedObject={setSelectedObject}
+                selectedObject={selectedObject}
+                detailMode={detailMode}
+                showEvents={showEvents}
+                showHumans={showHumans}
+                showWorks={showWorks}
+                manualMode={manualMode}
+                setManualMode={setManualMode}
+              />
+            </div>
+          </div>
+          <div className="overlay-layer">
+            <AppPanels
               selectedYear={selectedYear}
-              setSelectedObject={setSelectedObject}
-              selectedObject={selectedObject}
+              setSelectedYear={setSelectedYear}
+              activeFullRange={activeFullRange}
+              windowRange={windowRange}
+              setWindowRange={setWindowRange}
               detailMode={detailMode}
-              showEvents={showEvents}
-              showHumans={showHumans}
-              showWorks={showWorks}
-              manualMode={manualMode}
+              setDetailMode={(value) => {
+                if (!value) {
+                  setShowHumans(true);
+                  setShowWorks(false);
+                  setSelectedObject(null);
+                }
+              }}
+              isInitiated={isInitiated}
+              selectedObject={selectedObject}
+              setSelectedObject={setSelectedObject}
+              selectedHuman={selectedHuman}
+              selectedLocation={selectedLocation}
+              selectedMilitaryEvent={selectedMilitaryEvent}
+              selectedMovement={selectedMovement}
+              setHumanLocations={setHumanLocations}
+              setHumanRelations={setHumanRelations}
+              selectedOccupation={selectedOccupation}
+              selectedGender={selectedGender}
+              selectedNationality={selectedNationality}
+              selectedCollection={selectedCollection}
+              setSelectedOccupation={setSelectedOccupation}
+              setSelectedGender={setSelectedGender}
+              setSelectedNationality={setSelectedNationality}
+              setSelectedCollection={setSelectedCollection}
+              setShowWorks={setShowWorks}
+              backendUrl={backendUrl}
+              movements={movements}
+              setMovements={setMovements}
+              filteredHumans={humanLayer.filteredHumans}
+              // filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
               setManualMode={setManualMode}
             />
+            
+            <BottomTimelineSection
+              selectedYear={selectedYear}
+              setSelectedYear={setSelectedYear}
+              activeFullRange={activeFullRange}
+              windowRange={windowRange}
+              setWindowRange={setWindowRange}
+              // detailMode={detailMode}
+              humanRelations={humanRelations}
+              humanLocations={humanLocations}
+              movements={movements}
+              selectedObject={selectedObject}
+              setSelectedObject={setSelectedObject}
+              setManualMode={setManualMode}
+              selectedMilitaryEvent={selectedMilitaryEvent}
+              selectedHuman={selectedHuman}
+              selectedLocation={selectedLocation}
+              filteredHumans={humanLayer.filteredHumans}
+              showWorks={showWorks}
+              setShowWorks={setShowWorks}
+              showHumans={showHumans}
+              setShowHumans={setShowHumans}
+              showEvents={showEvents}
+              setShowEvents={setShowEvents}
+              showEventDetails={showEventDetails}
+              setShowEventDetails = {setShowEventDetails}
+              showDisasters={showDisasters}
+              setShowDisasters={setShowDisasters}
+              filteredWorks={workLayer.filteredWorks}
+              filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
+              workCounts={workLayer.workCounts}
+              humanAliveCounts={humanLayer.aliveCounts}
+              militaryEventCounts={militaryLayer.eventCounts}
+            />
+            
           </div>
         </div>
-        <div className="overlay-layer">
-        
-        <AppPanels
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          activeFullRange={activeFullRange}
-          windowRange={windowRange}
-          setWindowRange={setWindowRange}
-          detailMode={detailMode}
-          setDetailMode={(value) => {
-            if (!value) {
-              setShowHumans(true);
-              setShowWorks(false);
-              setSelectedObject(null);
-            }
-          }}
-          isInitiated={isInitiated}
-          selectedObject={selectedObject}
-          setSelectedObject={setSelectedObject}
-          selectedHuman={selectedHuman}
-          selectedLocation={selectedLocation}
-          selectedMilitaryEvent={selectedMilitaryEvent}
-          selectedMovement={selectedMovement}
-          setHumanLocations={setHumanLocations}
-          setHumanRelations={setHumanRelations}
-          selectedOccupation={selectedOccupation}
-          selectedGender={selectedGender}
-          selectedNationality={selectedNationality}
-          selectedCollection={selectedCollection}
-          setSelectedOccupation={setSelectedOccupation}
-          setSelectedGender={setSelectedGender}
-          setSelectedNationality={setSelectedNationality}
-          setSelectedCollection={setSelectedCollection}
-          backendUrl={backendUrl}
-          movements={movements}
-          setMovements={setMovements}
-          filteredHumans={humanLayer.filteredHumans}
-          // filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
-          setManualMode={setManualMode}
-        />
-        
-        <BottomTimelineSection
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          activeFullRange={activeFullRange}
-          windowRange={windowRange}
-          setWindowRange={setWindowRange}
-          // detailMode={detailMode}
-          humanRelations={humanRelations}
-          humanLocations={humanLocations}
-          movements={movements}
-          setSelectedObject={setSelectedObject}
-          setManualMode={setManualMode}
-          selectedMilitaryEvent={selectedMilitaryEvent}
-          selectedHuman={selectedHuman}
-          selectedLocation={selectedLocation}
-          filteredHumans={humanLayer.filteredHumans}
-          showWorks={showWorks}
-          setShowWorks={setShowWorks}
-          showHumans={showHumans}
-          setShowHumans={setShowHumans}
-          showEvents={showEvents}
-          setShowEvents={setShowEvents}
-          showEventDetails={showEventDetails}
-          setShowEventDetails = {setShowEventDetails}
-          showDisasters={showDisasters}
-          setShowDisasters={setShowDisasters}
-          filteredWorks={workLayer.filteredWorks}
-          filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
-          workCounts={workLayer.workCounts}
-          humanAliveCounts={humanLayer.aliveCounts}
-          militaryEventCounts={militaryLayer.eventCounts}
-        />
-        
-       </div>
-      </div>
     </div>
   );
     

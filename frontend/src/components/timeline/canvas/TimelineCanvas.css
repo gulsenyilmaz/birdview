@@ -1,0 +1,521 @@
+/* ============================================================
+   TIMELINE CANVAS
+============================================================ */
+.timeline-canvas {
+  --timeline-side-width: 120px;
+  --timeline-axis-height: 24px;
+
+  position: relative;
+
+  width: 100%;
+  max-height: 30dvh;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+
+  /* Artık canvas'ın tamamı scroll etmiyor */
+  overflow: hidden;
+
+  user-select: none;
+
+  box-shadow: 0 2px 1px rgba(158, 158, 158, 0.4);
+}
+
+/* ============================================================
+   SCROLLABLE LAYERS
+============================================================ */
+
+.timeline-layers-scroll {
+  flex: 1 1 auto;
+
+  min-height: 0;
+  width: 100%;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   COMMON ROW LAYOUT
+
+   ┌────────────────────────────┬────────────┐
+   │ responsive chart           │ controls   │
+   └────────────────────────────┴────────────┘
+============================================================ */
+
+.timeline-layer-row,
+.timeline-bottom-row {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    var(--timeline-side-width);
+
+  align-items: stretch;
+
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   LAYER ROW
+============================================================ */
+
+.timeline-layer-row {
+  border-bottom: 1px solid #e8e6df;
+}
+
+
+/* ============================================================
+   LAYER CHART
+============================================================ */
+
+.timeline-layer-chart {
+  position: relative;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   LAYER CONTROL
+============================================================ */
+
+.timeline-layer-control {
+  min-width: 0;
+
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  padding-top: 2px;
+
+  box-sizing: border-box;
+
+  border-left: 1px solid #ababab;
+}
+
+
+/* ============================================================
+   COMMON LAYER SVG
+============================================================ */
+
+.timeline-layer-svg {
+  display: block;
+
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   LAYER SEPARATOR
+============================================================ */
+
+.timeline-layer-separator {
+  stroke: #b8b7b1;
+  stroke-width: 0.5;
+}
+
+
+/* ============================================================
+   HISTOGRAM
+============================================================ */
+
+.histogram-bar {
+  opacity: 0.75;
+}
+
+.histogram-bar.clickable {
+  cursor: pointer;
+}
+
+.histogram-bar.clickable:hover {
+  opacity: 0.9;
+}
+
+
+/* ============================================================
+   BAR LAYER
+============================================================ */
+
+.bar-item.clickable {
+  cursor: pointer;
+}
+
+.bar-lifespan {
+  opacity: 0.25;
+}
+
+.bar-active-period {
+  opacity: 0.75;
+
+  transition: opacity 0.15s ease;
+}
+
+.bar-item.clickable:hover .bar-active-period {
+  opacity: 0.9;
+}
+
+.bar-label {
+  fill: #fff0f0;
+
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* ============================================================
+   SELECTED YEAR LINE
+
+   Histogram, Bar ve Axis aynı class'ı kullanıyor.
+============================================================ */
+
+.timeline-year-line {
+  stroke: #202020;
+  stroke-width: 1.5;
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   BOTTOM TIMELINE ROW
+
+   slider 12px + labels 12px = 24px
+============================================================ */
+
+.timeline-bottom-row {
+  flex: 0 0 var(--timeline-axis-height);
+
+  width: 100%;
+
+  height: var(--timeline-axis-height);
+  min-height: var(--timeline-axis-height);
+  max-height: var(--timeline-axis-height);
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    var(--timeline-side-width);
+
+  align-items: stretch;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  background: white;
+
+  z-index: 10;
+}
+
+
+/* ============================================================
+   TIMELINE AXIS CELL
+============================================================ */
+
+.timeline-axis-cell {
+  min-width: 0;
+  height: var(--timeline-axis-height);
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   ZOOM CELL
+============================================================ */
+
+.timeline-zoom-cell {
+  min-width: 0;
+  height: var(--timeline-axis-height);
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border-left: 1px solid #ababab;
+
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   TIMELINE AXIS SVG
+============================================================ */
+
+.timeline-axis {
+  display: block;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   SLIDER ROW
+============================================================ */
+
+.timeline-slider-row {
+  pointer-events: auto;
+}
+
+
+/* ============================================================
+   YEAR SLIDER HANDLE
+============================================================ */
+
+.timeline-year-handle {
+  fill: #ae1414;
+
+  stroke: #9a1414;
+  stroke-width: 1;
+
+  cursor: col-resize;
+
+  touch-action: none;
+
+  transition: opacity 0.15s ease;
+}
+
+.timeline-year-handle:hover {
+  opacity: 0.85;
+}
+
+
+/* ============================================================
+   YEAR LABEL AREA
+============================================================ */
+
+.timeline-year-labels {
+  cursor: grab;
+
+  touch-action: none;
+}
+
+.timeline-year-labels:active {
+  cursor: grabbing;
+}
+
+
+/* ============================================================
+   YEAR LABEL BACKGROUND
+============================================================ */
+
+.timeline-year-label-background {
+  fill: rgba(172, 172, 172, 0.95);
+}
+
+
+/* ============================================================
+   YEAR TICKS
+============================================================ */
+
+.timeline-year-tick {
+  stroke: #d3d1c7;
+  stroke-width: 1;
+}
+
+.timeline-year-tick.active {
+  stroke: #9a1414;
+}
+
+
+/* ============================================================
+   YEAR LABEL TEXT
+============================================================ */
+
+.timeline-year-text {
+  fill: #5f5e5a;
+
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+.timeline-year-text.active {
+  fill: #9a1414;
+
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   ZOOM CONTROL
+============================================================ */
+
+.zoom-slider-wrapper {
+  position: relative;
+
+  width: 100%;
+  height: var(--timeline-axis-height);
+
+  padding: 0 0.3dvw;
+
+  display: flex;
+  flex-direction: row;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   ZOOM LABELS
+============================================================ */
+
+.zoom-label {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  color: #5f5e5a;
+
+  font-family: "Inter", sans-serif;
+  font-size: 1.1dvb;
+  font-weight: 500;
+
+  margin: 0 0.3rem;
+
+  user-select: none;
+}
+
+
+/* ============================================================
+   ZOOM RANGE
+============================================================ */
+
+.zoom-slider {
+  flex: 1;
+
+  width: 100%;
+  min-width: 0;
+  height: 2px;
+
+  padding: 0;
+  margin: 0;
+
+  background-color: #444441;
+
+  border: none;
+  border-radius: 0;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  cursor: pointer;
+
+  /*
+    Küçük değer = zoom in
+    Büyük değer = zoom out.
+
+    + sağda olduğu için slider görsel olarak ters.
+  */
+  transform: scaleX(-1);
+}
+
+
+/* ============================================================
+   ZOOM THUMB — CHROME / EDGE / SAFARI
+============================================================ */
+
+.zoom-slider::-webkit-slider-thumb {
+  width: 0.5dvw;
+  min-width: 5px;
+
+  height: 1.5dvh;
+  min-height: 10px;
+
+  background: #ba7517;
+
+  border: 1px solid #ef9f27;
+  border-radius: 0;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.zoom-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+
+  background: #ef9f27;
+}
+
+
+/* ============================================================
+   ZOOM THUMB — FIREFOX
+============================================================ */
+
+.zoom-slider::-moz-range-thumb {
+  width: 0.5dvw;
+  min-width: 5px;
+
+  height: 1.5dvh;
+  min-height: 10px;
+
+  background: #ba7517;
+
+  border: 1px solid #ef9f27;
+  border-radius: 0;
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.zoom-slider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+
+  background: #ef9f27;
+}
+
+
+/* ============================================================
+   ZOOM TRACK — FIREFOX
+============================================================ */
+
+.zoom-slider::-moz-range-track {
+  height: 2px;
+
+  background-color: #444441;
+
+  border: none;
+  border-radius: 0;
+}

@@ -6,11 +6,7 @@ import LocationBox from "./detail_panels/LocationBox";
 import MilitaryEventBox from "./detail_panels/MilitaryEventBox";
 import MovementBox from "./detail_panels/MovementBox";
 
-import TimeWindowSlider from "./timeline/TimeWindowSlider";
-// import ContentStrip from "./timeline/ContentStrip";
-
-// import HumanList from "./timeline/HumanList";
-// import MilitaryEventDetail from "./detail_panels/MilitaryEventDetail";
+import TimeWindowSlider from "./timeline/window/TimeWindowSlider";
 import FilterList from "./general_panels/FilterList";
 
 import type { Human } from "../entities/Human";
@@ -24,6 +20,7 @@ import type { MilitaryEvent } from "../entities/MilitaryEvent";
 import type { Collection } from "../entities/Collection";
 
 import type { SelectedObject } from "../hooks/useAppSelection";
+import { useState } from "react";
 
 interface AppPanelsProps {
   selectedYear: number;
@@ -42,7 +39,6 @@ interface AppPanelsProps {
   selectedLocation: Location | null;
   selectedMilitaryEvent: MilitaryEvent | null;
   selectedMovement: Movement | null;
-
  
   setHumanLocations: React.Dispatch<React.SetStateAction<Location[]>>;
   setHumanRelations: React.Dispatch<React.SetStateAction<RelatedHuman[]>>;
@@ -56,23 +52,21 @@ interface AppPanelsProps {
   setSelectedGender: React.Dispatch<React.SetStateAction<Gender | null>>;
   setSelectedNationality: React.Dispatch<React.SetStateAction<Nationality | null>>;
   setSelectedCollection: React.Dispatch<React.SetStateAction<Collection | null>>;
-
+  setShowWorks:(obj: boolean) => void;
   backendUrl: string;
   movements: Movement[];
   setMovements: React.Dispatch<React.SetStateAction<Movement[]>>;
 
   filteredHumans: Human[];
   // filteredMilitaryEvents: MilitaryEvent[];
-  
-
   setManualMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AppPanels: React.FC<AppPanelsProps> = ({
-    selectedYear,
+  selectedYear,
   setSelectedYear,
   activeFullRange,
-   windowRange,
+  windowRange,
   setWindowRange,
   detailMode,
   isInitiated,
@@ -94,6 +88,7 @@ const AppPanels: React.FC<AppPanelsProps> = ({
   setSelectedGender,
   setSelectedNationality,
   setSelectedCollection,
+  setShowWorks,
   backendUrl,
   movements,
   setMovements,
@@ -124,14 +119,17 @@ const AppPanels: React.FC<AppPanelsProps> = ({
     }
   };
 
+   const [dashboardMode, setDashboardMode] = useState(true);
+
   return (
     <>
       
     {isInitiated && ( <>
-      <div className={`left_dashboard-panel ${!detailMode ? "open" : ""}`}>
+      <div className={`left_dashboard-panel ${!detailMode && dashboardMode? "open" : ""}`}>
         <Dashboard 
-            selectedYear={selectedYear}
             humans={filteredHumans} 
+            dashboardMode={dashboardMode}
+            setDashboardMode={setDashboardMode}
           />
       </div>
 
@@ -172,6 +170,7 @@ const AppPanels: React.FC<AppPanelsProps> = ({
 
       <div className={`left-panel ${detailMode ? "open" : ""}`}>
         <DetailBox
+          selectedYear={selectedYear}
           detailMode={detailMode}
           setDetailMode={setDetailMode}
         >
@@ -180,30 +179,34 @@ const AppPanels: React.FC<AppPanelsProps> = ({
               person={selectedHuman}
               setHumanLocations={setHumanLocations}
               setHumanRelations={setHumanRelations}
+              setShowWorks={setShowWorks}
               setManualMode={setManualMode}
             />
           )}
 
-          {selectedLocation && <LocationBox location={selectedLocation} />}
+          {selectedLocation && 
+            <LocationBox 
+              location={selectedLocation} 
+            />
+          }
 
-          {selectedMilitaryEvent && <MilitaryEventBox militaryEvent={selectedMilitaryEvent} />}
+          {selectedMilitaryEvent && 
+            <MilitaryEventBox 
+              militaryEvent={selectedMilitaryEvent} 
+            />
+          }
 
-          {selectedMovement && <MovementBox movement={selectedMovement} />}
+          {selectedMovement && 
+            <MovementBox 
+              movement={selectedMovement} 
+            />
+          }
         </DetailBox>
 
       </div>
 
-      <div className={`top-panel ${selectedHuman ? "hide" : ""}`}>
-       
-        <TimeWindowSlider
-          fullRange={activeFullRange}
-          windowRange={windowRange}
-          setWindowRange={setWindowRange}
-          setSelectedYear={setSelectedYear}
-          selectedYear={selectedYear}
-        />
-
-        <DescriptionBanner
+      <div className="top-panel">
+       <DescriptionBanner
             humans={filteredHumans}
             selectedMovement={selectedMovement}
             selectedOccupation={selectedOccupation}
@@ -212,6 +215,16 @@ const AppPanels: React.FC<AppPanelsProps> = ({
             selectedCollection={selectedCollection}
             onClearFilter={handleClearFilter}
         />
+        <div className={`top-panel-child ${selectedObject ? "hide" : ""}`}>
+          <TimeWindowSlider
+            fullRange={activeFullRange}
+            windowRange={windowRange}
+            setWindowRange={setWindowRange}
+            setSelectedYear={setSelectedYear}
+            selectedYear={selectedYear}
+          />
+        </div>
+        
 
       </div>
     </>
