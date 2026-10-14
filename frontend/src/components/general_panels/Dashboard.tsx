@@ -131,7 +131,7 @@ const BarChart: React.FC<{
 };
 
 const Dashboard: React.FC<DashboardProps> = ({ humans, dashboardMode, setDashboardMode }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  
 
   const nationalityCounter: Record<string, number> = {};
 
@@ -257,12 +257,12 @@ const Dashboard: React.FC<DashboardProps> = ({ humans, dashboardMode, setDashboa
         className="dashboard-close"
         onClick={() => setDashboardMode(!dashboardMode)}
         aria-label={
-          isOpen
+          dashboardMode
             ? "Close dashboard"
             : "Open dashboard"
         }
         title={
-          isOpen
+          dashboardMode
             ? "Close dashboard"
             : "Open dashboard"
         }
