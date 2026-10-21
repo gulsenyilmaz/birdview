@@ -122,7 +122,7 @@ const AppPanels: React.FC<AppPanelsProps> = ({
     }
   };
 
-   const [dashboardMode, setDashboardMode] = useState(true);
+   const [dashboardMode, setDashboardMode] = useState(false);
 
   return (
     <>
