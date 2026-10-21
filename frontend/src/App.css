@@ -13,6 +13,9 @@
   flex-direction: column;
 
   background-color: #ffffff;
+
+   -webkit-user-select: none;
+  user-select: none;
 }
 
 .main-content {
@@ -59,7 +62,7 @@
 .right-panel {
   position: absolute;
   
-  top: 12.5dvh;
+  top: 16.5dvh;
   right: 0;
 
   display: flex;
@@ -244,7 +247,7 @@
 
   left: 0;
   right: 0;
-  bottom: 2.5dvh;
+  bottom: 0.5dvh;
 
   padding: .5rem;
 
@@ -325,5 +328,12 @@
 .bottom-worklist-panel {
   pointer-events: auto;
   /* background-color: transparent; */
+}
+
+.app-container input,
+.app-container textarea,
+.app-container [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
 }
 

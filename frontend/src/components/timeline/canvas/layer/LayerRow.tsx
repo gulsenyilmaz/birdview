@@ -56,6 +56,7 @@ const LayerRow: React.FC<LayerRowProps> = ({
             maxYear={maxYear}
             selectedYear={selectedYear}
             xScale={xScale}
+            setSelectedYear={setSelectedYear}
           />
         )}
       </div>

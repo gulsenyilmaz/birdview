@@ -11,6 +11,8 @@ import type {
   TimelineXScale,
 } from "../../../timelineTypes";
 
+import YearLine from "../../YearLine";
+
 interface HistogramLayerProps {
   layer: HistogramLayerConfig;
 
@@ -192,8 +194,8 @@ const HistogramLayer: React.FC<HistogramLayerProps> = ({
      SELECTED YEAR
   ========================================================== */
 
-  const yearLineX =
-    xScale(selectedYear);
+  // const yearLineX =
+  //   xScale(selectedYear);
 
   /* ==========================================================
      RENDER
@@ -301,14 +303,11 @@ const HistogramLayer: React.FC<HistogramLayerProps> = ({
           SELECTED YEAR LINE
       ================================================ */}
 
-      <line
-        x1={yearLineX}
-        y1={0}
-        x2={yearLineX}
-        y2={HIST_ROW_H}
-        stroke="#202020"
-        strokeWidth={1.5}
-        pointerEvents="none"
+      <YearLine
+        selectedYear={selectedYear}
+        xScale={xScale}
+        height={HIST_ROW_H}
+        setSelectedYear={setSelectedYear}
       />
     </svg>
   );

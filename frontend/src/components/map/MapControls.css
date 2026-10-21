@@ -1,0 +1,375 @@
+/* ============================================================
+   MAP SETTINGS — POSITION
+============================================================ */
+
+.map-settings {
+  position: absolute;
+  top: var(--map-settings-top, calc(10dvh + 8px));
+  right: 0;
+  bottom: auto;
+  z-index: 3500;
+
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+
+  width: max-content;
+  max-width: 100%;
+
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  color: #505b60;
+
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.map-settings,
+.map-settings * {
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   SLIDING PANEL VIEWPORT
+============================================================ */
+
+.map-settings-viewport {
+  flex: 0 1 auto;
+  min-width: 0;
+
+  overflow: hidden;
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   CONTROLS — SINGLE ROW
+============================================================ */
+
+.map-controls {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+
+  width: max-content;
+  max-width: 100%;
+  height: 30px;
+  padding: 4px 8px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+
+  border: 1px solid #c9cecc;
+  border-right: none;
+  border-radius: 5px 0 0 5px;
+  background: rgba(245, 247, 246, 0.98);
+
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+
+  transform: translateX(100%);
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    transform 0.45s ease-in-out,
+    visibility 0s linear 0.45s;
+}
+
+.map-settings.open .map-controls {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+
+  transition:
+    transform 0.45s ease-in-out,
+    visibility 0s;
+}
+
+
+/* ============================================================
+   FIXED TOGGLE BUTTON
+============================================================ */
+
+.map-settings-toggle {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  flex-shrink: 0;
+  gap: 8px;
+
+  min-height: 30px;
+  margin: 0;
+  padding: 6px 10px;
+
+  border: 1px solid #c9cecc;
+  border-radius: 0;
+  background: rgba(246, 247, 245, 0);
+
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #ae1414;
+
+  pointer-events: auto;
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.map-settings-toggle:hover,
+.map-settings-toggle.active {
+  background: #e0e8ec;
+  color: #ae1414;
+}
+
+.map-settings-toggle:focus-visible {
+  outline: 2px solid #4e7087;
+  outline-offset: -3px;
+}
+
+.map-settings-toggle > span {
+  font-size: 18px;
+  line-height: 1;
+}
+
+
+/* ============================================================
+   COMMON LABELS
+============================================================ */
+
+.map-controls label {
+  margin: 0;
+  cursor: pointer;
+}
+
+.map-controls .map-control-label {
+  flex: none;
+
+  margin: 0;
+  padding: 0;
+
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  color: inherit;
+}
+
+
+/* ============================================================
+   MANUAL MODE
+============================================================ */
+
+.map-controls .map-manual-control {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 7px;
+
+  min-height: 20px;
+  padding: 0 4px;
+}
+
+.map-controls input[type="checkbox"] {
+  flex-shrink: 0;
+
+  width: 14px;
+  height: 14px;
+  margin: 0;
+
+  accent-color: #4e7087;
+  cursor: pointer;
+}
+
+.map-controls input[type="checkbox"]:checked + .map-control-label {
+  color: #294f69;
+}
+
+.map-controls input[type="checkbox"]:focus-visible {
+  outline: 2px solid #4e7087;
+  outline-offset: 2px;
+}
+
+
+/* ============================================================
+   DISPLAY AND COLOR GROUPS
+============================================================ */
+
+.map-controls .map-controls-group {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 2px;
+
+  padding: 2px;
+
+  border: 1px solid #cbd2d5;
+  border-radius: 5px;
+  background: #e8edef;
+}
+
+.map-controls .map-controls-heading {
+  flex: none;
+
+  padding: 0 7px;
+
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  color: #738087;
+}
+
+
+/* ============================================================
+   RADIO OPTIONS
+============================================================ */
+
+.map-controls .map-control-option {
+  position: relative;
+
+  display: block;
+  flex: none;
+}
+
+/* Radio remains accessible through keyboard and its label. */
+
+.map-controls input[type="radio"] {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.map-controls .map-control-option .map-control-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 20px;
+  padding: 4px 8px;
+
+  border-radius: 3px;
+  color: #5c6870;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.map-controls .map-control-option:hover .map-control-label {
+  background: #d8e2e8;
+  color: #294f69;
+}
+
+.map-controls input[type="radio"]:checked + .map-control-label {
+  background: #4e7087;
+  color: #fff;
+}
+
+.map-controls input[type="radio"]:focus-visible + .map-control-label {
+  outline: 2px solid #294f69;
+  outline-offset: -2px;
+}
+
+
+/* ============================================================
+   PROMINENCE SLIDER
+============================================================ */
+
+.map-controls .map-prominence-control {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px;
+
+  width: auto;
+  min-height: 28px;
+  padding: 4px 8px;
+
+  border: 1px solid #cdbfcf;
+  border-radius: 5px;
+  background: #eee8ef;
+}
+
+.map-controls .map-prominence-control .map-control-label {
+  color: #705575;
+}
+
+.map-controls .map-prominence-control input[type="range"] {
+  flex: none;
+
+  width: 110px;
+  min-width: 60px;
+  margin: 0;
+  padding: 0;
+
+  accent-color: #8a6b90;
+  cursor: pointer;
+}
+
+.map-controls .map-prominence-control input[type="range"]:focus-visible {
+  outline: 2px solid #8a6b90;
+  outline-offset: 2px;
+}
+
+.map-controls .map-prominence-value {
+  flex-shrink: 0;
+  min-width: 5ch;
+
+  font-size: inherit;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+
+  color: #896125;
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .map-settings .map-controls,
+  .map-settings.open .map-controls,
+  .map-settings-toggle,
+  .map-controls .map-control-option .map-control-label {
+    transition: none;
+  }
+}

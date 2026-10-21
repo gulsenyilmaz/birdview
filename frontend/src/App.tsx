@@ -37,16 +37,18 @@ function App() {
   const [selectedNationality, setSelectedNationality] = useState<Nationality| null>(null);
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
 
-  const defaultWindowRange:[number, number] = [1000, 2026];
+  const defaultWindowRange:[number, number] = [0, 2026];
   
   const [windowRange, setWindowRange] = useState<[number, number]>(defaultWindowRange);
   const [movements, setMovements] = useState<Movement[]>([]); 
   const [humanRelations, setHumanRelations] = useState<RelatedHuman[]>([]);
+  const [humanSelectedDetail, setHumanSelectedDetail] = useState<string | null>(null);
+  
 
   const [showHumans, setShowHumans] = useState(true);
   const [showEvents, setShowEvents] = useState(false);
   const [showEventDetails, setShowEventDetails] = useState(false);
-  const [showWorks, setShowWorks] = useState(false);
+  const [showWorks, setShowWorks] = useState(true);
   const [showDisasters, setShowDisasters] = useState(false);
 
 
@@ -80,7 +82,7 @@ function App() {
   });
 
   const militaryLayer = useMilitaryEventLayer({
-    active: showEvents, // şimdilik hep açık
+    active: showEvents, 
     backendUrl,
     filters: {
       military_event_depth_index: selectedMilitaryEvent?.depth_index,
@@ -89,7 +91,7 @@ function App() {
   });
 
   const workLayer = useWorkLayer({
-    active: showWorks, // şimdilik hep açık
+    active: selectedHuman != null, 
     backendUrl,
     filters: {
       human_id: selectedHuman?.id,
@@ -117,7 +119,7 @@ function App() {
 
     } else if (selectedHuman) {
 
-      setShowWorks(false);
+      setShowWorks(true);
       nextRange = humanLayer.fullRange;
       
     } else if (selectedLocation) {
@@ -226,6 +228,7 @@ function App() {
               selectedMovement={selectedMovement}
               setHumanLocations={setHumanLocations}
               setHumanRelations={setHumanRelations}
+              setHumanSelectedDetail = {setHumanSelectedDetail}
               selectedOccupation={selectedOccupation}
               selectedGender={selectedGender}
               selectedNationality={selectedNationality}
@@ -235,6 +238,7 @@ function App() {
               setSelectedNationality={setSelectedNationality}
               setSelectedCollection={setSelectedCollection}
               setShowWorks={setShowWorks}
+              hasWorks={workLayer.workCounts.length > 0}
               backendUrl={backendUrl}
               movements={movements}
               setMovements={setMovements}
@@ -252,6 +256,7 @@ function App() {
               // detailMode={detailMode}
               humanRelations={humanRelations}
               humanLocations={humanLocations}
+              humanSelectedDetail={humanSelectedDetail}
               movements={movements}
               selectedObject={selectedObject}
               setSelectedObject={setSelectedObject}

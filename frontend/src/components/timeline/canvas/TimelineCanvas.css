@@ -27,6 +27,13 @@
    SCROLLABLE LAYERS
 ============================================================ */
 
+.timeline-bottom-gutter {
+  flex-shrink: 0;
+  overflow-y: hidden;
+  scrollbar-gutter: stable;
+
+}
+
 .timeline-layers-scroll {
   flex: 1 1 auto;
 
@@ -35,9 +42,12 @@
 
   overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-gutter: stable;
 
   box-sizing: border-box;
 }
+
+
 
 
 /* ============================================================
@@ -303,6 +313,13 @@
 
 .timeline-year-handle:hover {
   opacity: 0.85;
+}
+
+.timeline-year-drag-area {
+  fill: transparent;
+  pointer-events: all;
+  cursor: col-resize;
+  touch-action: none;
 }
 
 

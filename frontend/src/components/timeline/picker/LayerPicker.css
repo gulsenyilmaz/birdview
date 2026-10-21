@@ -15,6 +15,19 @@
   z-index: 3000;
 }
 
+.layer-picker {
+  position: relative;
+
+  width: fit-content;
+  height: fit-content;
+
+  margin-left: auto;
+  margin-right: var(--timeline-scrollbar-width, 0px);
+
+  box-sizing: border-box;
+  z-index: 3000;
+}
+
 
 /* ============================================================
    ADD LAYER BUTTON
@@ -69,6 +82,7 @@
   bottom: 100%;
 
   min-width: 120px;
+  width: 120px;
 
   background-color: rgba(255, 255, 255, 0.41);
 

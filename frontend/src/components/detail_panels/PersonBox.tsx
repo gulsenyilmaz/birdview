@@ -9,10 +9,12 @@ import './PersonBox.css';
 
 interface PersonBoxProps {
   person:Human;
+  hasWorks:boolean;
   setHumanLocations: (arr: Location[]) => void;
   setHumanRelations:(arr: RelatedHuman[]) => void;
+  setHumanSelectedDetail:(str:string | null) => void;
 //   setSelectedObjectThumbnail: (str:string | null) => void;
-setShowWorks:(obj: boolean) => void;
+  setShowWorks:(obj: boolean) => void;
   setManualMode:(obj: boolean) => void
   
 }
@@ -35,7 +37,7 @@ interface PersonDetails {
   gender: string;
 }
 
-const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHumanRelations, setShowWorks, setManualMode}) => {
+const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHumanRelations, setHumanSelectedDetail, setShowWorks, hasWorks,setManualMode}) => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [personDetails, setPersonDetails] = useState<PersonDetails | null>(null);
@@ -48,7 +50,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
     // const [political, setPolitical] = useState<RelatedHuman[]>([]);    
     // const [uniqueTypes, setUniqueTypes] = useState<string[]>([]);
    
-    const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "professional"| "museums"| "works">("cv");
+    const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "professional"| "museums"| "works" | null>(null);
     const [fallbackImage, setFallbackImage] = useState<string | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateError, setUpdateError] = useState<string | null>(null);
@@ -62,28 +64,33 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                     .then(data => {
                         console.log("setPersonDetails", data);
                         setPersonDetails(data);
-                        if(data.locations && data.locations.length>0){
-                            const cv_locs:Location[] = (data.locations as Location[])
-                                    .filter(l => l.relationship_type_name !== "has_works_in");
 
-                            const museum_locs:Location[] = (data.locations as Location[])
-                                    .filter(l => l.relationship_type_name === "has_works_in");
+                        const locations: Location[] = data.locations ?? [];
 
-                            setMuseums(museum_locs);
-                            setCvLocations(cv_locs);                                                       
-                            setHumanLocations(cv_locs);
-                            setFamily(data.family);
-                            setProfessional(data.professional);
-                            // setIntellectual(data.intellectual);
-                            // setSocial(data.social);
-                            // setPolitical(data.political);
+                        setCvLocations(
+                            locations.filter(
+                                location => location.relationship_type_name !== "has_works_in"
+                            )
+                        );
 
-                            // setUniqueTypes( Array.from(
-                            //     new Set(
-                            //         cv_locs.map(l => l.relationship_type_name)
-                            //     )
-                            // ))
-                        }
+                        setFamily(data.family ?? []);
+                        setProfessional(data.professional ?? []);
+
+                        setMuseums(
+                            locations.filter(
+                                location => location.relationship_type_name === "has_works_in"
+                            )
+                        );
+                        // setIntellectual(data.intellectual);
+                        // setSocial(data.social);
+                        // setPolitical(data.political);
+
+                        // setUniqueTypes( Array.from(
+                        //     new Set(
+                        //         cv_locs.map(l => l.relationship_type_name)
+                        //     )
+                        // ))
+                        
                         // setSelectedObjectThumbnail(data.img_url);
                         if (!data.img_url) {
                             getWikipediaImage(person.name).then(setFallbackImage);
@@ -110,13 +117,14 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
 
 
     useEffect(() => {
-
+        setHumanSelectedDetail(null);
 
         if (selectedTab=="cv") {
             setManualMode(false)
             setHumanRelations([]);
             setHumanLocations(cv_locations);
             setShowWorks(false);
+            setHumanSelectedDetail("CV");
             
             // setUniqueTypes( Array.from(
             //     new Set(
@@ -130,6 +138,8 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             setHumanLocations([]);
             setHumanRelations(family);
             setShowWorks(false);
+            setHumanSelectedDetail("FAMILY");
+            
 
             // setUniqueTypes( Array.from(
             //     new Set(
@@ -143,7 +153,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             setHumanLocations([]);
             setHumanRelations(professional)
             setShowWorks(false);
-
+            setHumanSelectedDetail("PROFESSIONAL LIFE");
             
             // setUniqueTypes( Array.from(
             //     new Set(
@@ -156,6 +166,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             setHumanRelations([]);
             setHumanLocations(museums);
             setShowWorks(false);
+            setHumanSelectedDetail(null);
             // setUniqueTypes( Array.from(
             //     new Set(
             //         museums.map(l => l.relationship_type_name)
@@ -167,6 +178,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             setHumanRelations([]);
             setHumanLocations([]);
             setShowWorks(true);
+            setHumanSelectedDetail(null);
             // setUniqueTypes( Array.from(
             //     new Set(
             //         museums.map(l => l.relationship_type_name)
@@ -177,7 +189,18 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
             setHumanLocations([]);
          }
 
-    }, [selectedTab]);
+    }, [
+            selectedTab,
+            cv_locations,
+            family,
+            professional,
+            museums,
+            setManualMode,
+            setHumanRelations,
+            setHumanLocations,
+            setShowWorks,
+            setHumanSelectedDetail,
+            ]);
 
 
    async function getWikipediaImage(title: string, lang: string = "en") {
@@ -318,6 +341,8 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                     
                         
                 </div>
+
+                {hasWorks && (
                 <div className="tab-buttons">
                     <button
                         className={selectedTab === "works" ? "active" : ""}
@@ -325,10 +350,9 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                     >
                         WORKS
                     </button>
-                   
-                    
-                        
                 </div>
+                )}
+                    
                 
                 <div className="admin-tools">
                     <a

@@ -1,5 +1,7 @@
 import './MapScene.css';
 import React, { useEffect, useState, useMemo } from "react";
+import MapControls from "./MapControls";
+import type { MapLayerType, MapColorType } from "./MapControls";
 
 import { FlyToInterpolator } from '@deck.gl/core';
 
@@ -94,10 +96,33 @@ const MapScene: React.FC<MapSceneProps> = ({
   const [processedRelatedHumans, setProcessedRelatedHumans] = useState<RelatedHumanEnriched[]>([]);
   
  
-  const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text' | 'circle'>('text');
-  const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("nationality");
+  // const [selectedLayerType, setSelectedLayerType] = useState<'arc' | 'text' | 'circle'>('text');
+  // const [colorFilterType, setColorFilterType] = useState<"gender" | "age" | "nationality">("nationality");
+  const [selectedLayerType, setSelectedLayerType] =
+  useState<MapLayerType>("text");
+
+  const [colorFilterType, setColorFilterType] =
+    useState<MapColorType>("nationality");
+
+  const [identifierThreshold, setIdentifierThreshold] = useState(30);
+
+  // Slider en az 100'e, veride daha büyük değer varsa o değere uzanır.
+  // Kişi listesi değiştiğinde mevcut slider değeri aralık dışında kalmaz.
+  const maxIdentifierThreshold = useMemo(
+    () =>
+      humans.reduce(
+        (maximum, human) =>
+          Math.max(maximum, human.num_of_identifiers ?? 0),
+        Math.max(100, identifierThreshold)
+      ),
+    [humans, identifierThreshold]
+  );
+
 
   const [animationProgress, setAnimationProgress] = useState(.2);
+
+
+  
 
   useEffect(() => {
     let frameId: number;
@@ -131,7 +156,7 @@ const MapScene: React.FC<MapSceneProps> = ({
 
   useEffect(() => {
     if(showHumans){
-      const enrichedHumans: HumanEnriched[] = humans.filter(h => h.birth_date<1700 || h.num_of_identifiers>30).map((h) => {
+      const enrichedHumans: HumanEnriched[] = humans.filter(h => h.birth_date<1700 || (h.num_of_identifiers ?? 0) > identifierThreshold).map((h) => {
           const age = selectedYear - h.birth_date;
           const seed = h.id % 10;
           let fillColor: [number, number, number, number];
@@ -171,7 +196,7 @@ const MapScene: React.FC<MapSceneProps> = ({
         setProcessedHumans(enrichedHumans);
       }
 
-  }, [showHumans, humans, selectedYear, colorFilterType, viewState.zoom]);
+  }, [showHumans, humans, selectedYear, colorFilterType, viewState.zoom,identifierThreshold]);
 
   useEffect(() => {
     if(isHuman(selectedObject)){
@@ -336,91 +361,18 @@ const layers = useMemo(() => {
          
       </DeckGL>
     </div>
-    <div className="layer-selector">
-         <label>
-          
-          <input
-              type="checkbox"
-              checked={manualMode}
-              onChange={(e) => setManualMode(e.target.checked)}
-            />
-            <span className="label-title">Manuel Mode</span>
-        
-        </label> 
-      
-             {(showHumans && !detailMode) && (
-              <>
-              <div className="radio-group">
-                <label>
-                  <input
-                    type="radio"
-                    value="arc"
-                    checked={selectedLayerType === "arc"}
-                    onChange={() => setSelectedLayerType("arc")}
-                  />
-                  <span className="label-title">Arc</span>
-                </label>
-
-                <label>
-                  <input
-                    type="radio"
-                    value="text"
-                    checked={selectedLayerType === 'text'}
-                    onChange={() => setSelectedLayerType('text')}
-                  />
-                  <span className="label-title">Text Layer</span>
-                  
-                </label>
-
-                <label>
-                  <input
-                    type="radio"
-                    value="text"
-                    checked={selectedLayerType === 'circle'}
-                    onChange={() => setSelectedLayerType('circle')}
-                  />
-                  <span className="label-title">Circle Layer</span>
-                  
-                </label>
-              </div>
-              <div className="radio-group">
-                <label>
-                  <input
-                    type="radio"
-                    value="age"
-                    checked={colorFilterType === "age"}
-                    onChange={() => setColorFilterType("age")}
-                  />
-                  <span className="label-title">Age</span>
-                  
-                </label>
-
-                <label>
-                  <input
-                    type="radio"
-                    value="gender"
-                    checked={colorFilterType === "gender"}
-                    onChange={() => setColorFilterType("gender")}
-                  />
-                  <span className="label-title">Gender</span>
-                  
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    value="nationality"
-                    checked={colorFilterType === "nationality"}
-                    onChange={() => setColorFilterType("nationality")}
-                  />
-                  <span className="label-title">Nationality</span>
-                  
-                </label>
-                
-              </div>
-              </>
-          )} 
-        </div>
-      
+    <MapControls
+        manualMode={manualMode}
+        setManualMode={setManualMode}
+        showHumanControls={showHumans && !detailMode}
+        selectedLayerType={selectedLayerType}
+        setSelectedLayerType={setSelectedLayerType}
+        colorFilterType={colorFilterType}
+        setColorFilterType={setColorFilterType}
+        identifierThreshold={identifierThreshold}
+        setIdentifierThreshold={setIdentifierThreshold}
+        maxIdentifierThreshold={maxIdentifierThreshold}
+      />
   </div>
   );
 };

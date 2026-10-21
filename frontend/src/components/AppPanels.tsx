@@ -42,7 +42,7 @@ interface AppPanelsProps {
  
   setHumanLocations: React.Dispatch<React.SetStateAction<Location[]>>;
   setHumanRelations: React.Dispatch<React.SetStateAction<RelatedHuman[]>>;
-
+  setHumanSelectedDetail: React.Dispatch<React.SetStateAction<string | null>>;
   selectedOccupation: Occupation | null;
   selectedGender: Gender | null;
   selectedNationality: Nationality | null;
@@ -53,6 +53,7 @@ interface AppPanelsProps {
   setSelectedNationality: React.Dispatch<React.SetStateAction<Nationality | null>>;
   setSelectedCollection: React.Dispatch<React.SetStateAction<Collection | null>>;
   setShowWorks:(obj: boolean) => void;
+  hasWorks: boolean;
   backendUrl: string;
   movements: Movement[];
   setMovements: React.Dispatch<React.SetStateAction<Movement[]>>;
@@ -80,6 +81,7 @@ const AppPanels: React.FC<AppPanelsProps> = ({
   selectedMovement,
   setHumanLocations,
   setHumanRelations,
+  setHumanSelectedDetail,
   selectedOccupation,
   selectedGender,
   selectedNationality,
@@ -89,6 +91,7 @@ const AppPanels: React.FC<AppPanelsProps> = ({
   setSelectedNationality,
   setSelectedCollection,
   setShowWorks,
+  hasWorks,
   backendUrl,
   movements,
   setMovements,
@@ -179,7 +182,9 @@ const AppPanels: React.FC<AppPanelsProps> = ({
               person={selectedHuman}
               setHumanLocations={setHumanLocations}
               setHumanRelations={setHumanRelations}
+              setHumanSelectedDetail ={setHumanSelectedDetail}
               setShowWorks={setShowWorks}
+              hasWorks={hasWorks}
               setManualMode={setManualMode}
             />
           )}

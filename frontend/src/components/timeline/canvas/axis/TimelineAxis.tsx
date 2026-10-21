@@ -436,10 +436,10 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
           className="timeline-year-handle"
           x={
             yearLineX -
-            6
+            9
           }
           y={0}
-          width={12}
+          width={18}
           height={
             SLIDER_ROW_H
           }
@@ -565,6 +565,24 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
         y2={
           AXIS_H
         }
+      />
+      {/* Handle ve yıl çizgisi için ortak, geniş sürükleme alanı */}
+      <rect
+        className="timeline-year-drag-area"
+        x={yearLineX - 12}
+        y={0}
+        width={24}
+        height={AXIS_H}
+        onPointerDown={handleSliderPointerDown}
+        onPointerMove={handleSliderPointerMove}
+        onPointerUp={handleSliderPointerUp}
+        onPointerCancel={handleSliderPointerUp}
+        onLostPointerCapture={() => {
+          sliderDragRect.current = null;
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
       />
     </svg>
   );

@@ -19,6 +19,11 @@
   padding: 0 0.2dvw;
   opacity: 0.5;
   transition: opacity 0.15s;
+
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .label-title.active {

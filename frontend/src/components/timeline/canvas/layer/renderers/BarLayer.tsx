@@ -14,6 +14,8 @@ import {
   HIST_ROW_H,
 } from "../../../timelineConstants";
 
+import YearLine from "../../YearLine";
+
 interface BarLayerProps {
   layer: BarLayerConfig;
 
@@ -23,6 +25,7 @@ interface BarLayerProps {
   maxYear: number;
 
   selectedYear: number;
+  setSelectedYear: (year: number) => void;
 
   xScale: TimelineXScale;
 }
@@ -44,6 +47,7 @@ const BarLayer: React.FC<BarLayerProps> = ({
   maxYear,
   selectedYear,
   xScale,
+  setSelectedYear
 }) => {
   /* ==========================================================
      VISIBLE DATA
@@ -146,8 +150,8 @@ const BarLayer: React.FC<BarLayerProps> = ({
      SELECTED YEAR
   ========================================================== */
 
-  const yearLineX =
-    xScale(selectedYear);
+  // const yearLineX =
+  //   xScale(selectedYear);
 
   /* ==========================================================
      RENDER
@@ -336,12 +340,11 @@ const BarLayer: React.FC<BarLayerProps> = ({
 
       {/* selected year */}
 
-      <line
-        className="timeline-year-line"
-        x1={yearLineX}
-        y1={0}
-        x2={yearLineX}
-        y2={layerHeight}
+      <YearLine
+        selectedYear={selectedYear}
+        xScale={xScale}
+        height={layerHeight}
+        setSelectedYear={setSelectedYear}
       />
     </svg>
   );

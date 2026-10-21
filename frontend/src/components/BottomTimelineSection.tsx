@@ -1,4 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, {   useLayoutEffect,
+  useMemo,
+  useRef,
+  useState, } from "react";
 
 import type { LayerConfig } from "./timeline/timelineTypes";
 
@@ -31,6 +34,7 @@ interface BottomTimelineSectionProps {
 
   humanRelations:RelatedHuman[];
   humanLocations:Location[];
+  humanSelectedDetail:string | null;
   selectedYear: number;
   setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
   activeFullRange: [number, number];
@@ -78,7 +82,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   filteredHumans,
   humanRelations,
   humanLocations,
- 
+  humanSelectedDetail,
   // detailMode,
   movements,
   selectedObject,
@@ -103,6 +107,43 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   militaryEventCounts,
 }) => {
   const [showMovements, setShowMovements] = useState(false);
+  const bottomPanelRef = useRef<HTMLDivElement>(null);
+
+useLayoutEffect(() => {
+  const panel = bottomPanelRef.current;
+  const scrollArea =
+    panel?.querySelector<HTMLDivElement>(".timeline-layers-scroll");
+
+  if (!panel || !scrollArea) return;
+
+  const updateScrollbarWidth = () => {
+    const style = getComputedStyle(scrollArea);
+
+    const borderWidth =
+      (parseFloat(style.borderLeftWidth) || 0) +
+      (parseFloat(style.borderRightWidth) || 0);
+
+    const scrollbarWidth = Math.max(
+      0,
+      scrollArea.offsetWidth -
+        scrollArea.clientWidth -
+        borderWidth
+    );
+
+    panel.style.setProperty(
+      "--timeline-scrollbar-width",
+      `${scrollbarWidth}px`
+    );
+  };
+
+  updateScrollbarWidth();
+
+  const observer = new ResizeObserver(updateScrollbarWidth);
+  observer.observe(scrollArea);
+
+  return () => observer.disconnect();
+}, []);
+
   const layers = useMemo<LayerConfig[]>(() => {
      const result: LayerConfig[] = [];
 
@@ -120,18 +161,23 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
           binAggregation: "sum",
         });
       }
-      result.push({
-        id: "relations",
-        type: "bar",
-        scope: "general",
-        label: "RELATIONS",
-        color: getLayerColor("RELATIONS"),
-        show: showHumans,
-        setShow: setShowHumans,
-        objectColor: getColorForRelationTypeString,
-        data: humanRelations.length > 0 ? humanRelations : humanLocations,
-        onSelect: setSelectedObject,
-      });
+      if (humanSelectedDetail !== null) {
+        result.push({
+          id: "relations",
+          type: "bar",
+          scope: "detail",
+          label: humanSelectedDetail,
+          color: getLayerColor("RELATIONS"),
+          show: showHumans,
+          setShow: setShowHumans,
+          objectColor: getColorForRelationTypeString,
+          data:
+            humanSelectedDetail === "CV"
+              ? humanLocations
+              : humanRelations,
+          onSelect: setSelectedObject,
+        });
+      }
     }
 
     if (!selectedHuman) {
@@ -213,7 +259,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   }, [
     selectedHuman, workCounts, humanAliveCounts, militaryEventCounts,
     movements, humanRelations, humanLocations,
-    showWorks, showHumans, showEvents, showDisasters,showMovements,
+    showWorks, showHumans, showEvents, showDisasters,showMovements,humanSelectedDetail
   ]);
 
   return (
@@ -245,7 +291,7 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
         </ContentTrack>
       </div>
 
-      <div className="bottom-panel">
+      <div className="bottom-panel" ref={bottomPanelRef}>
           <LayerPicker
             layers={layers}
           />

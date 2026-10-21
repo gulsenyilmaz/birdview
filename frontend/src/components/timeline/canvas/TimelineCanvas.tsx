@@ -420,7 +420,7 @@ const TimelineCanvas: React.FC<TimelineCanvasProps> = ({
     {/* =========================
         FIXED TIMELINE + ZOOM
     ========================= */}
-
+  <div className="timeline-bottom-gutter">
     <div className="timeline-bottom-row">
       <div
         ref={chartMeasureRef}
@@ -453,7 +453,7 @@ const TimelineCanvas: React.FC<TimelineCanvasProps> = ({
           onChange={handleZoomChange}
         />
       </div>
-    </div>
+    </div></div>
   </div>
 );
 };

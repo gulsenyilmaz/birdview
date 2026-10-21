@@ -20,6 +20,9 @@ export function useWorkLayer(args: {
   const [workCounts, setWorkCounts] = useState<{ year: number; count: number }[]>([]);
 
   useEffect(() => {
+
+    setWorks([]);
+    setWorkCounts([]);
     if (!active) return;
     if (!backendUrl) return;
     if (!filters.human_id) return
