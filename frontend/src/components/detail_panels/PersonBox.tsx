@@ -50,7 +50,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
     // const [political, setPolitical] = useState<RelatedHuman[]>([]);    
     // const [uniqueTypes, setUniqueTypes] = useState<string[]>([]);
    
-    const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "professional"| "museums"| "works" | null>(null);
+    const [selectedTab, setSelectedTab] = useState<"cv" | "family"| "professional"| "museums"| "works" | null>("cv");
     const [fallbackImage, setFallbackImage] = useState<string | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateError, setUpdateError] = useState<string | null>(null);
@@ -81,6 +81,7 @@ const PersonBox: React.FC<PersonBoxProps> = ({person, setHumanLocations, setHuma
                                 location => location.relationship_type_name === "has_works_in"
                             )
                         );
+                        
                         // setIntellectual(data.intellectual);
                         // setSocial(data.social);
                         // setPolitical(data.political);
