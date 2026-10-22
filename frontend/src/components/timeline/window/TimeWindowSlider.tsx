@@ -20,9 +20,9 @@ const GUIDE_H = 15;
 const COLORS = {
   rail: "#D3D1C7",
   guide: "#b1afac84",
-  track: "#a8793566",
-  handle: "#a87935",
-  handleBorder: "#896125",
+  track: "#6f827066",
+  handle: "#6f8270",
+  handleBorder: "#526653",
   label: "#D3D1C7",
 };
 
