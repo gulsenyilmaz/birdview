@@ -230,7 +230,7 @@ def get_person_details(human_id: int):
 
     cur.execute(
         """
-        SELECT l.id, l.name, hlt.name AS relationship_type_name, hl.start_date, hl.end_date, l.lat AS loc_lat, l.lon AS loc_lon, l.qid
+        SELECT l.id, l.name, hlt.name AS relationship_type_name, hl.start_date, hl.end_date, l.lat AS loc_lat, l.lon AS loc_lon, l.qid,hl.visit_order
         FROM human_location AS hl
         JOIN locations AS l ON l.id = hl.location_id
         JOIN human_location_types AS hlt ON hlt.id = hl.relationship_type_id

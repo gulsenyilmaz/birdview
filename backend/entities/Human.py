@@ -303,7 +303,7 @@ class Human(BaseEntity):
             return
 
         for location in locations:
-            if  not location:
+            if not location:
                 continue
             print("locations-------------------------------------------------")
 
@@ -341,21 +341,26 @@ class Human(BaseEntity):
                 human_id = self.id,
                 location_id = location_database_entity.id,
                 relationship_type_id = humanlocationtype_database_entity.id,
+                start_date = location["start_date"],
+                end_date = location["end_date"],
+                visit_order = location.get("visit_order"),
                 cursor = self.cursor,
                 w = self.w
             )
             if humanlocation_database_entity.id is None:
-                
-                humanlocation_database_entity.set_data(
-                    {
-                        "human_id": self.id,
-                        "location_id": location_database_entity.id,
-                        "relationship_type_id": humanlocationtype_database_entity.id,
-                        "start_date": location["start_date"],
-                        "end_date": location["end_date"],
-                        "source_url": location["source_url"] if location["source_url"] else "",
-                    }
-                )
+                humanlocation_database_entity.set_data({
+                    "human_id": self.id,
+                    "location_id": location_database_entity.id,
+                    "relationship_type_id": humanlocationtype_database_entity.id,
+                    "start_date": location["start_date"],
+                    "end_date": location["end_date"],
+                    "source_url": location.get("source_url") or "",
+                    "visit_order": location.get("visit_order")
+                })
+            else:
+                humanlocation_database_entity.update({
+                    "visit_order": location.get("visit_order")
+                })
 
     def update_relatives(self, relatives):
         if not relatives:

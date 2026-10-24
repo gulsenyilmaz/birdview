@@ -63,8 +63,8 @@ interface BottomTimelineSectionProps {
   setShowEventDetails: React.Dispatch<React.SetStateAction<boolean>>;
   showEvents: boolean;
   setShowEvents: React.Dispatch<React.SetStateAction<boolean>>;
-  showDisasters: boolean;
-  setShowDisasters: React.Dispatch<React.SetStateAction<boolean>>;
+  // showDisasters: boolean;
+  // setShowDisasters: React.Dispatch<React.SetStateAction<boolean>>;
 
   workCounts: CountItem[];
   humanAliveCounts: CountItem[];
@@ -100,8 +100,8 @@ const BottomTimelineSection: React.FC<BottomTimelineSectionProps> = ({
   setShowEvents,
   showEventDetails,
   setShowEventDetails,
-  showDisasters,
-  setShowDisasters,
+  // showDisasters,
+  // setShowDisasters,
   workCounts,
   humanAliveCounts,
   militaryEventCounts,
@@ -206,41 +206,41 @@ useLayoutEffect(() => {
       binAggregation: "sum",
     });
 
-    result.push({
-      id: "disasters",
-      type: "histogram",
-      scope: "general",
-      label: "DISASTERS",
-      color: getLayerColor("DISASTERS"),
-      show: showDisasters,
-      setShow: setShowDisasters,
-      counts: militaryEventCounts,
-      binAggregation: "sum",
-    });
+    // result.push({
+    //   id: "disasters",
+    //   type: "histogram",
+    //   scope: "general",
+    //   label: "DISASTERS",
+    //   color: getLayerColor("DISASTERS"),
+    //   show: showDisasters,
+    //   setShow: setShowDisasters,
+    //   counts: militaryEventCounts,
+    //   binAggregation: "sum",
+    // });
 
-    result.push({
-      id: "landmarks",
-      type: "histogram",
-      scope: "general",
-      label: "LANDMARKS",
-      color: getLayerColor("LANDMARKS"),
-      show: showDisasters,
-      setShow: setShowDisasters,
-      counts: militaryEventCounts,
-      binAggregation: "sum",
-    });
+    // result.push({
+    //   id: "landmarks",
+    //   type: "histogram",
+    //   scope: "general",
+    //   label: "LANDMARKS",
+    //   color: getLayerColor("LANDMARKS"),
+    //   show: showDisasters,
+    //   setShow: setShowDisasters,
+    //   counts: militaryEventCounts,
+    //   binAggregation: "sum",
+    // });
 
-    result.push({
-      id: "cities",
-      type: "histogram",
-      scope: "general",
-      label: "CITIES",
-      color: getLayerColor("CITIES"),
-      show: showDisasters,
-      setShow: setShowDisasters,
-      counts: militaryEventCounts,
-      binAggregation: "sum",
-    });
+    // result.push({
+    //   id: "cities",
+    //   type: "histogram",
+    //   scope: "general",
+    //   label: "CITIES",
+    //   color: getLayerColor("CITIES"),
+    //   show: showDisasters,
+    //   setShow: setShowDisasters,
+    //   counts: militaryEventCounts,
+    //   binAggregation: "sum",
+    // });
 
     result.push({
       id: "movements",
@@ -259,7 +259,7 @@ useLayoutEffect(() => {
   }, [
     selectedHuman, workCounts, humanAliveCounts, militaryEventCounts,
     movements, humanRelations, humanLocations,
-    showWorks, showHumans, showEvents, showDisasters,showMovements,humanSelectedDetail
+    showWorks, showHumans, showEvents,showMovements,humanSelectedDetail
   ]);
 
   return (

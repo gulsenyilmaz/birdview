@@ -1,4 +1,3 @@
-import pandas as pd
 import sqlite3
 import csv  
 import time
@@ -111,46 +110,59 @@ def update_human_location_sources():
     finally:
         conn.close()
 
+def parse_year(value):
+    if value is None or value == "":
+        return None
+    return int(str(value).split("-")[0])
+
 def add_human_location(human_id, file_path):
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
     cursor = conn.cursor()
 
-    with open(OUTPUT_CSV, mode="w", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
-        writer.writerow(["id", "name", "Result"])
+    try:
+        with open(file_path, newline="", encoding="utf-8-sig") as input_file:
+            rows = list(csv.DictReader(input_file))
 
-        df = pd.read_csv(file_path, low_memory=False)
-        df = df.where(pd.notna(df), None)
+        with open(OUTPUT_CSV, "w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow(["id", "name", "Result"])
 
-        human = Human(id=human_id, cursor=cursor, w=writer)
+            human = Human(id=human_id, cursor=cursor, w=writer)
 
-        if human.name is None: 
-            log_results(writer, human_id, "", f"❌ THERE IS NO HUMAN")
-            return
-        
-        locations = []
+            if human.id is None:
+                log_results(writer, human_id, "", "Human not found")
+                return
 
-        for row in df.itertuples(index=False, name="HumanRow"):
-            relationship_type = row.relationship_type
-            start_date = row.start_date
-            end_date = row.end_date
-            location_qid=row.location_qid
-            source_url = row.source_url
+            locations = []
 
-            locations.append(
-                {
-                    "qid": location_qid,
-                    "relation_type": relationship_type,
-                    "start_date": start_date,
-                    "end_date": end_date,
-                    "source_url":source_url
-                }
-            )
-        human.update_locations(locations)
-        conn.commit()
-    conn.close()
+            for row in rows:
+                qid = (row.get("location_qid") or "").strip()
+
+                if not qid:
+                    continue
+
+                locations.append({
+                    "qid": qid,
+                    "relation_type": "traveled_to",
+                    "start_date": parse_year(row.get("start_date")),
+                    "end_date": parse_year(row.get("end_date")),
+                    "source_url": row.get("source_url") or "",
+                    "visit_order": int(row["visit_order"]) if row.get("visit_order") else None
+                })
+
+            human.update_locations(locations)
+            conn.commit()
+
+            print(f"Processed {len(locations)} location records")
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        conn.close()
 
 def add_relatives(qid):
 
@@ -241,4 +253,4 @@ def clean_double_entry_humans():
 
 
 if __name__ == "__main__":
-    update_humans()
+    add_human_location(151506,"data/hadrian_notables_wikidata_125_route_with_names.csv")

@@ -1,8 +1,6 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
-import type {
-  TimelineXScale,
-} from "../../timelineTypes";
+import type { TimelineXScale } from "../../timelineTypes";
 
 import {
   SLIDER_ROW_H,
@@ -12,85 +10,212 @@ import {
 
 interface TimelineAxisProps {
   chartWidth: number;
-
   selectedYear: number;
-
   minYear: number;
   maxYear: number;
-
   fullRange: [number, number];
-
   yearStep: number;
-
   xScale: TimelineXScale;
-
   setSelectedYear: (year: number) => void;
-
-  setWindowRange: (
-    range: [number, number]
-  ) => void;
+  setWindowRange: (range: [number, number]) => void;
 }
 
 const TimelineAxis: React.FC<TimelineAxisProps> = ({
   chartWidth,
-
   selectedYear,
-
   minYear,
   maxYear,
-
   fullRange,
-
   yearStep,
-
   xScale,
-
   setSelectedYear,
   setWindowRange,
 }) => {
-  const svgRef =
-    useRef<SVGSVGElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const yearDragAreaRef = useRef<SVGRectElement>(null);
+
+  const currentYearRef = useRef(selectedYear);
+  const sliderDragRect = useRef<DOMRect | null>(null);
+
+  const labelDragStart = useRef<{
+    x: number;
+    min: number;
+    max: number;
+  } | null>(null);
 
   /* ==========================================================
      RANGE
   ========================================================== */
 
-  const [
-    alltimeMinYear,
-    alltimeMaxYear,
-  ] = fullRange;
+  const [alltimeMinYear, alltimeMaxYear] = fullRange;
 
-  const totalRange =
-    maxYear - minYear;
+  const totalRange = maxYear - minYear;
+
+  const selectableMinYear = Math.ceil(
+    Math.max(minYear, alltimeMinYear)
+  );
+
+  const selectableMaxYear = Math.floor(
+    Math.min(maxYear, alltimeMaxYear)
+  );
 
   /* ==========================================================
      SELECTED YEAR
   ========================================================== */
 
-  const yearLineX =
-    xScale(selectedYear);
+  const yearLineX = xScale(selectedYear);
+
+  useEffect(() => {
+    currentYearRef.current = selectedYear;
+  }, [selectedYear]);
+
+  const updateSelectedYear = (year: number) => {
+    if (
+      !Number.isFinite(year) ||
+      selectableMinYear > selectableMaxYear
+    ) {
+      return;
+    }
+
+    const nextYear = Math.max(
+      selectableMinYear,
+      Math.min(selectableMaxYear, Math.round(year))
+    );
+
+    if (nextYear === currentYearRef.current) {
+      return;
+    }
+
+    currentYearRef.current = nextYear;
+    setSelectedYear(nextYear);
+  };
+
+  /* ==========================================================
+     KEYBOARD
+
+     Handle odaklıyken:
+     ← / →          : 1 yıl
+     Shift + ← / →  : 10 yıl
+  ========================================================== */
+
+  const handleYearKeyDown = (
+    event: React.KeyboardEvent<SVGRectElement>
+  ) => {
+    if (
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    let direction: number;
+
+    if (event.key === "ArrowRight") {
+      direction = 1;
+    } else if (event.key === "ArrowLeft") {
+      direction = -1;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const step = event.shiftKey ? 10 : 1;
+
+    updateSelectedYear(
+      currentYearRef.current + direction * step
+    );
+  };
+
+  /* ==========================================================
+     MOUSE WHEEL
+
+     Yalnızca handle / yıl çizgisi üzerindeyken:
+     Yukarı : ileri
+     Aşağı  : geri
+     Shift  : 10 yıl
+
+     passive: false sayesinde yıl değişirken sayfa kaymaz.
+  ========================================================== */
+
+  useEffect(() => {
+    const element = yearDragAreaRef.current;
+
+    if (!element) return;
+
+    const handleWheel = (event: WheelEvent) => {
+      // Tarayıcı zoom ve sistem kısayollarını koru.
+      if (
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const delta =
+        event.deltaY !== 0
+          ? event.deltaY
+          : event.deltaX;
+
+      if (
+        delta === 0 ||
+        selectableMinYear > selectableMaxYear
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const direction = delta < 0 ? 1 : -1;
+      const step = event.shiftKey ? 10 : 1;
+
+      const nextYear = Math.max(
+        selectableMinYear,
+        Math.min(
+          selectableMaxYear,
+          Math.round(
+            currentYearRef.current + direction * step
+          )
+        )
+      );
+
+      if (nextYear === currentYearRef.current) {
+        return;
+      }
+
+      currentYearRef.current = nextYear;
+      setSelectedYear(nextYear);
+    };
+
+    element.addEventListener("wheel", handleWheel, {
+      passive: false,
+    });
+
+    return () => {
+      element.removeEventListener("wheel", handleWheel);
+    };
+  }, [
+    selectableMinYear,
+    selectableMaxYear,
+    setSelectedYear,
+  ]);
 
   /* ==========================================================
      LABEL DRAG
 
-     Yıl etiketleri alanını sürükleyerek
-     timeline window'unu sağa / sola taşıyoruz.
+     Yıl etiketlerini sürükleyerek görünür pencereyi taşı.
   ========================================================== */
-
-  const isDraggingLabels =
-    useRef(false);
-
-  const labelDragStart =
-    useRef<{
-      x: number;
-      min: number;
-      max: number;
-    } | null>(null);
 
   const handleLabelPointerDown = (
     event: React.PointerEvent<SVGGElement>
   ) => {
-    isDraggingLabels.current = true;
+    if (event.button !== 0) return;
+
+    event.preventDefault();
 
     labelDragStart.current = {
       x: event.clientX,
@@ -106,99 +231,57 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
   const handleLabelPointerMove = (
     event: React.PointerEvent<SVGGElement>
   ) => {
+    const start = labelDragStart.current;
+
     if (
-      !isDraggingLabels.current ||
-      !labelDragStart.current ||
-      chartWidth <= 0
+      !start ||
+      chartWidth <= 0 ||
+      yearStep <= 0 ||
+      !event.currentTarget.hasPointerCapture(
+        event.pointerId
+      )
     ) {
       return;
     }
 
-    const dx =
-      event.clientX -
-      labelDragStart.current.x;
+    const dx = event.clientX - start.x;
+    const windowSize = start.max - start.min;
+    const yearsPerPixel = windowSize / chartWidth;
 
-    /*
-     * Gerçek chart genişliğine göre
-     * pixel → year dönüşümü.
-     */
-    const yearsPerPixel =
-      totalRange /
-      chartWidth;
+    // Sağa sürükleme: geçmişe.
+    // Sola sürükleme: geleceğe.
+    const yearDelta = -dx * yearsPerPixel;
 
-    /*
-     * Sağa sürükleme → geçmişe
-     * Sola sürükleme → geleceğe
-     */
-    const yearDelta =
-      -dx *
-      yearsPerPixel;
-
-    /*
-     * Hareketi mevcut timeline step'ine oturt.
-     */
     const snappedDelta =
-      Math.round(
-        yearDelta /
-          yearStep
-      ) *
-      yearStep;
+      Math.round(yearDelta / yearStep) * yearStep;
 
-    if (
-      snappedDelta === 0
-    ) {
+    let newMin = start.min + snappedDelta;
+    let newMax = start.max + snappedDelta;
+
+    if (windowSize >= alltimeMaxYear - alltimeMinYear) {
+      setWindowRange([
+        alltimeMinYear,
+        alltimeMaxYear,
+      ]);
       return;
     }
 
-    let newMin =
-      labelDragStart.current.min +
-      snappedDelta;
-
-    let newMax =
-      labelDragStart.current.max +
-      snappedDelta;
-
-    /*
-     * Sol sınır.
-     */
-    if (
-      newMin <
-      alltimeMinYear
-    ) {
-      newMin =
-        alltimeMinYear;
-
-      newMax =
-        newMin +
-        totalRange;
+    if (newMin < alltimeMinYear) {
+      newMin = alltimeMinYear;
+      newMax = newMin + windowSize;
     }
 
-    /*
-     * Sağ sınır.
-     */
-    if (
-      newMax >
-      alltimeMaxYear
-    ) {
-      newMax =
-        alltimeMaxYear;
-
-      newMin =
-        newMax -
-        totalRange;
+    if (newMax > alltimeMaxYear) {
+      newMax = alltimeMaxYear;
+      newMin = newMax - windowSize;
     }
 
-    setWindowRange([
-      newMin,
-      newMax,
-    ]);
+    setWindowRange([newMin, newMax]);
   };
 
   const handleLabelPointerUp = (
     event: React.PointerEvent<SVGGElement>
   ) => {
-    isDraggingLabels.current = false;
-
     labelDragStart.current = null;
 
     if (
@@ -214,23 +297,23 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
 
   /* ==========================================================
      SLIDER DRAG
-
-     Kırmızı handle'ı sürükleyerek selectedYear değişiyor.
   ========================================================== */
-
-  const sliderDragRect =
-    useRef<DOMRect | null>(null);
 
   const handleSliderPointerDown = (
     event: React.PointerEvent<SVGRectElement>
   ) => {
-    const svg =
-      svgRef.current;
+    if (event.button !== 0) return;
 
-    if (!svg) return;
+    const svg = svgRef.current;
+
+    if (!svg || chartWidth <= 0) return;
 
     event.preventDefault();
     event.stopPropagation();
+
+    yearDragAreaRef.current?.focus({
+      preventScroll: true,
+    });
 
     sliderDragRect.current =
       svg.getBoundingClientRect();
@@ -243,11 +326,12 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
   const handleSliderPointerMove = (
     event: React.PointerEvent<SVGRectElement>
   ) => {
-    const rect =
-      sliderDragRect.current;
+    const rect = sliderDragRect.current;
 
     if (
       !rect ||
+      rect.width <= 0 ||
+      chartWidth <= 0 ||
       !event.currentTarget.hasPointerCapture(
         event.pointerId
       )
@@ -255,35 +339,18 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
       return;
     }
 
-    const relativeX =
-      event.clientX -
-      rect.left;
+    const relativeX = event.clientX - rect.left;
 
     const svgX =
-      relativeX *
-      (
-        chartWidth /
-        rect.width
-      );
+      relativeX * (chartWidth / rect.width);
 
-    const clampedX =
-      Math.max(
-        0,
-        Math.min(
-          chartWidth,
-          svgX
-        )
-      );
+    const clampedX = Math.max(
+      0,
+      Math.min(chartWidth, svgX)
+    );
 
-    const year =
-      Math.round(
-        xScale.invert(
-          clampedX
-        )
-      );
-
-    setSelectedYear(
-      year
+    updateSelectedYear(
+      xScale.invert(clampedX)
     );
   };
 
@@ -306,72 +373,47 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
   /* ==========================================================
      SLIDER RAIL CLICK
 
-     Slider'ın herhangi bir noktasına tıklayınca
-     selectedYear doğrudan o yıla geçiyor.
+     Slider satırına tıklayınca seçili yılı değiştir.
   ========================================================== */
 
   const handleSvgClick = (
     event: React.MouseEvent<SVGSVGElement>
   ) => {
-    const svg =
-      svgRef.current;
+    const svg = svgRef.current;
 
-    if (!svg) return;
+    if (!svg || chartWidth <= 0) return;
 
-    const rect =
-      svg.getBoundingClientRect();
+    const rect = svg.getBoundingClientRect();
 
-    const x =
-      (
-        event.clientX -
-        rect.left
-      ) *
-      (
-        chartWidth /
-        rect.width
-      );
-
-    const y =
-      (
-        event.clientY -
-        rect.top
-      ) *
-      (
-        AXIS_H /
-        rect.height
-      );
-
-    /*
-     * Yalnızca slider row click kabul ediyor.
-     * Label row drag için ayrılmış durumda.
-     */
-    if (
-      y < 0 ||
-      y >
-        SLIDER_ROW_H
-    ) {
+    if (rect.width <= 0 || rect.height <= 0) {
       return;
     }
 
-    const clampedX =
-      Math.max(
-        0,
-        Math.min(
-          chartWidth,
-          x
-        )
-      );
+    const x =
+      (event.clientX - rect.left) *
+      (chartWidth / rect.width);
 
-    const year =
-      Math.round(
-        xScale.invert(
-          clampedX
-        )
-      );
+    const y =
+      (event.clientY - rect.top) *
+      (AXIS_H / rect.height);
 
-    setSelectedYear(
-      year
+    // Etiket satırı sürükleme için ayrılmıştır.
+    if (y < 0 || y > SLIDER_ROW_H) {
+      return;
+    }
+
+    const clampedX = Math.max(
+      0,
+      Math.min(chartWidth, x)
     );
+
+    updateSelectedYear(
+      xScale.invert(clampedX)
+    );
+
+    yearDragAreaRef.current?.focus({
+      preventScroll: true,
+    });
   };
 
   /* ==========================================================
@@ -380,28 +422,23 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
 
   const years: number[] = [];
 
-  /*
-     * Örn:
-     *
-     * minYear = 1837
-     * step = 20
-     *
-     * ilk label = 1840
-  */
-
-  const firstYear =
-    Math.ceil(
-      minYear /
-        yearStep
-    ) *
-    yearStep;
-
-  for (
-    let year = firstYear;
-    year <= maxYear;
-    year += yearStep
+  if (
+    Number.isFinite(yearStep) &&
+    yearStep > 0 &&
+    Number.isFinite(minYear) &&
+    Number.isFinite(maxYear) &&
+    totalRange >= 0
   ) {
-    years.push(year);
+    const firstYear =
+      Math.ceil(minYear / yearStep) * yearStep;
+
+    for (
+      let year = firstYear;
+      year <= maxYear;
+      year += yearStep
+    ) {
+      years.push(year);
+    }
   }
 
   /* ==========================================================
@@ -415,14 +452,9 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
       width={chartWidth}
       height={AXIS_H}
       viewBox={`0 0 ${chartWidth} ${AXIS_H}`}
-      onClick={
-        handleSvgClick
-      }
+      onClick={handleSvgClick}
     >
-      {/* ====================================================
-          SLIDER ROW
-      ==================================================== */}
-
+      {/* SLIDER ROW */}
       <g className="timeline-slider-row">
         <line
           className="timeline-layer-separator"
@@ -434,145 +466,106 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
 
         <rect
           className="timeline-year-handle"
-          x={
-            yearLineX -
-            9
-          }
+          x={yearLineX - 9}
           y={0}
           width={18}
-          height={
-            SLIDER_ROW_H
-          }
-          onPointerDown={
-            handleSliderPointerDown
-          }
-          onPointerMove={
-            handleSliderPointerMove
-          }
-          onPointerUp={
-            handleSliderPointerUp
-          }
-          onPointerCancel={
-            handleSliderPointerUp
-          }
+          height={SLIDER_ROW_H}
+          pointerEvents="none"
         />
       </g>
 
-      {/* ====================================================
-          YEAR LABEL ROW
-      ==================================================== */}
-
+      {/* YEAR LABEL ROW */}
       <g
         className="timeline-year-labels"
-        onPointerDown={
-          handleLabelPointerDown
-        }
-        onPointerMove={
-          handleLabelPointerMove
-        }
-        onPointerUp={
-          handleLabelPointerUp
-        }
-        onPointerCancel={
-          handleLabelPointerUp
-        }
+        style={{
+          touchAction: "none",
+          userSelect: "none",
+        }}
+        onPointerDown={handleLabelPointerDown}
+        onPointerMove={handleLabelPointerMove}
+        onPointerUp={handleLabelPointerUp}
+        onPointerCancel={handleLabelPointerUp}
+        onLostPointerCapture={() => {
+          labelDragStart.current = null;
+        }}
       >
         <rect
           className="timeline-year-label-background"
           x={0}
-          y={
-            SLIDER_ROW_H
-          }
-          width={
-            chartWidth
-          }
-          height={
-            LABEL_ROW_H
-          }
+          y={SLIDER_ROW_H}
+          width={chartWidth}
+          height={LABEL_ROW_H}
         />
 
-        {years.map(
-          (year) => {
-            const x =
-              xScale(year);
+        {years.map((year) => {
+          const x = xScale(year);
 
-            const isActive =
-              selectedYear >=
-                year &&
-              selectedYear <
-                year +
-                  yearStep;
+          const isActive =
+            selectedYear >= year &&
+            selectedYear < year + yearStep;
 
-            return (
-              <g
-                key={
-                  year
+          return (
+            <g key={year}>
+              <line
+                className={
+                  isActive
+                    ? "timeline-year-tick active"
+                    : "timeline-year-tick"
                 }
-              >
-                <line
-                  className={
-                    isActive
-                      ? "timeline-year-tick active"
-                      : "timeline-year-tick"
-                  }
-                  x1={x}
-                  y1={
-                    SLIDER_ROW_H +
-                    2
-                  }
-                  x2={x}
-                  y2={
-                    AXIS_H -
-                    2
-                  }
-                />
+                x1={x}
+                y1={SLIDER_ROW_H + 2}
+                x2={x}
+                y2={AXIS_H - 2}
+              />
 
-                <text
-                  className={
-                    isActive
-                      ? "timeline-year-text active"
-                      : "timeline-year-text"
-                  }
-                  x={
-                    x + 3
-                  }
-                  y={
-                    AXIS_H -
-                    3
-                  }
-                >
-                  {year}
-                </text>
-              </g>
-            );
-          }
-        )}
+              <text
+                className={
+                  isActive
+                    ? "timeline-year-text active"
+                    : "timeline-year-text"
+                }
+                x={x + 3}
+                y={AXIS_H - 3}
+              >
+                {year}
+              </text>
+            </g>
+          );
+        })}
       </g>
 
-      {/* ====================================================
-          SELECTED YEAR LINE
-      ==================================================== */}
-
+      {/* SELECTED YEAR LINE */}
       <line
         className="timeline-year-line"
-        x1={
-          yearLineX
-        }
+        x1={yearLineX}
         y1={0}
-        x2={
-          yearLineX
-        }
-        y2={
-          AXIS_H
-        }
+        x2={yearLineX}
+        y2={AXIS_H}
+        pointerEvents="none"
       />
-      {/* Handle ve yıl çizgisi için ortak, geniş sürükleme alanı */}
+
+      {/* Handle ve yıl çizgisi için ortak etkileşim alanı */}
       <rect
+        ref={yearDragAreaRef}
         className="timeline-year-drag-area"
         x={yearLineX - 12}
         y={0}
         width={24}
         height={AXIS_H}
+        fill="transparent"
+        pointerEvents="all"
+        style={{
+          cursor: "ew-resize",
+          touchAction: "none",
+        }}
+        tabIndex={0}
+        role="slider"
+        aria-label="Selected year"
+        aria-orientation="horizontal"
+        aria-valuemin={selectableMinYear}
+        aria-valuemax={selectableMaxYear}
+        aria-valuenow={selectedYear}
+        onKeyDown={handleYearKeyDown}
         onPointerDown={handleSliderPointerDown}
         onPointerMove={handleSliderPointerMove}
         onPointerUp={handleSliderPointerUp}

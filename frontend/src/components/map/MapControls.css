@@ -66,10 +66,10 @@
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
 
-  border: 1px solid #c9cecc;
+  border: none;
   border-right: none;
-  border-radius: 5px 0 0 5px;
-  background: rgba(245, 247, 246, 0.98);
+  border-radius: 0;
+  background: rgba(245, 247, 246, 0.6);
 
   font-family: inherit;
   font-size: inherit;
@@ -227,7 +227,7 @@
   padding: 2px;
 
   border: 1px solid #cbd2d5;
-  border-radius: 5px;
+  border-radius: 0;
   background: #e8edef;
 }
 
@@ -281,7 +281,7 @@
   min-height: 20px;
   padding: 4px 8px;
 
-  border-radius: 3px;
+  border-radius: 0;
   color: #5c6870;
 
   transition:
@@ -322,7 +322,7 @@
   padding: 4px 8px;
 
   border: 1px solid #cdbfcf;
-  border-radius: 5px;
+  border-radius: 0;
   background: #eee8ef;
 }
 

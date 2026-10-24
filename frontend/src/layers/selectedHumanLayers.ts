@@ -52,7 +52,7 @@ export function createSelectedHumanLayers({
       {
         id: 'IconLayer',
         data: humanLocations,
-        getColor: (d: Location) => getColorForRelationType(d.relationship_type_name, existsThatYear(d.start_date, d.end_date, selectedYear)?250:20),
+        getColor: (d: Location) => getColorForRelationType(d.relationship_type_name, existsThatYear(d.start_date, d.end_date, selectedYear)?250:60),
         getIcon: () => 'marker',
         getPosition: (d: Location) => [d.loc_lon, d.loc_lat],
         getSize: 20,
@@ -149,7 +149,7 @@ export function createSelectedHumanLayers({
         characterSet: 'auto',
         fontSettings: { buffer: 8, sdf: true },
 
-        getText: d => ".\n\n\n\n\n\n" +d.name+" \n\n" + d.relationship_type_name.toLocaleUpperCase(),
+        getText: d => ".\n\n\n\n\n\n" +d.name,
         getPosition: d => [d.loc_lon, d.loc_lat],
         getColor: d => getColorForRelationType(d.relationship_type_name,255),
         getSize: () => 0.5,

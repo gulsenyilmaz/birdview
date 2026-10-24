@@ -167,6 +167,9 @@ export const getColorForRelationType = (
     case 'buried_at':
       return [136, 135, 128, opacity];   // gray-400 — #888780 rgb(136, 135, 128)
 
+    case 'traveled_to':
+      return [194, 174, 24, opacity];   // gray-400 — #c2ae18 rgb(194, 174, 24)
+
     // FAMILY
     case 'father':
       return [55, 138, 221, opacity];    // blue-400 — #378ADD

@@ -25,7 +25,7 @@ export function computeBounds(locations: Location[], detailMode: Boolean = false
   const maxDiff = Math.max(lonDiff, latDiff);
 
   let zoom = 6;
-  if (maxDiff > 220) return { centerLon:6.0- (detailMode ? 55 : 0), centerLat:4.0, zoom:1.5 };
+  if (maxDiff > 220) return { centerLon:0- (detailMode ? 55 : 0), centerLat:25.0, zoom:1 };
   else if (maxDiff > 150) zoom = 1.7;
   else if (maxDiff > 80) zoom = 2.5;
   else if (maxDiff > 30) zoom = 2.9;

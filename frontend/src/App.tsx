@@ -49,7 +49,7 @@ function App() {
   const [showEvents, setShowEvents] = useState(false);
   const [showEventDetails, setShowEventDetails] = useState(false);
   const [showWorks, setShowWorks] = useState(true);
-  const [showDisasters, setShowDisasters] = useState(false);
+  // const [showDisasters, setShowDisasters] = useState(false);
 
 
   const {
@@ -273,8 +273,8 @@ function App() {
               setShowEvents={setShowEvents}
               showEventDetails={showEventDetails}
               setShowEventDetails = {setShowEventDetails}
-              showDisasters={showDisasters}
-              setShowDisasters={setShowDisasters}
+              // showDisasters={showDisasters}
+              // setShowDisasters={setShowDisasters}
               filteredWorks={workLayer.filteredWorks}
               filteredMilitaryEvents={militaryLayer.filteredMilitaryEvents}
               workCounts={workLayer.workCounts}

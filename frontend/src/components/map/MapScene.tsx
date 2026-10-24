@@ -31,6 +31,11 @@ import { createSelectedHumanLayers } from "../../layers/selectedHumanLayers"
 import { getColorForGender, getColorForAge, getColorForLabel } from "../../utils/colorUtils";
 import { computeBounds, offsetFibonacciPosition } from "../../utils/locationUtils"
 
+import {
+  createHumanMoves,
+  getAnimationState,
+} from "../../layers/humanMovementLayers";
+
 
 
 type ViewStateType = {
@@ -43,6 +48,8 @@ type ViewStateType = {
   transitionDuration?: number | 'auto';
 };
 
+
+const MOVEMENT_DURATION = 1400;
 
 const INITIAL_VIEW_STATE: ViewStateType = {
   latitude: 20,
@@ -106,6 +113,8 @@ const MapScene: React.FC<MapSceneProps> = ({
 
   const [identifierThreshold, setIdentifierThreshold] = useState(30);
 
+
+
   // Slider en az 100'e, veride daha büyük değer varsa o değere uzanır.
   // Kişi listesi değiştiğinde mevcut slider değeri aralık dışında kalmaz.
   const maxIdentifierThreshold = useMemo(
@@ -119,39 +128,12 @@ const MapScene: React.FC<MapSceneProps> = ({
   );
 
 
-  const [animationProgress, setAnimationProgress] = useState(.2);
+  
 
 
   
 
-  useEffect(() => {
-    let frameId: number;
 
-    const duration = 1400;
-
-    const start = performance.now();
-
-    setAnimationProgress(0);
-
-    const animate = (now: number) => {
-      const progress = Math.min(
-        (now - start) / duration,
-        1
-      );
-
-      setAnimationProgress(progress);
-
-      if (progress < 1) {
-        frameId = requestAnimationFrame(animate);
-      }
-    };
-
-    frameId = requestAnimationFrame(animate);
-
-    return () => {
-      cancelAnimationFrame(frameId);
-    };
-  }, [selectedYear]);
 
 
   useEffect(() => {
@@ -217,38 +199,154 @@ const MapScene: React.FC<MapSceneProps> = ({
       }
 
   }, [selectedObject, humanRelations, selectedYear, viewState.zoom]);
+ 
+  const [animationProgress, setAnimationProgress] = useState(0);
+
+const selectedHuman = isHuman(selectedObject);
+
+const currentYearMoves = useMemo(() => {
+  if (!selectedHuman) return [];
+
+  return createHumanMoves(humanLocations).filter(
+    move => move.year === selectedYear
+  );
+}, [selectedHuman, humanLocations, selectedYear]);
+
+useEffect(() => {
+  setAnimationProgress(0);
+
+  if (currentYearMoves.length === 0) return;
+
+  let frameId: number;
+
+  // Her hareket için ayrı 1400 ms.
+  const duration =
+    currentYearMoves.length * MOVEMENT_DURATION;
+
+  const start = performance.now();
+
+  const animate = (now: number) => {
+    const progress = Math.min(
+      (now - start) / duration,
+      1
+    );
+
+    setAnimationProgress(progress);
+
+    if (progress < 1) {
+      frameId = requestAnimationFrame(animate);
+    }
+  };
+
+  frameId = requestAnimationFrame(animate);
+
+  return () => {
+    cancelAnimationFrame(frameId);
+  };
+}, [currentYearMoves]);
+
+const { currentMove } = getAnimationState(
+  currentYearMoves,
+  animationProgress
+);
 
   useEffect(() => {
-    if (manualMode) return;
-    
-    const combinedLocations:any[] = [];
-    
+  if (manualMode) return;
 
-    if(showHumans){
-      combinedLocations.push(...humans.map(h => ({ lon: h.lon, lat: h.lat })));
+  const combinedLocations: {
+    lon: number;
+    lat: number;
+  }[] = [];
+
+  if (currentMove) {
+    // Kamera yalnızca animasyondaki iki durağı kapsar.
+    combinedLocations.push(
+      {
+        lon: currentMove.from.loc_lon,
+        lat: currentMove.from.loc_lat,
+      },
+      {
+        lon: currentMove.to.loc_lon,
+        lat: currentMove.to.loc_lat,
+      }
+    );
+  } else {
+    // Bu yılda hareket yoksa mevcut genel görünümü kullan.
+    if (showHumans) {
+      combinedLocations.push(
+        ...humans.map(h => ({
+          lon: h.lon,
+          lat: h.lat,
+        }))
+      );
     }
 
-    if(isHuman(selectedObject)){
-      combinedLocations.push(...humanRelations.map(l => ({ lon: l.lon, lat: l.lat })));
-      combinedLocations.push(...humanLocations.map(l => ({ lon: l.loc_lon, lat: l.loc_lat })));
+    if (selectedHuman) {
+      combinedLocations.push(
+        ...humanRelations.map(h => ({
+          lon: h.lon,
+          lat: h.lat,
+        })),
+        ...humanLocations.map(location => ({
+          lon: location.loc_lon,
+          lat: location.loc_lat,
+        }))
+      );
     }
 
-    if (showEvents){
-      combinedLocations.push(...militaryEvents.map(me =>({ lon: me.lon, lat: me.lat })));
+    if (showEvents) {
+      combinedLocations.push(
+        ...militaryEvents.map(event => ({
+          lon: event.lon,
+          lat: event.lat,
+        }))
+      );
     }
+  }
 
-    const { centerLon, centerLat, zoom } = computeBounds(combinedLocations, detailMode);
+  const validLocations = combinedLocations.filter(
+    location =>
+      Number.isFinite(location.lon) &&
+      Number.isFinite(location.lat)
+  );
 
-    setViewState((prev) => ({
-      ...prev,
-      longitude: centerLon,
-      latitude: centerLat,
-      zoom: zoom,
-      transitionInterpolator: new FlyToInterpolator({ speed: 2 }),
-      transitionDuration: 'auto',
-    }));
+  const { centerLon, centerLat, zoom } = computeBounds(
+    validLocations,
+    detailMode
+  );
 
-  }, [humans, humanLocations, militaryEvents, detailMode, showHumans, showEvents, manualMode]);
+  // Her hareket MOVEMENT_DURATION kadar sürer.
+  // Kamera geçişini bir hareketin süresinden kısa tut.
+  const movementTransitionDuration = Math.min(
+    450,
+    MOVEMENT_DURATION / 2
+  );
+
+  setViewState(previous => ({
+    ...previous,
+    longitude: centerLon,
+    latitude: centerLat,
+    zoom,
+    transitionInterpolator: new FlyToInterpolator({
+      speed: 2,
+    }),
+    transitionDuration: currentMove
+      ? movementTransitionDuration
+      : "auto",
+  }));
+}, [
+  currentMove,
+  currentYearMoves.length,
+  selectedHuman,
+  humans,
+  humanRelations,
+  humanLocations,
+  militaryEvents,
+  detailMode,
+  showHumans,
+  showEvents,
+  manualMode,
+]);
 
 
 const layers = useMemo(() => {
@@ -308,7 +406,7 @@ const layers = useMemo(() => {
 
   return layersArray;
 
-}, [selectedObject, showEvents, showHumans, showWorks, humanLocations,animationProgress, processedRelatedHumans, processedHumans, viewState.zoom, selectedLayerType,  militaryEvents]);
+}, [selectedObject, selectedYear, showEvents, showHumans, showWorks, humanLocations, animationProgress, processedRelatedHumans, processedHumans, viewState.zoom, selectedLayerType,  militaryEvents]);
 
   return (
   <div className="map-scene-root">
